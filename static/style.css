@@ -1,0 +1,386 @@
+/* RESET & FONTS */
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+body { background-color: #EBEBEB; }
+
+/* NAVBAR (Deep Blue) */
+.navbar {
+    background-color: rgba(21, 76, 121, 0.95); /* Slightly less transparent for readability */
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+
+    /* --- STICKY NAV CODE --- */
+    position: sticky;  /* 1. Tells it to stick */
+    top: 0;            /* 2. Sticks to the very top */
+    z-index: 1000;     /* 3. Ensures it stays ON TOP of everything else */
+}
+
+.logo { font-size: 18px; font-weight: 500; }
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    margin-left: 20px;
+    font-size: 14px;
+    opacity: 0.9;
+}
+.nav-links a:hover { opacity: 1; text-decoration: underline; }
+
+/* MAIN LAYOUT */
+.container {
+    display: flex;
+    justify-content: center;
+    padding-top: 50px;
+    padding-bottom: 50px;
+}
+
+/* WHITE CARD */
+.card {
+    background: white;
+    width: 900px;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    position: relative;
+}
+
+/* RED BACK BUTTON */
+.back-btn {
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    background-color: #d9534f; /* Red color */
+    color: white;
+    padding: 8px 16px;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+}
+.back-btn:hover { background-color: #c9302c; }
+
+/* HEADINGS */
+h2 { 
+    text-align: center; 
+    color: #333; 
+    margin-top: 10px;
+    margin-bottom: 30px; 
+    font-size: 28px;
+    font-weight: bold;
+}
+
+/* FORM LAYOUT */
+.card-content {
+    display: flex;
+    gap: 50px;
+}
+
+form {
+    flex: 1; /* Left side */
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.illustration {
+    flex: 1; /* Right side */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.illustration img { width: 100%; max-width: 350px; }
+
+/* INPUT FIELDS (Matching screenshot) */
+label {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: -10px; /* Pull label closer to input */
+    margin-left: 2px;
+}
+
+input {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f9f9f9; /* Light gray background */
+    font-size: 14px;
+    color: #333;
+}
+input:focus {
+    outline: none;
+    border-color: #1b4f8a;
+    background-color: white;
+}
+
+/* REGISTER BUTTON */
+.register-btn {
+    background-color: #007bff; /* Bright Blue */
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 10px;
+    width: 150px; /* Not full width */
+}
+.register-btn:hover { background-color: #0056b3; }
+
+/* --- ADD THIS TO THE BOTTOM OF YOUR CSS FILE --- */
+
+/* Home Page Background */
+body.home-page {
+    /* This loads the image from static/images/bg.jpg */
+    background-image: url('/static/images/ucbackground.jpg');
+    
+    /* Makes the image cover the entire screen */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed; /* Keeps image still when scrolling */
+    
+    /* Ensures it takes up full height */
+    height: 100vh;
+    margin: 0;
+}
+
+/* Update Navbar to be semi-transparent so it blends nicely */
+.navbar {
+    background-color: rgba(21, 76, 121, 0.9); /* CSS Blue with slight transparency */
+    /* ... keep your other navbar settings here ... */
+}
+
+/* --- LOGIN MODAL STYLES --- */
+
+/* The Dark Background Overlay */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1000; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4); /* Dim the background */
+    backdrop-filter: blur(5px); /* Blur the university background slightly */
+    justify-content: center;
+    align-items: center;
+}
+
+/* The Glass Card */
+.modal-content.glass-effect {
+    background: rgba(255, 255, 255, 0.65); /* Semi-transparent white */
+    backdrop-filter: blur(15px); /* Strong blur for the glass effect */
+    padding: 40px;
+    border-radius: 15px;
+    width: 400px;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    position: relative;
+    text-align: left;
+    color: #333;
+}
+
+/* Close Button (X) */
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #333;
+}
+
+/* Form Styles */
+.modal-content h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    color: #1b4f8a;
+}
+
+.input-group { margin-bottom: 15px; }
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+/* Input Fields with Icons */
+.input-with-icon { position: relative; }
+
+.input-with-icon input {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-bottom: 2px solid #333; /* Dark bottom border style */
+    background: transparent;
+    outline: none;
+}
+
+.input-with-icon i {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    color: #333;
+}
+
+/* Options (Remember Me / Forgot Password) */
+.options {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    margin-bottom: 20px;
+}
+.options a { color: #333; text-decoration: none; }
+
+/* Login Button */
+.login-btn-submit {
+    width: 100%;
+    padding: 12px;
+    background-color: #1a2e35; /* Dark color like screenshot */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+.login-btn-submit:hover { opacity: 0.9; }
+
+/* Register Link */
+.register-link {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 13px;
+}
+.register-link a { color: #1b4f8a; font-weight: bold; text-decoration: none; }
+
+/* --- REGISTER PAGE STYLES --- */
+
+/* 1. Main Page Container */
+body.register-page {
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Stops scrollbars from appearing */
+    position: relative; /* Necessary for the background layer */
+}
+
+/* 2. The Blurry Background Layer */
+body.register-page::before {
+    content: "";
+    position: absolute;
+    top: -20px; 
+    left: -20px; 
+    right: -20px; 
+    bottom: -20px; /* Extend edges so blur doesn't show white borders */
+    
+    background-image: url('/static/images/ucbackground.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    
+    /* THIS MAKES IT BLURRY */
+    filter: blur(8px); 
+    
+    z-index: -1; /* Puts it BEHIND the form */
+}
+
+/* 3. Center the Form */
+.register-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1; /* Ensures form stays on top */
+}
+
+/* 3. The Glass Card Design (WIDER VERSION) */
+.glass-card {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(15px);
+    padding: 40px;
+    
+    /* CHANGED: Increased width from 450px to 700px */
+    width: 700px; 
+    max-width: 90%; /* Ensures it fits on smaller mobile screens */
+    
+    border-radius: 15px;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    position: relative;
+    text-align: center;
+}
+
+/* 4. Form Inputs */
+.glass-card .input-group {
+    position: relative;
+    margin-bottom: 15px;
+}
+
+.glass-card input {
+    width: 100%;
+    padding: 12px 15px;
+    padding-right: 35px; /* Space for icon */
+    background: rgba(255, 255, 255, 0.5); /* Light transparent input */
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    color: #333;
+}
+
+.glass-card input::placeholder { color: #666; }
+
+.glass-card i {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #555;
+}
+
+
+/* 5. Two inputs in one row */
+.row {
+    display: flex;
+    gap: 10px; /* Increased gap for better spacing */
+}
+.row .input-group { 
+    flex: 1; /* This makes them split the 700px width evenly */
+}
+
+/* 6. Register Button */
+.register-btn-glass {
+    width: 100%;
+    padding: 12px;
+    background-color: #1b4f8a; /* CCS Blue */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background 0.3s;
+}
+.register-btn-glass:hover {
+    background-color: #154070;
+}
+
+/* 7. Links */
+.login-link {
+    margin-top: 15px;
+    font-size: 13px;
+    color: #333;
+}
+.login-link a {
+    color: #1b4f8a;
+    font-weight: bold;
+    text-decoration: none;
+}

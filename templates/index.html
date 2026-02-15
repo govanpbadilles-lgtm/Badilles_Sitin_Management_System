@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CCS | Home</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="home-page">
+
+    <nav class="navbar">
+        <div class="logo">College of Computer Studies Sit-in Monitoring System</div>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="#">Community</a>
+            <a href="#">About</a>
+            <a href="#" id="loginLink">Login</a>
+        </div>
+    </nav>
+
+    <div id="loginModal" class="modal">
+        <div class="modal-content glass-effect">
+            <span class="close-btn">&times;</span>
+            <h2>Login</h2>
+            
+            <form action="/login" method="POST">
+                <div class="input-group">
+                    <label>Email</label>
+                    <div class="input-with-icon">
+                        <input type="email" name="email" required>
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Password</label>
+                    <div class="input-with-icon">
+                        <input type="password" name="password" required>
+                        <i class="fas fa-lock"></i>
+                    </div>
+                </div>
+
+                <button type="submit" class="login-btn-submit">Login</button>
+                
+                <p class="register-link">Don't have an account? <a href="/register">Register</a></p>
+            </form>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
