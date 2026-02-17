@@ -1,32 +1,44 @@
+/* =======================================================
+   MAIN INITIALIZATION
+   We use 'DOMContentLoaded' to ensure the HTML is fully 
+   loaded before we try to attach any JavaScript to it.
+   ======================================================= */
 document.addEventListener('DOMContentLoaded', function() {
     
     // =======================================================
     // PART 1: HOME PAGE LOGIC (Login Modal)
     // =======================================================
     
-    // We try to find the modal first. If it exists, we know we are on the Home Page.
+    /* We attempt to find the 'loginModal'. 
+       If this variable is null, it means we are NOT on the Home Page, 
+       so we skip all the code inside the 'if' block to prevent errors.
+    */
     const loginModal = document.getElementById("loginModal");
 
     if (loginModal) {
-        const loginBtn = document.getElementById("loginLink");
-        const closeBtn = document.querySelector(".close-btn");
+        // --- 1. Setup Variables ---
+        const loginBtn = document.getElementById("loginLink"); // The "Login" link in Navbar
+        const closeBtn = document.querySelector(".close-btn"); // The "X" inside the modal
 
-        // 1. OPEN MODAL: When "Login" is clicked
+        // --- 2. Open Modal Logic ---
+        // Checks if the login button actually exists before adding listener
         if (loginBtn) {
             loginBtn.addEventListener('click', function(event) {
-                event.preventDefault(); // Stop the link from jumping
-                loginModal.style.display = "flex"; // Show and center it
+                event.preventDefault();       // STOP the link from jumping to top of page
+                loginModal.style.display = "flex"; // Show the modal (Flex centers it)
             });
         }
 
-        // 2. CLOSE MODAL: When "X" is clicked
+        // --- 3. Close Modal Logic (Clicking X) ---
         if (closeBtn) {
             closeBtn.addEventListener('click', function() {
-                loginModal.style.display = "none"; // Hide it
+                loginModal.style.display = "none"; // Hide the modal
             });
         }
 
-        // 3. CLOSE MODAL: When clicking outside the glass card
+        // --- 4. Close Modal Logic (Clicking Outside) ---
+        // If user clicks the dark background (the modal wrapper), close it.
+        // If they click the "Glass Card" inside, do nothing (let them type).
         window.addEventListener('click', function(event) {
             if (event.target === loginModal) {
                 loginModal.style.display = "none";
@@ -39,20 +51,28 @@ document.addEventListener('DOMContentLoaded', function() {
     // PART 2: REGISTER PAGE LOGIC (Form Validation)
     // =======================================================
 
-    // We try to find the form. If it exists, we know we are on the Register Page.
+    /* We attempt to find the 'regForm'. 
+       If this exists, we know we are on the Register Page.
+    */
     const regForm = document.getElementById('regForm');
 
     if (regForm) {
+        
+        // Listen for the "Submit" event (when user clicks Register button)
         regForm.addEventListener('submit', function(event) {
-            // Get the values inside the event listener to get the LATEST typing
+            
+            // --- 1. Get Password Values ---
+            // We get values *inside* the function to ensure we get what the user JUST typed.
             const pass1 = document.getElementById('password').value;
             const pass2 = document.getElementById('confirm_password').value;
 
-            // Check if they match
+            // --- 2. Compare Passwords ---
             if (pass1 !== pass2) {
-                event.preventDefault(); // Stop the form from sending data
-                alert("Passwords do not match! Please try again.");
+                // If they don't match:
+                event.preventDefault(); // STOP the form from sending data to server
+                alert("Passwords do not match! Please try again."); // Show error
             }
+            // If they match, the form continues to Flask automatically.
         });
     }
 

@@ -1,11 +1,38 @@
-/* RESET & FONTS */
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+/* =========================================
+   1. RESET & GLOBAL STYLES
+   ========================================= */
+* { 
+    box-sizing: border-box; 
+    margin: 0; 
+    padding: 0; 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+}
 
-body { background-color: #EBEBEB; }
+body { 
+    background-color: #EBEBEB; /* Default fallback color */
+}
 
-/* NAVBAR (Deep Blue) */
+/* Headings */
+h2 { 
+    text-align: center; 
+    color: #333; 
+    margin-top: 10px; 
+    margin-bottom: 30px; 
+    font-size: 28px; 
+    font-weight: bold;
+}
+
+/* Links */
+a { 
+    text-decoration: none; 
+    transition: opacity 0.3s;
+}
+
+/* =========================================
+   2. NAVIGATION BAR
+   ========================================= */
 .navbar {
-    background-color: rgba(21, 76, 121, 0.95); /* Slightly less transparent for readability */
+    background-color: rgba(21, 76, 121, 0.95); /* Deep Blue with slight transparency */
     padding: 15px 30px;
     display: flex;
     justify-content: space-between;
@@ -13,39 +40,54 @@ body { background-color: #EBEBEB; }
     color: white;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 
-    /* --- STICKY NAV CODE --- */
-    position: sticky;  /*  Tells it to stick */
-    top: 0;            /*  Sticks to the very top */
-    z-index: 1000;     /*  Ensures it stays ON TOP of everything else */
+    /* --- STICKY NAV LOGIC --- */
+    position: sticky;  /* Sticks element when scrolling */
+    top: 0;            /* Sticks to the very top of viewport */
+    z-index: 1000;     /* Ensures it floats ABOVE everything else */
 }
 
+/* Logo Section */
 .logo { 
     font-size: 18px; 
     font-weight: 500;
-    
-    /* ALIGNMENT SETTINGS */
     display: flex;         /* Puts text and image side-by-side */
     align-items: center;   /* Centers them vertically */
-    gap: 15px;             /* Adds space between the text and the logo */
+    gap: 15px;             /* Space between text and logo image */
 }
 
-/* LOGO IMAGE SIZE */
 .logo img {
-    height: 50px;          /* Adjust height to fit nicely in the bar */
-    width: auto; 
-             /* Keeps the shape correct */
+    height: 50px;          /* Fixed height for consistency */
+    width: auto;           /* Maintains aspect ratio */
 }
 
+/* Navigation Links */
 .nav-links a {
     color: white;
-    text-decoration: none;
     margin-left: 20px;
     font-size: 14px;
     opacity: 0.9;
 }
-.nav-links a:hover { opacity: 1; text-decoration: underline; }
+.nav-links a:hover { 
+    opacity: 1; 
+    text-decoration: underline; 
+}
 
-/* MAIN LAYOUT */
+/* =========================================
+   3. HOME PAGE STYLES
+   ========================================= */
+
+/* Background Image Setup */
+body.home-page {
+    background-image: url('/static/images/ucbackground.jpg');
+    background-size: cover;          /* Covers entire screen */
+    background-position: center;     /* Centers the image */
+    background-repeat: no-repeat;
+    background-attachment: fixed;    /* Parallax effect: image stays still when scrolling */
+    height: 100vh;                   /* Full Viewport Height */
+    margin: 0;
+}
+
+/* --- HERO SECTION (Welcome Text + Floating Logo) --- */
 .container {
     display: flex;
     justify-content: center;
@@ -53,370 +95,20 @@ body { background-color: #EBEBEB; }
     padding-bottom: 50px;
 }
 
-/* WHITE CARD */
-.card {
-    background: white;
-    width: 900px;
-    padding: 40px;
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    position: relative;
-}
-
-/* RED BACK BUTTON */
-.back-btn {
-    position: absolute;
-    top: 30px;
-    left: 30px;
-    background-color: #d9534f; /* Red color */
-    color: white;
-    padding: 8px 16px;
-    text-decoration: none;
-    border-radius: 4px;
-    font-size: 12px;
-    font-weight: bold;
-}
-.back-btn:hover { background-color: #c9302c; }
-
-/* HEADINGS */
-h2 { 
-    text-align: center; 
-    color: #333; 
-    margin-top: 10px;
-    margin-bottom: 30px; 
-    font-size: 28px;
-    font-weight: bold;
-}
-
-/* FORM LAYOUT */
-.card-content {
-    display: flex;
-    gap: 50px;
-}
-
-form {
-    flex: 1; /* Left side */
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.illustration {
-    flex: 1; /* Right side */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.illustration img { width: 100%; max-width: 350px; }
-
-/* INPUT FIELDS (Matching screenshot) */
-label {
-    font-size: 12px;
-    color: #666;
-    margin-bottom: -10px; /* Pull label closer to input */
-    margin-left: 2px;
-}
-
-input {
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background-color: #f9f9f9; /* Light gray background */
-    font-size: 14px;
-    color: #333;
-}
-input:focus {
-    outline: none;
-    border-color: #1b4f8a;
-    background-color: white;
-}
-
-/* REGISTER BUTTON */
-.register-btn {
-    background-color: #007bff; /* Bright Blue */
-    color: white;
-    padding: 12px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: bold;
-    margin-top: 10px;
-    width: 150px; /* Not full width */
-}
-.register-btn:hover { background-color: #0056b3; }
-
-/* --- ADD THIS TO THE BOTTOM OF YOUR CSS FILE --- */
-
-/* Home Page Background */
-body.home-page {
-    /* This loads the image from static/images/bg.jpg */
-    background-image: url('/static/images/ucbackground.jpg');
-    
-    /* Makes the image cover the entire screen */
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed; /* Keeps image still when scrolling */
-    
-    /* Ensures it takes up full height */
-    height: 100vh;
-    margin: 0;
-}
-
-/* Update Navbar to be semi-transparent so it blends nicely */
-.navbar {
-    background-color: rgba(21, 76, 121, 0.9); /* CSS Blue with slight transparency */
-    /* ... keep your other navbar settings here ... */
-}
-
-/* --- LOGIN MODAL STYLES --- */
-
-/* The Dark Background Overlay */
-.modal {
-    display: none; /* Hidden by default */
-    position: fixed;
-    z-index: 1000; /* Sit on top */
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.4); /* Dim the background */
-    backdrop-filter: blur(5px); /* Blur the university background slightly */
-    justify-content: center;
-    align-items: center;
-}
-
-/* The Glass Card */
-.modal-content.glass-effect {
-    background: rgba(255, 255, 255, 0.65); /* Semi-transparent white */
-    backdrop-filter: blur(15px); /* Strong blur for the glass effect */
-    padding: 40px;
-    border-radius: 15px;
-    width: 400px;
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    position: relative;
-    text-align: left;
-    color: #333;
-}
-
-/* Close Button (X) */
-.close-btn {
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    font-size: 24px;
-    cursor: pointer;
-    color: #333;
-}
-
-/* Form Styles */
-.modal-content h2 {
-    text-align: center;
-    margin-bottom: 25px;
-    color: #1b4f8a;
-}
-
-.input-group { margin-bottom: 15px; }
-
-.input-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 500;
-}
-
-/* Input Fields with Icons */
-.input-with-icon { position: relative; }
-
-.input-with-icon input {
-    width: 100%;
-    padding: 10px;
-    border: none;
-    border-bottom: 2px solid #333; /* Dark bottom border style */
-    background: transparent;
-    outline: none;
-}
-
-.input-with-icon i {
-    position: absolute;
-    right: 10px;
-    top: 10px;
-    color: #333;
-}
-
-/* Options (Remember Me / Forgot Password) */
-.options {
-    display: flex;
-    justify-content: space-between;
-    font-size: 13px;
-    margin-bottom: 20px;
-}
-.options a { color: #333; text-decoration: none; }
-
-/* Login Button */
-.login-btn-submit {
-    width: 100%;
-    padding: 12px;
-    background-color: #1a2e35; /* Dark color like screenshot */
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-}
-.login-btn-submit:hover { opacity: 0.9; }
-
-/* Register Link */
-.register-link {
-    text-align: center;
-    margin-top: 15px;
-    font-size: 13px;
-}
-.register-link a { color: #1b4f8a; font-weight: bold; text-decoration: none; }
-
-/* --- REGISTER PAGE STYLES --- */
-
-/* 1. Main Page Container */
-body.register-page {
-    height: 100vh;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden; /* Stops scrollbars from appearing */
-    position: relative; /* Necessary for the background layer */
-}
-
-/* 2. The Blurry Background Layer */
-body.register-page::before {
-    content: "";
-    position: absolute;
-    top: -20px; 
-    left: -20px; 
-    right: -20px; 
-    bottom: -20px; /* Extend edges so blur doesn't show white borders */
-    
-    background-image: url('/static/images/ucbackground.jpg');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    
-    /* THIS MAKES IT BLURRY */
-    filter: blur(8px); 
-    
-    z-index: -1; /* Puts it BEHIND the form */
-}
-
-/* 3. Center the Form */
-.register-container {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1; /* Ensures form stays on top */
-}
-
-/* 3. The Glass Card Design (WIDER VERSION) */
-.glass-card {
-    background: rgba(255, 255, 255, 0.75);
-    backdrop-filter: blur(15px);
-    padding: 40px;
-    
-    /* CHANGED: Increased width from 450px to 700px */
-    width: 700px; 
-    max-width: 90%; /* Ensures it fits on smaller mobile screens */
-    
-    border-radius: 15px;
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    position: relative;
-    text-align: center;
-}
-
-/* 4. Form Inputs */
-.glass-card .input-group {
-    position: relative;
-    margin-bottom: 15px;
-}
-
-.glass-card input {
-    width: 100%;
-    padding: 12px 15px;
-    padding-right: 35px; /* Space for icon */
-    background: rgba(255, 255, 255, 0.5); /* Light transparent input */
-    border: none;
-    border-radius: 8px;
-    font-size: 14px;
-    outline: none;
-    color: #333;
-}
-
-.glass-card input::placeholder { color: #666; }
-
-.glass-card i {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #555;
-}
-
-
-/* 5. Two inputs in one row */
-.row {
-    display: flex;
-    gap: 10px; /* Increased gap for better spacing */
-}
-.row .input-group { 
-    flex: 1; /* This makes them split the 700px width evenly */
-}
-
-/* 6. Register Button */
-.register-btn-glass {
-    width: 100%;
-    padding: 12px;
-    background-color: #1b4f8a; /* CCS Blue */
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    margin-top: 10px;
-    transition: background 0.3s;
-}
-.register-btn-glass:hover {
-    background-color: #154070;
-}
-
-/* 7. Links */
-.login-link {
-    margin-top: 15px;
-    font-size: 13px;
-    color: #333;
-}
-.login-link a {
-    color: #1b4f8a;
-    font-weight: bold;
-    text-decoration: none;
-}
-
-/* --- HERO SECTION (Home Page) --- */
-
-/* 1. Layout: Puts text left, logo right */
 .hero-content {
     display: flex;
-    justify-content: space-between; /* Push apart */
-    align-items: center; /* Vertically center */
+    justify-content: space-between; /* Pushes Text left, Logo right */
+    align-items: center;            /* Centers vertically */
     width: 85%;
     max-width: 1200px;
-    margin-top: 50px; /* Push down from navbar */
+    margin-top: 50px;
 }
 
-/* 2. Text Styling */
+/* Left Side: Text */
 .hero-text {
-    flex: 1; /* Takes up half space */
+    flex: 1; /* Takes up 50% width */
     color: white;
-    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7); /* Dark shadow to read on photo */
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7); /* Shadow makes text readable on photo */
 }
 
 .hero-text h1 {
@@ -432,14 +124,14 @@ body.register-page::before {
     opacity: 0.9;
 }
 
-/* 3. The "Get Started" Button */
+/* "Get Started" Button */
 .hero-btn {
     padding: 12px 30px;
     font-size: 16px;
-    background: linear-gradient(45deg, #1b4f8a, #007bff);
+    background: linear-gradient(45deg, #1b4f8a, #007bff); /* Blue Gradient */
     color: white;
     border: none;
-    border-radius: 25px;
+    border-radius: 25px;            /* Rounded pill shape */
     cursor: pointer;
     font-weight: bold;
     box-shadow: 0 4px 15px rgba(0,0,0,0.3);
@@ -447,30 +139,307 @@ body.register-page::before {
 }
 
 .hero-btn:hover {
-    transform: translateY(-3px); /* Moves up slightly */
+    transform: translateY(-3px);    /* Lifts button up slightly */
     box-shadow: 0 6px 20px rgba(0,0,0,0.4);
 }
 
-/* 4. The Logo Image (Right Side) */
+/* Right Side: Hero Image */
 .hero-image {
-    flex: 1; /* Takes up half space */
+    flex: 1; /* Takes up 50% width */
     display: flex;
-    justify-content: flex-end; /* Pushes image to the right */
+    justify-content: flex-end; /* Aligns image to the right */
 }
 
 .hero-image img {
     width: 100%;
-    max-width: 450px; /* Adjust size of logo */
+    max-width: 450px;
     height: auto;
     
-    /* THE FLOATING ANIMATION */
-    animation: float 4s ease-in-out infinite;
-    filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3)); /* Shadow behind logo */
+    /* Animation definition */
+    animation: float 4s ease-in-out infinite; 
+    filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));
 }
 
-/* 5. Keyframes for Floating Effect */
+/* =========================================
+   4. LOGIN MODAL (Popup)
+   ========================================= */
+
+/* The Dark Overlay Background */
+.modal {
+    display: none;        /* Hidden by default (JS turns this to flex) */
+    position: fixed;      /* Stays in place when scrolling */
+    z-index: 1000;        /* Highest priority layer */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4); /* Dimmed background */
+    backdrop-filter: blur(5px);           /* Background blur effect */
+    justify-content: center;
+    align-items: center;
+}
+
+/* The Glass Card inside Modal */
+.modal-content.glass-effect {
+    background: rgba(255, 255, 255, 0.65); /* Semi-transparent white */
+    backdrop-filter: blur(15px);           /* Strong blur ("Frosted Glass") */
+    padding: 40px;
+    border-radius: 15px;
+    width: 400px;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    position: relative;
+    text-align: left;
+    color: #333;
+}
+
+/* Close 'X' Button */
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #333;
+}
+
+/* Form Styles */
+.modal-content h2 {
+    color: #1b4f8a;
+    margin-bottom: 25px;
+}
+
+/* Input Fields Logic */
+.input-group { margin-bottom: 15px; }
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    font-size: 12px;
+    color: #666;
+}
+
+.input-with-icon { position: relative; }
+
+.input-with-icon input {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-bottom: 2px solid #333; /* Underline style */
+    background: transparent;
+    outline: none;
+}
+
+.input-with-icon i {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    color: #333;
+}
+
+/* Footer Options */
+.options {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    margin-bottom: 20px;
+}
+.options a { color: #333; }
+
+.login-btn-submit {
+    width: 100%;
+    padding: 12px;
+    background-color: #1a2e35; /* Dark Teal/Black */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+.login-btn-submit:hover { opacity: 0.9; }
+
+.register-link {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 13px;
+}
+.register-link a { color: #1b4f8a; font-weight: bold; }
+
+
+/* =========================================
+   5. REGISTER PAGE STYLES
+   ========================================= */
+
+/* Main Page Layout */
+body.register-page {
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;   /* Prevents scrollbars */
+    position: relative; /* Needed for ::before pseudo-element */
+}
+
+/* The Blurry Background Layer */
+/* Note: We use a pseudo-element (::before) to blur the BG 
+   without blurring the form text on top of it. */
+body.register-page::before {
+    content: "";
+    position: absolute;
+    top: -20px; left: -20px; right: -20px; bottom: -20px;
+    background-image: url('/static/images/ucbackground.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: blur(8px);  /* The blur magic */
+    z-index: -1;        /* Sends it behind the content */
+}
+
+.register-container {
+    flex: 1; /* Takes remaining height */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+}
+
+/* Wider Glass Card for Registration */
+.glass-card {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(15px);
+    padding: 40px;
+    
+    /* Size Settings */
+    width: 700px; 
+    max-width: 90%;
+    
+    border-radius: 15px;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    position: relative;
+    text-align: center;
+}
+
+/* Register Inputs */
+.glass-card input {
+    width: 100%;
+    padding: 12px 15px;
+    padding-right: 35px;
+    background: rgba(255, 255, 255, 0.5); /* Light semi-transparent box */
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    color: #333;
+}
+.glass-card input::placeholder { color: #666; }
+
+/* Input Icons */
+.glass-card i {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%); /* Centers icon vertically */
+    color: #555;
+}
+
+/* Row Layout (Side-by-Side inputs) */
+.row {
+    display: flex;
+    gap: 10px;
+}
+.row .input-group { 
+    flex: 1; /* Forces elements to share width equally */
+}
+
+/* Register Button */
+.register-btn-glass {
+    width: 100%;
+    padding: 12px;
+    background-color: #1b4f8a;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background 0.3s;
+}
+.register-btn-glass:hover {
+    background-color: #154070;
+}
+
+/* =========================================
+   6. ANIMATIONS
+   ========================================= */
+
+/* Floating Animation for Hero Logo */
 @keyframes float {
     0% { transform: translateY(0px); }
-    50% { transform: translateY(-20px); } /* Moves up */
-    100% { transform: translateY(0px); } /* Moves down */
+    50% { transform: translateY(-20px); } /* Moves UP */
+    100% { transform: translateY(0px); }  /* Moves DOWN */
+}
+
+/* =========================================
+   7. RESPONSIVE DESIGN (Mobile & Tablet)
+   ========================================= */
+
+@media (max-width: 900px) {
+    
+    /* 1. Stack the Hero Section Vertically */
+    .hero-content {
+        flex-direction: column-reverse; /* Puts image on top, text on bottom */
+        text-align: center;             /* Centers the text */
+        margin-top: 20px;
+        width: 90%;
+    }
+
+    /* 2. Make Sections Full Width */
+    .hero-text, .hero-image {
+        width: 100%;
+        flex: none; /* Stop trying to split 50/50 */
+    }
+
+    /* 3. Shrink the Big Welcome Text */
+    .hero-text h1 {
+        font-size: 32px; /* Smaller than 50px */
+        margin-top: 20px;
+    }
+
+    .hero-text p {
+        font-size: 16px;
+    }
+
+    /* 4. Shrink and Center the Floating Logo */
+    .hero-image {
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+    
+    .hero-image img {
+        max-width: 250px; /* Smaller logo for small screens */
+    }
+
+    /* 5. Adjust Navbar for Small Screens */
+    .navbar {
+        padding: 10px 15px; /* Less padding */
+        flex-direction: column; /* Stack logo and links */
+        gap: 10px;
+    }
+
+    .nav-links {
+        margin-top: 10px;
+    }
+
+    .nav-links a {
+        margin: 0 10px; /* Adjust spacing between links */
+        font-size: 13px;
+    }
+    
+    /* 6. Adjust Login Modal width for mobile */
+    .modal-content.glass-effect {
+        width: 90%; /* Fit screen width */
+    }
 }

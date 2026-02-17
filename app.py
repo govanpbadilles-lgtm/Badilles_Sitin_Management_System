@@ -1,19 +1,27 @@
 import sqlite3
 from flask import Flask, render_template, request, redirect, url_for, session
 
+# =======================================================
+# 1. APP CONFIGURATION
+# =======================================================
 app = Flask(__name__)
 
-# --- CONFIGURATION ---
+# Secret key is required for 'session' (logging in) to work securely.
 app.secret_key = 'super_secret_key_ccs_sit_in' 
 
-# --- DATABASE CONNECTION ---
+
+# =======================================================
+# 2. DATABASE MANAGEMENT
+# =======================================================
+
 def get_db_connection():
+    """Opens a connection to the SQLite database file."""
     conn = sqlite3.connect('students.db')
-    conn.row_factory = sqlite3.Row
+    conn.row_factory = sqlite3.Row # Allows accessing columns by name (e.g., row['email'])
     return conn
 
-# --- INITIALIZE DATABASE ---
 def init_db():
+    """Creates the 'users' table if it doesn't exist yet."""
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute('''
@@ -33,27 +41,40 @@ def init_db():
     conn.commit()
     conn.close()
 
-# Initialize the table when the app starts
+# Initialize the database immediately when the app launches
 init_db()
 
-# --- ROUTES ---
+
+# =======================================================
+# 3. ROUTE HANDLERS
+# =======================================================
 
 @app.route('/')
 def home():
-    # If user is logged in, skip the login page and go to dashboard
+    """
+    The Home Page.
+    - If user is logged in: Redirect straight to Dashboard.
+    - If not logged in: Show the Landing Page (with Login Modal).
+    """
     if 'user_id' in session:
         return redirect(url_for('dashboard'))
         
     return render_template('index.html')
 
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    """
+    The Registration Page.
+    - GET: Shows the registration form.
+    - POST: Receives form data and saves it to the database.
+    """
     if request.method == 'POST':
-        # 1. Get data from form
+        # 1. Get data from form inputs
         id_number = request.form['id_number']
         lastname = request.form['lastname']
         firstname = request.form['firstname']
-        middlename = request.form.get('middlename', '') 
+        middlename = request.form.get('middlename', '') # Optional field
         course_level = request.form['course_level']
         password = request.form['password']
         email = request.form['email']
@@ -63,38 +84,46 @@ def register():
         # 2. Save to Database
         conn = get_db_connection()
         cursor = conn.cursor()
+        
         try:
             cursor.execute('''
                 INSERT INTO users (id_number, lastname, firstname, middlename, course_level, password, email, course, address)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''', (id_number, lastname, firstname, middlename, course_level, password, email, course, address))
+            
             conn.commit()
             conn.close()
-            # Success! Return to Home Page to Login
+            
+            # 3. Success! Redirect to Home so they can Login.
             return redirect(url_for('home')) 
             
         except sqlite3.IntegrityError:
-            return "Error: This ID Number is already registered."
+            # This happens if the ID Number already exists in the DB
+            return "Error: This ID Number is already registered. <a href='/register'>Try Again</a>"
 
-    # If GET request, show the form
+    # If GET request, just show the HTML form
     return render_template('register.html')
+
 
 @app.route('/login', methods=['POST'])
 def login():
+    """
+    Handles the Login Logic (triggered by the Modal).
+    """
     email = request.form['email']
     password = request.form['password']
 
     conn = get_db_connection()
     cursor = conn.cursor()
     
-    # Check if a user with this email exists
+    # 1. Find user by email
     user = cursor.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
     conn.close()
 
     if user:
-        # Check if the password matches
+        # 2. Check if password matches
         if user['password'] == password:
-            # Login successful! Save user to session
+            # 3. Login Successful -> Save User Info in Session
             session['user_id'] = user['id']
             session['firstname'] = user['firstname']
             return redirect(url_for('dashboard'))
@@ -103,18 +132,30 @@ def login():
     else:
         return "Email not found! <a href='/'>Try Again</a>"
 
+
 @app.route('/dashboard')
 def dashboard():
-    # Protect this page!
+    """
+    The Protected Page.
+    - Only visible if you are logged in.
+    """
     if 'user_id' not in session:
         return redirect(url_for('home'))
     
     return f"<h1>Welcome, {session['firstname']}!</h1><p>You are now logged in.</p><a href='/logout'>Logout</a>"
 
+
 @app.route('/logout')
 def logout():
+    """
+    Logs the user out by clearing the session.
+    """
     session.clear()
     return redirect(url_for('home'))
 
+
+# =======================================================
+# 4. RUN THE APP
+# =======================================================
 if __name__ == '__main__':
     app.run(debug=True)
