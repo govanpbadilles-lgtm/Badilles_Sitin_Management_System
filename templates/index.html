@@ -9,7 +9,10 @@
 <body class="home-page">
 
     <nav class="navbar">
-        <div class="logo">College of Computer Studies Sit-in Monitoring System</div>
+        <div class="logo">
+            <img src="{{ url_for('static', filename='images/uclogonav.png') }}" alt="UC Logo">
+            College of Computer Studies Sit-in Monitoring System
+        </div>
         <div class="nav-links">
             <a href="/">Home</a>
             <a href="#">Community</a>
@@ -17,6 +20,22 @@
             <a href="#" id="loginLink">Login</a>
         </div>
     </nav>
+
+    <div class="container">
+        <div class="hero-content">
+            
+            <div class="hero-text">
+                <h1>Welcome to<br>CCS Sit-in System</h1>
+                <p>Efficiently monitor and manage student laboratory sessions.</p>
+                <button class="hero-btn" onclick="document.getElementById('loginModal').style.display='flex'">Get Started</button>
+            </div>
+
+            <div class="hero-image">
+                <img src="{{ url_for('static', filename='images/ucmainccslogo.png') }}" alt="CCS Logo">
+            </div>
+            
+        </div>
+    </div>
 
     <div id="loginModal" class="modal">
         <div class="modal-content glass-effect">
@@ -38,6 +57,11 @@
                         <input type="password" name="password" required>
                         <i class="fas fa-lock"></i>
                     </div>
+                </div>
+
+                <div class="options">
+                    <label><input type="checkbox"> Remember me</label>
+                    <a href="#">Forgot Password?</a>
                 </div>
 
                 <button type="submit" class="login-btn-submit">Login</button>

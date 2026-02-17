@@ -14,12 +14,27 @@ body { background-color: #EBEBEB; }
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 
     /* --- STICKY NAV CODE --- */
-    position: sticky;  /* 1. Tells it to stick */
-    top: 0;            /* 2. Sticks to the very top */
-    z-index: 1000;     /* 3. Ensures it stays ON TOP of everything else */
+    position: sticky;  /*  Tells it to stick */
+    top: 0;            /*  Sticks to the very top */
+    z-index: 1000;     /*  Ensures it stays ON TOP of everything else */
 }
 
-.logo { font-size: 18px; font-weight: 500; }
+.logo { 
+    font-size: 18px; 
+    font-weight: 500;
+    
+    /* ALIGNMENT SETTINGS */
+    display: flex;         /* Puts text and image side-by-side */
+    align-items: center;   /* Centers them vertically */
+    gap: 15px;             /* Adds space between the text and the logo */
+}
+
+/* LOGO IMAGE SIZE */
+.logo img {
+    height: 50px;          /* Adjust height to fit nicely in the bar */
+    width: auto; 
+             /* Keeps the shape correct */
+}
 
 .nav-links a {
     color: white;
@@ -383,4 +398,79 @@ body.register-page::before {
     color: #1b4f8a;
     font-weight: bold;
     text-decoration: none;
+}
+
+/* --- HERO SECTION (Home Page) --- */
+
+/* 1. Layout: Puts text left, logo right */
+.hero-content {
+    display: flex;
+    justify-content: space-between; /* Push apart */
+    align-items: center; /* Vertically center */
+    width: 85%;
+    max-width: 1200px;
+    margin-top: 50px; /* Push down from navbar */
+}
+
+/* 2. Text Styling */
+.hero-text {
+    flex: 1; /* Takes up half space */
+    color: white;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7); /* Dark shadow to read on photo */
+}
+
+.hero-text h1 {
+    font-size: 50px;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 20px;
+}
+
+.hero-text p {
+    font-size: 18px;
+    margin-bottom: 30px;
+    opacity: 0.9;
+}
+
+/* 3. The "Get Started" Button */
+.hero-btn {
+    padding: 12px 30px;
+    font-size: 16px;
+    background: linear-gradient(45deg, #1b4f8a, #007bff);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: bold;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.hero-btn:hover {
+    transform: translateY(-3px); /* Moves up slightly */
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+}
+
+/* 4. The Logo Image (Right Side) */
+.hero-image {
+    flex: 1; /* Takes up half space */
+    display: flex;
+    justify-content: flex-end; /* Pushes image to the right */
+}
+
+.hero-image img {
+    width: 100%;
+    max-width: 450px; /* Adjust size of logo */
+    height: auto;
+    
+    /* THE FLOATING ANIMATION */
+    animation: float 4s ease-in-out infinite;
+    filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3)); /* Shadow behind logo */
+}
+
+/* 5. Keyframes for Floating Effect */
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); } /* Moves up */
+    100% { transform: translateY(0px); } /* Moves down */
 }
