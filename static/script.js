@@ -1,79 +1,103 @@
-/* =======================================================
-   MAIN INITIALIZATION
-   We use 'DOMContentLoaded' to ensure the HTML is fully 
-   loaded before we try to attach any JavaScript to it.
-   ======================================================= */
 document.addEventListener('DOMContentLoaded', function() {
     
-    // =======================================================
-    // PART 1: HOME PAGE LOGIC (Login Modal)
-    // =======================================================
-    
-    /* We attempt to find the 'loginModal'. 
-       If this variable is null, it means we are NOT on the Home Page, 
-       so we skip all the code inside the 'if' block to prevent errors.
-    */
     const loginModal = document.getElementById("loginModal");
 
     if (loginModal) {
-        // --- 1. Setup Variables ---
-        const loginBtn = document.getElementById("loginLink"); // The "Login" link in Navbar
-        const closeBtn = document.querySelector(".close-btn"); // The "X" inside the modal
+        const loginBtn = document.getElementById("loginLink");
+        const closeBtn = document.querySelector(".close-btn"); 
 
-        // --- 2. Open Modal Logic ---
-        // Checks if the login button actually exists before adding listener
         if (loginBtn) {
             loginBtn.addEventListener('click', function(event) {
-                event.preventDefault();       // STOP the link from jumping to top of page
-                loginModal.style.display = "flex"; // Show the modal (Flex centers it)
+                event.preventDefault();       
+                loginModal.style.display = "flex"; 
             });
         }
 
-        // --- 3. Close Modal Logic (Clicking X) ---
         if (closeBtn) {
             closeBtn.addEventListener('click', function() {
-                loginModal.style.display = "none"; // Hide the modal
+                loginModal.style.display = "none"; 
             });
         }
 
-        // --- 4. Close Modal Logic (Clicking Outside) ---
-        // If user clicks the dark background (the modal wrapper), close it.
-        // If they click the "Glass Card" inside, do nothing (let them type).
         window.addEventListener('click', function(event) {
             if (event.target === loginModal) {
                 loginModal.style.display = "none";
             }
         });
+
+        // --- AUTO-OPEN MODAL & SHOW TOASTS ---
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        // 1. If coming from the normal "Login" link on register page
+        if (urlParams.get('openLogin') === 'true') {
+            loginModal.style.display = "flex";
+        }
+        
+        // 2. If coming from a SUCCESSFUL registration
+        if (urlParams.get('registered') === 'true') {
+            // Wait just a tiny bit (100ms) for the page to render, then show toast
+            setTimeout(() => {
+                showToast('success', 'Registration successful');
+            }, 100);
+            
+            // Open the login modal automatically
+            loginModal.style.display = "flex";
+            
+            // Clean up the URL so the toast doesn't pop up again if they refresh the page
+            window.history.replaceState({}, document.title, "/"); 
+        }
     }
 
-
-    // =======================================================
-    // PART 2: REGISTER PAGE LOGIC (Form Validation)
-    // =======================================================
-
-    /* We attempt to find the 'regForm'. 
-       If this exists, we know we are on the Register Page.
-    */
     const regForm = document.getElementById('regForm');
 
     if (regForm) {
         
-        // Listen for the "Submit" event (when user clicks Register button)
         regForm.addEventListener('submit', function(event) {
             
-            // --- 1. Get Password Values ---
-            // We get values *inside* the function to ensure we get what the user JUST typed.
             const pass1 = document.getElementById('password').value;
             const pass2 = document.getElementById('confirm_password').value;
-
-            // --- 2. Compare Passwords ---
+            
             if (pass1 !== pass2) {
-                // If they don't match:
-                event.preventDefault(); // STOP the form from sending data to server
-                alert("Passwords do not match! Please try again."); // Show error
+                event.preventDefault(); 
+                alert("Passwords do not match! Please try again."); 
             }
-            // If they match, the form continues to Flask automatically.
         });
     }
 
 });
+
+// =======================================================
+// TOAST NOTIFICATION LOGIC
+// =======================================================
+
+function showToast(type, message) {
+    let toastBox = document.getElementById('toastBox');
+    
+    // Safety check just in case the HTML div is missing
+    if (!toastBox) return; 
+
+    let toast = document.createElement('div');
+    
+    // Add the base class and the type class (success or error)
+    toast.classList.add('toast');
+    toast.classList.add(type);
+
+    // Set the icon based on the type
+    let icon = '';
+    if (type === 'success') {
+        icon = '<i class="fas fa-check-circle"></i>';
+    } else if (type === 'error') {
+        icon = '<i class="fas fa-times-circle"></i>';
+    }
+
+    // Insert the icon and message into the div
+    toast.innerHTML = icon + message;
+    
+    // Add the toast to the screen
+    toastBox.appendChild(toast);
+
+    // Remove the toast automatically after 3.5 seconds
+    setTimeout(() => {
+        toast.remove();
+    }, 3500);
+}

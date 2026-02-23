@@ -1,23 +1,16 @@
 import sqlite3
 from flask import Flask, render_template, request, redirect, url_for, session
 
-# =======================================================
-# 1. APP CONFIGURATION
-# =======================================================
 app = Flask(__name__)
 
 # Secret key is required for 'session' (logging in) to work securely.
 app.secret_key = 'super_secret_key_ccs_sit_in' 
 
-
-# =======================================================
-# 2. DATABASE MANAGEMENT
-# =======================================================
-
+# DATABASE MANAGEMENT
 def get_db_connection():
     """Opens a connection to the SQLite database file."""
     conn = sqlite3.connect('students.db')
-    conn.row_factory = sqlite3.Row # Allows accessing columns by name (e.g., row['email'])
+    conn.row_factory = sqlite3.Row 
     return conn
 
 def init_db():
@@ -41,14 +34,11 @@ def init_db():
     conn.commit()
     conn.close()
 
-# Initialize the database immediately when the app launches
+# Initialize the database
 init_db()
 
 
-# =======================================================
-# 3. ROUTE HANDLERS
-# =======================================================
-
+# ROUTE HANDLERS
 @app.route('/')
 def home():
     """
@@ -81,7 +71,7 @@ def register():
         course = request.form['course']
         address = request.form['address']
 
-        # 2. Save to Database
+        # Save to Database
         conn = get_db_connection()
         cursor = conn.cursor()
         
@@ -94,14 +84,13 @@ def register():
             conn.commit()
             conn.close()
             
-            # 3. Success! Redirect to Home so they can Login.
-            return redirect(url_for('home')) 
+            # If mo Success! Redirect to Home so they can Login.
+            # 3. Success! Redirect to Home and tell it to show the toast
+            return redirect(url_for('home', registered='true'))
             
         except sqlite3.IntegrityError:
-            # This happens if the ID Number already exists in the DB
             return "Error: This ID Number is already registered. <a href='/register'>Try Again</a>"
-
-    # If GET request, just show the HTML form
+        
     return render_template('register.html')
 
 
@@ -116,14 +105,14 @@ def login():
     conn = get_db_connection()
     cursor = conn.cursor()
     
-    # 1. Find user by email
+    # Find user by email
     user = cursor.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
     conn.close()
 
     if user:
-        # 2. Check if password matches
+        #  Check if password matches
         if user['password'] == password:
-            # 3. Login Successful -> Save User Info in Session
+            #  Login Successful -> Save User Info in Session
             session['user_id'] = user['id']
             session['firstname'] = user['firstname']
             return redirect(url_for('dashboard'))
@@ -154,8 +143,5 @@ def logout():
     return redirect(url_for('home'))
 
 
-# =======================================================
-# 4. RUN THE APP
-# =======================================================
 if __name__ == '__main__':
     app.run(debug=True)

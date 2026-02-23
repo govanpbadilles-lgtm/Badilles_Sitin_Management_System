@@ -1,6 +1,4 @@
-/* =========================================
-   1. RESET & GLOBAL STYLES
-   ========================================= */
+/* RESET & GLOBAL STYLES*/
 * { 
     box-sizing: border-box; 
     margin: 0; 
@@ -28,11 +26,10 @@ a {
     transition: opacity 0.3s;
 }
 
-/* =========================================
-   2. NAVIGATION BAR
-   ========================================= */
+
+   /* NAVIGATION BAR*/
 .navbar {
-    background-color: rgba(21, 76, 121, 0.95); /* Deep Blue with slight transparency */
+    background-color: rgba(21, 76, 121, 0.95); 
     padding: 15px 30px;
     display: flex;
     justify-content: space-between;
@@ -40,24 +37,24 @@ a {
     color: white;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 
-    /* --- STICKY NAV LOGIC --- */
-    position: sticky;  /* Sticks element when scrolling */
-    top: 0;            /* Sticks to the very top of viewport */
-    z-index: 1000;     /* Ensures it floats ABOVE everything else */
+    /*STICKY NAV LOGIC*/
+    position: sticky;  
+    top: 0;            
+    z-index: 1000;     
 }
 
 /* Logo Section */
 .logo { 
     font-size: 18px; 
     font-weight: 500;
-    display: flex;         /* Puts text and image side-by-side */
-    align-items: center;   /* Centers them vertically */
-    gap: 15px;             /* Space between text and logo image */
+    display: flex;         
+    align-items: center;   
+    gap: 15px;            
 }
 
 .logo img {
-    height: 50px;          /* Fixed height for consistency */
-    width: auto;           /* Maintains aspect ratio */
+    height: 50px;          
+    width: auto;           
 }
 
 /* Navigation Links */
@@ -72,22 +69,19 @@ a {
     text-decoration: underline; 
 }
 
-/* =========================================
-   3. HOME PAGE STYLES
-   ========================================= */
-
+/* HOME PAGE STYLES*/
 /* Background Image Setup */
 body.home-page {
     background-image: url('/static/images/ucbackground.jpg');
-    background-size: cover;          /* Covers entire screen */
-    background-position: center;     /* Centers the image */
+    background-size: cover;          
+    background-position: center;    
     background-repeat: no-repeat;
-    background-attachment: fixed;    /* Parallax effect: image stays still when scrolling */
-    height: 100vh;                   /* Full Viewport Height */
+    background-attachment: fixed;    
+    height: 100vh;                  
     margin: 0;
 }
 
-/* --- HERO SECTION (Welcome Text + Floating Logo) --- */
+/* HERO SECTION (Welcome Text + Floating Logo) */
 .container {
     display: flex;
     justify-content: center;
@@ -97,8 +91,8 @@ body.home-page {
 
 .hero-content {
     display: flex;
-    justify-content: space-between; /* Pushes Text left, Logo right */
-    align-items: center;            /* Centers vertically */
+    justify-content: space-between; 
+    align-items: center;            
     width: 85%;
     max-width: 1200px;
     margin-top: 50px;
@@ -106,9 +100,9 @@ body.home-page {
 
 /* Left Side: Text */
 .hero-text {
-    flex: 1; /* Takes up 50% width */
+    flex: 1; 
     color: white;
-    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7); /* Shadow makes text readable on photo */
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7); 
 }
 
 .hero-text h1 {
@@ -128,10 +122,10 @@ body.home-page {
 .hero-btn {
     padding: 12px 30px;
     font-size: 16px;
-    background: linear-gradient(45deg, #1b4f8a, #007bff); /* Blue Gradient */
+    background: linear-gradient(45deg, #1b4f8a, #007bff); 
     color: white;
     border: none;
-    border-radius: 25px;            /* Rounded pill shape */
+    border-radius: 25px;            
     cursor: pointer;
     font-weight: bold;
     box-shadow: 0 4px 15px rgba(0,0,0,0.3);
@@ -139,7 +133,7 @@ body.home-page {
 }
 
 .hero-btn:hover {
-    transform: translateY(-3px);    /* Lifts button up slightly */
+    transform: translateY(-3px);   
     box-shadow: 0 6px 20px rgba(0,0,0,0.4);
 }
 
@@ -147,7 +141,7 @@ body.home-page {
 .hero-image {
     flex: 1; /* Takes up 50% width */
     display: flex;
-    justify-content: flex-end; /* Aligns image to the right */
+    justify-content: flex-end; 
 }
 
 .hero-image img {
@@ -160,29 +154,27 @@ body.home-page {
     filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));
 }
 
-/* =========================================
-   4. LOGIN MODAL (Popup)
-   ========================================= */
+/*  LOGIN MODAL (Popup) */
 
 /* The Dark Overlay Background */
 .modal {
-    display: none;        /* Hidden by default (JS turns this to flex) */
-    position: fixed;      /* Stays in place when scrolling */
-    z-index: 1000;        /* Highest priority layer */
+    display: none;       
+    position: fixed;     
+    z-index: 1000;       
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.4); /* Dimmed background */
-    backdrop-filter: blur(5px);           /* Background blur effect */
+    background-color: rgba(0, 0, 0, 0.4); 
+    backdrop-filter: blur(5px);          
     justify-content: center;
     align-items: center;
 }
 
 /* The Glass Card inside Modal */
 .modal-content.glass-effect {
-    background: rgba(255, 255, 255, 0.65); /* Semi-transparent white */
-    backdrop-filter: blur(15px);           /* Strong blur ("Frosted Glass") */
+    background: rgba(255, 255, 255, 0.65); 
+    backdrop-filter: blur(15px);          
     padding: 40px;
     border-radius: 15px;
     width: 400px;
@@ -267,113 +259,7 @@ body.home-page {
 .register-link a { color: #1b4f8a; font-weight: bold; }
 
 
-/* =========================================
-   5. REGISTER PAGE STYLES
-   ========================================= */
-
-/* Main Page Layout */
-body.register-page {
-    height: 100vh;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;   /* Prevents scrollbars */
-    position: relative; /* Needed for ::before pseudo-element */
-}
-
-/* The Blurry Background Layer */
-/* Note: We use a pseudo-element (::before) to blur the BG 
-   without blurring the form text on top of it. */
-body.register-page::before {
-    content: "";
-    position: absolute;
-    top: -20px; left: -20px; right: -20px; bottom: -20px;
-    background-image: url('/static/images/ucbackground.jpg');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    filter: blur(8px);  /* The blur magic */
-    z-index: -1;        /* Sends it behind the content */
-}
-
-.register-container {
-    flex: 1; /* Takes remaining height */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1;
-}
-
-/* Wider Glass Card for Registration */
-.glass-card {
-    background: rgba(255, 255, 255, 0.75);
-    backdrop-filter: blur(15px);
-    padding: 40px;
-    
-    /* Size Settings */
-    width: 700px; 
-    max-width: 90%;
-    
-    border-radius: 15px;
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    position: relative;
-    text-align: center;
-}
-
-/* Register Inputs */
-.glass-card input {
-    width: 100%;
-    padding: 12px 15px;
-    padding-right: 35px;
-    background: rgba(255, 255, 255, 0.5); /* Light semi-transparent box */
-    border: none;
-    border-radius: 8px;
-    font-size: 14px;
-    outline: none;
-    color: #333;
-}
-.glass-card input::placeholder { color: #666; }
-
-/* Input Icons */
-.glass-card i {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%); /* Centers icon vertically */
-    color: #555;
-}
-
-/* Row Layout (Side-by-Side inputs) */
-.row {
-    display: flex;
-    gap: 10px;
-}
-.row .input-group { 
-    flex: 1; /* Forces elements to share width equally */
-}
-
-/* Register Button */
-.register-btn-glass {
-    width: 100%;
-    padding: 12px;
-    background-color: #1b4f8a;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    margin-top: 10px;
-    transition: background 0.3s;
-}
-.register-btn-glass:hover {
-    background-color: #154070;
-}
-
-/* =========================================
-   6. ANIMATIONS
-   ========================================= */
+/*  ANIMATIONS */
 
 /* Floating Animation for Hero Logo */
 @keyframes float {
@@ -382,29 +268,27 @@ body.register-page::before {
     100% { transform: translateY(0px); }  /* Moves DOWN */
 }
 
-/* =========================================
-   7. RESPONSIVE DESIGN (Mobile & Tablet)
-   ========================================= */
+/* RESPONSIVE DESIGN (Mobile & Tablet) */
 
 @media (max-width: 900px) {
     
-    /* 1. Stack the Hero Section Vertically */
+    /* Stack the Hero Section Vertically */
     .hero-content {
-        flex-direction: column-reverse; /* Puts image on top, text on bottom */
-        text-align: center;             /* Centers the text */
+        flex-direction: column-reverse; 
+        text-align: center;             
         margin-top: 20px;
         width: 90%;
     }
 
-    /* 2. Make Sections Full Width */
+    /* Make Sections Full Width */
     .hero-text, .hero-image {
         width: 100%;
-        flex: none; /* Stop trying to split 50/50 */
+        flex: none; 
     }
 
-    /* 3. Shrink the Big Welcome Text */
+    /* Shrink the Big Welcome Text */
     .hero-text h1 {
-        font-size: 32px; /* Smaller than 50px */
+        font-size: 32px; 
         margin-top: 20px;
     }
 
@@ -412,20 +296,20 @@ body.register-page::before {
         font-size: 16px;
     }
 
-    /* 4. Shrink and Center the Floating Logo */
+    /* Shrink and Center the Floating Logo */
     .hero-image {
         justify-content: center;
         margin-bottom: 20px;
     }
     
     .hero-image img {
-        max-width: 250px; /* Smaller logo for small screens */
+        max-width: 250px;
     }
 
-    /* 5. Adjust Navbar for Small Screens */
+    /* Adjust Navbar for Small Screens */
     .navbar {
-        padding: 10px 15px; /* Less padding */
-        flex-direction: column; /* Stack logo and links */
+        padding: 10px 15px; 
+        flex-direction: column; 
         gap: 10px;
     }
 
@@ -434,12 +318,82 @@ body.register-page::before {
     }
 
     .nav-links a {
-        margin: 0 10px; /* Adjust spacing between links */
+        margin: 0 10px; 
         font-size: 13px;
     }
     
-    /* 6. Adjust Login Modal width for mobile */
+    /* Adjust Login Modal width for mobile */
     .modal-content.glass-effect {
-        width: 90%; /* Fit screen width */
+        width: 90%; 
     }
+}
+
+/* =========================================
+   TOAST NOTIFICATIONS (Alerts)
+   ========================================= */
+
+/* The container that holds the alerts on the top right */
+#toastBox {
+    position: fixed;
+    top: 30px;
+    right: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    z-index: 9999;
+}
+
+/* The actual white alert box */
+.toast {
+    width: 350px;
+    height: 60px;
+    background: #fff;
+    font-weight: 500;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    position: relative;
+    overflow: hidden;
+    color: #333;
+    font-size: 16px;
+    
+    /* Slide in animation */
+    transform: translateX(100%);
+    animation: slideInToast 0.5s forwards;
+}
+
+/* The icons inside the toast */
+.toast i {
+    font-size: 28px;
+    margin-right: 15px;
+}
+
+/* Specific colors for Success and Error */
+.toast.success i { color: #15c35a; } /* Green check */
+.toast.error i { color: #ff3333; }   /* Red X */
+
+/* The shrinking progress bar at the bottom */
+.toast::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 4px;
+    animation: toastProgress 3s linear forwards;
+}
+
+.toast.success::after { background: #15c35a; }
+.toast.error::after { background: #ff3333; }
+
+/* --- Toast Animations --- */
+@keyframes slideInToast {
+    100% { transform: translateX(0); }
+}
+
+@keyframes toastProgress {
+    100% { width: 0; }
 }

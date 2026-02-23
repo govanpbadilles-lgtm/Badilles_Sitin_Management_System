@@ -1,0 +1,95 @@
+
+/* Main Page Layout */
+body.register-page {
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;  
+    position: relative; 
+}
+
+/* The Blurry Background Layer */
+body.register-page::before {
+    content: "";
+    position: absolute;
+    top: -20px; left: -20px; right: -20px; bottom: -20px;
+    background-image: url('/static/images/ucbackground.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: blur(8px); 
+    z-index: -1; 
+}
+
+.register-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+}
+
+/* Wider Glass Card for Registration */
+.glass-card {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(15px);
+    padding: 40px;
+    width: 700px; 
+    max-width: 90%;
+    border-radius: 15px;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    position: relative;
+    text-align: center;
+}
+
+/* Register Inputs */
+.glass-card input {
+    width: 100%;
+    padding: 12px 15px;
+    padding-right: 35px;
+    background: rgba(255, 255, 255, 0.5); 
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    color: #333;
+}
+.glass-card input::placeholder { color: #666; }
+
+/* Input Icons */
+.glass-card i {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%); 
+    color: #555;
+}
+
+/* Row Layout (Side-by-Side inputs) */
+.row {
+    display: flex;
+    gap: 10px;
+}
+.row .input-group { 
+    flex: 1; 
+}
+
+/* Register Button */
+.register-btn-glass {
+    width: 100%;
+    padding: 12px;
+    background-color: #1b4f8a;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background 0.3s;
+}
+.register-btn-glass:hover {
+    background-color: #154070;
+}
