@@ -35,15 +35,19 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // 2. If coming from a SUCCESSFUL registration
         if (urlParams.get('registered') === 'true') {
-            // Wait just a tiny bit (100ms) for the page to render, then show toast
             setTimeout(() => {
                 showToast('success', 'Registration successful');
             }, 100);
-            
-            // Open the login modal automatically
             loginModal.style.display = "flex";
-            
-            // Clean up the URL so the toast doesn't pop up again if they refresh the page
+            window.history.replaceState({}, document.title, "/"); 
+        }
+
+        // 3. --- NEW: If coming from a FAILED login ---
+        if (urlParams.get('error') === 'true') {
+            setTimeout(() => {
+                showToast('error', 'Incorrect email or password!');
+            }, 100);
+            loginModal.style.display = "flex";
             window.history.replaceState({}, document.title, "/"); 
         }
     }
@@ -73,16 +77,13 @@ document.addEventListener('DOMContentLoaded', function() {
 function showToast(type, message) {
     let toastBox = document.getElementById('toastBox');
     
-    // Safety check just in case the HTML div is missing
     if (!toastBox) return; 
 
     let toast = document.createElement('div');
     
-    // Add the base class and the type class (success or error)
     toast.classList.add('toast');
     toast.classList.add(type);
 
-    // Set the icon based on the type
     let icon = '';
     if (type === 'success') {
         icon = '<i class="fas fa-check-circle"></i>';
@@ -90,13 +91,9 @@ function showToast(type, message) {
         icon = '<i class="fas fa-times-circle"></i>';
     }
 
-    // Insert the icon and message into the div
     toast.innerHTML = icon + message;
-    
-    // Add the toast to the screen
     toastBox.appendChild(toast);
 
-    // Remove the toast automatically after 3.5 seconds
     setTimeout(() => {
         toast.remove();
     }, 3500);

@@ -110,17 +110,18 @@ def login():
     conn.close()
 
     if user:
-        #  Check if password matches
+        # Check if password matches
         if user['password'] == password:
-            #  Login Successful -> Save User Info in Session
+            # Login Successful -> Save User Info in Session
             session['user_id'] = user['id']
             session['firstname'] = user['firstname']
             return redirect(url_for('dashboard'))
         else:
-            return "Incorrect Password! <a href='/'>Try Again</a>"
+            # FAILED: Wrong password. Redirect to home with error flag.
+            return redirect(url_for('home', error='true'))
     else:
-        return "Email not found! <a href='/'>Try Again</a>"
-
+        # FAILED: Email not found. Redirect to home with error flag.
+        return redirect(url_for('home', error='true'))
 
 @app.route('/dashboard')
 def dashboard():

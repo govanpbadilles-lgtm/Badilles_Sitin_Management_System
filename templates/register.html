@@ -45,10 +45,22 @@
 
                 <div class="row">
                     <div class="input-group">
-                        <input type="text" name="course" placeholder="Course" required>
+                        <select name="course" required>
+                            <option value="" disabled selected>Select Course</option>
+                            <option value="BSIT">BS Information Technology (BSIT)</option>
+                            <option value="BSCS">BS Computer Science (BSCS)</option>
+                            <option value="BSIS">BS Information Systems (BSIS)</option>
+                        </select>
                     </div>
+                    
                     <div class="input-group">
-                        <input type="text" name="course_level" placeholder="Level" required>
+                        <select name="course_level" required>
+                            <option value="" disabled selected>Select Year Level</option>
+                            <option value="1st Year">1st Year</option>
+                            <option value="2nd Year">2nd Year</option>
+                            <option value="3rd Year">3rd Year</option>
+                            <option value="4th Year">4th Year</option>
+                        </select>
                     </div>
                 </div>
 

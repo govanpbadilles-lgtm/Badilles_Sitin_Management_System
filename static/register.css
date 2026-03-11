@@ -1,3 +1,6 @@
+/* =========================================
+   REGISTER PAGE STYLES
+   ========================================= */
 
 /* Main Page Layout */
 body.register-page {
@@ -44,18 +47,32 @@ body.register-page::before {
     text-align: center;
 }
 
-/* Register Inputs */
-.glass-card input {
+/* --- NEW: Register Inputs & Dropdowns --- */
+.glass-card input, 
+.glass-card select { 
     width: 100%;
     padding: 12px 15px;
-    padding-right: 35px;
+    padding-right: 35px; /* Leaves room for icons */
     background: rgba(255, 255, 255, 0.5); 
     border: none;
     border-radius: 8px;
     font-size: 14px;
     outline: none;
     color: #333;
+
+    /* Dropdown specific settings */
+    cursor: pointer; 
+    appearance: none; 
+    -webkit-appearance: none;
+    -moz-appearance: none;
 }
+
+/* Style the dropdown list when clicked */
+.glass-card select option {
+    background-color: #fff;
+    color: #333;
+}
+
 .glass-card input::placeholder { color: #666; }
 
 /* Input Icons */
@@ -71,9 +88,12 @@ body.register-page::before {
 .row {
     display: flex;
     gap: 10px;
+    margin-bottom: 15px; /* Adds space below rows */
 }
+
 .row .input-group { 
     flex: 1; 
+    position: relative; /* Needed so icons stay inside the boxes */
 }
 
 /* Register Button */
@@ -92,4 +112,12 @@ body.register-page::before {
 }
 .register-btn-glass:hover {
     background-color: #154070;
+}
+
+/* --- FIX: Hide default browser eye icon in passwords --- */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear,
+input[type="password"]::-webkit-clear-button,
+input[type="password"]::-webkit-credentials-auto-fill-button {
+    display: none !important;
 }
