@@ -1,0 +1,271 @@
+/* =========================================
+   ADMIN DASHBOARD STYLES
+   ========================================= */
+
+/* Main Page Layout para sa Admin */
+body.admin-page {
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;  
+    position: relative; 
+    font-family: sans-serif;
+}
+
+/* Background Image ug Blur (Gipangitngitan nato gamay para ma-highlight ang card) */
+body.admin-page::before {
+    content: "";
+    position: absolute;
+    top: -20px; left: -20px; right: -20px; bottom: -20px;
+    background-image: url('/static/images/ucbackground.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: blur(8px) brightness(0.8); /* Added brightness para mas dark gamay */
+    z-index: -1; 
+}
+
+.admin-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+}
+
+/* Glass Card nga Custom para sa Admin */
+.admin-glass-card {
+    background: rgba(255, 255, 255, 0.85); /* Mas puti gamay kaysa sa register */
+    backdrop-filter: blur(15px);
+    padding: 50px;
+    width: 800px; 
+    max-width: 90%;
+    border-radius: 15px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); /* Mas dako nga shadow */
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    position: relative;
+    text-align: center;
+}
+
+/* Dagko nga Dashboard Buttons */
+.admin-btn-glass {
+    flex: 1;
+    padding: 20px;
+    background-color: #1b4f8a;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px; /* Space between icon and text */
+}
+
+/* Hover effect: Mo-alsa ug mo-hayag gamay inig tungtong sa mouse */
+.admin-btn-glass:hover {
+    background-color: #2464ab;
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.admin-btn-glass i {
+    font-size: 35px;
+}
+
+/* --- BAG-ONG LAYOUT PARA SA DASHBOARD --- */
+.admin-glass-card {
+    width: 1100px; /* Gipadako nato kay daghan na sulod */
+    padding: 40px;
+}
+
+.dashboard-grid {
+    display: flex;
+    gap: 40px;
+    text-align: left;
+    margin-top: 30px;
+}
+
+/* Tungaon sila sa duha */
+.dashboard-left, .dashboard-right {
+    flex: 1;
+}
+
+/* --- ESTILO SA STATISTICS (WALA) --- */
+.stat-card {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.6);
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.stat-card i {
+    font-size: 45px;
+    color: #1b4f8a;
+    margin-right: 20px;
+}
+
+.stat-info h3 {
+    margin: 0;
+    font-size: 32px;
+    color: #333;
+}
+
+.stat-info p {
+    margin: 0;
+    color: #666;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+/* --- ESTILO SA ANNOUNCEMENTS (TUO) --- */
+.announcement-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.announcement-form textarea {
+    width: 100%;
+    height: 100px;
+    padding: 15px;
+    border-radius: 8px;
+    border: none;
+    resize: none;
+    font-family: inherit;
+    background: rgba(255, 255, 255, 0.7);
+    outline: none;
+}
+
+.btn-post {
+    padding: 12px;
+    background: #15c35a;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.btn-post:hover { background: #12a64c; }
+
+.announcement-list {
+    max-height: 250px;
+    overflow-y: auto; /* Para maka-scroll kung daghan na */
+    padding-right: 10px;
+}
+
+.announcement-item {
+    background: rgba(255, 255, 255, 0.5);
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    border-left: 5px solid #1b4f8a;
+}
+
+.ann-meta { font-size: 12px; color: #555; margin-bottom: 5px; font-weight: bold;}
+.ann-msg { font-size: 14px; color: #333; margin: 0; }
+
+/* =========================================
+   MODERN ADMIN NAVBAR & DROPDOWN STYLES
+   ========================================= */
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Sakto nga distansya */
+}
+
+/* Style para sa normal links ug dropdown button */
+.nav-links a, .dropbtn {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+    padding: 8px 15px;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+/* Hover effect */
+.nav-links a:hover:not(.logout-btn), .dropdown:hover .dropbtn {
+    background-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+}
+
+/* ================== DROPDOWN LOGIC ================== */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none; 
+    position: absolute;
+    background-color: #ffffff;
+    min-width: 190px;
+    box-shadow: 0px 10px 20px rgba(0,0,0,0.2);
+    border-radius: 10px;
+    z-index: 999;
+    top: 100%;
+    padding-top: 5px; 
+    padding-bottom: 5px;
+}
+
+/* Mga links sa sulod sa dropdown */
+.dropdown-content a {
+    color: #333;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: flex;
+    border-radius: 0;
+    transition: background 0.2s;
+}
+
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+    color: #1b4f8a;
+    transform: none; /* Dili pa-isahon ang text sulod sa dropdown */
+}
+
+/* I-show ang dropdown inig hover */
+.dropdown:hover .dropdown-content {
+    display: block;
+    animation: fadeIn 0.2s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ================== LOGOUT BUTTON ================== */
+.nav-links .logout-btn {
+    background-color: #ff4c4c;
+    color: white;
+    font-weight: bold;
+    padding: 8px 20px;
+    margin-left: 10px;
+}
+
+.nav-links .logout-btn:hover {
+    background-color: #e60000;
+    box-shadow: 0 4px 10px rgba(255, 76, 76, 0.3);
+}

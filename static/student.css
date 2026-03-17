@@ -1,0 +1,172 @@
+/* =========================================
+   STUDENT DASHBOARD STYLES
+   ========================================= */
+
+body.student-page {
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;  
+    position: relative; 
+    font-family: sans-serif;
+}
+
+body.student-page::before {
+    content: "";
+    position: absolute;
+    top: -20px; left: -20px; right: -20px; bottom: -20px;
+    background-image: url('/static/images/ucbackground.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: blur(8px) brightness(0.85); 
+    z-index: -1; 
+}
+
+.student-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+    padding: 20px;
+}
+
+.student-glass-card {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(15px);
+    padding: 40px; /* Gipadak-an nato ang space sa sulod */
+    
+    /* KINI ANG MGA GIDAKO NATO */
+    width: 1500px; /* Gikan sa 1200px, gihimo natong 1500px para mas lapad */
+    max-width: 98%; /* Mu-stretch siya padulong sa kilid sa screen */
+    max-height: 95vh; /* Gitas-on: Hapita na niya sakupa ang tibuok screen paubos */
+    
+    border-radius: 15px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    display: flex;
+    flex-direction: column;
+}
+
+/* KINI ANG PARA SA 3-COLUMN LAYOUT */
+.dashboard-grid-3 {
+    display: grid;
+    /* GIBALIK NATO: Left = 1 part, Center = 1.5 parts, Right = 1 part */
+    grid-template-columns: 1fr 1.5fr 1fr; 
+    gap: 30px; /* Sakto ra nga space kada column */
+    margin-top: 20px;
+    overflow-y: auto; 
+    padding-right: 10px;
+}
+
+.col-card {
+    background: rgba(255, 255, 255, 0.5);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.col-card h2 {
+    color: #1b4f8a;
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 20px;
+    border-bottom: 2px solid #1b4f8a;
+    padding-bottom: 5px;
+}
+
+/* WALA: Student Info */
+.info-row { margin-bottom: 10px; font-size: 15px; color: #333; }
+.info-row strong { color: #1b4f8a; display: inline-block; width: 70px; }
+.session-badge { background: #1b4f8a; color: white; padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 18px; }
+
+/* TUNGA: Announcements */
+.announcement-item {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    border-left: 5px solid #15c35a;
+}
+.ann-meta { font-size: 12px; color: #555; margin-bottom: 5px; font-weight: bold; }
+.ann-msg { font-size: 14px; color: #333; margin: 0; line-height: 1.5; }
+
+/* TUO: Rules */
+.rules-list { padding-left: 20px; font-size: 14px; color: #333; line-height: 1.6; }
+.rules-list li { margin-bottom: 12px; }
+
+/* --- PROFILE PHOTO STYLES --- */
+.profile-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(27, 79, 138, 0.2);
+}
+
+.profile-photo {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #1b4f8a;
+    margin-bottom: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.profile-name {
+    font-size: 20px;
+    font-weight: bold;
+    color: #1b4f8a;
+    margin: 0;
+    text-align: center;
+}
+
+/* =========================================
+   MODERN NAVBAR STYLES
+   ========================================= */
+
+.nav-links {
+    display: flex;
+    gap: 10px; /* Sakto nga distansya kada link */
+    align-items: center;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #ffffff; /* Puti nga text para klaro sa dark background */
+    font-size: 15px;
+    font-weight: 500;
+    padding: 8px 15px;
+    border-radius: 20px; /* Pill-shape ang background inig hover */
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Distansya sa icon ug sa text */
+}
+
+/* Hover effect para sa mga normal nga links */
+.nav-links a:hover:not(.logout-btn) {
+    background-color: rgba(255, 255, 255, 0.15); /* Mo-hayag gamay inig tupa sa mouse */
+    transform: translateY(-2px); /* Mo-isa siya pataas gamay */
+}
+
+/* Espesyal nga design para sa Logout Button */
+.nav-links .logout-btn {
+    background-color: #ff4c4c;
+    color: white;
+    font-weight: bold;
+    padding: 8px 20px;
+    border-radius: 20px;
+    box-shadow: 0 4px 10px rgba(255, 76, 76, 0.3);
+    margin-left: 10px; /* I-distansya gamay palayo sa uban links */
+}
+
+.nav-links .logout-btn:hover {
+    background-color: #e60000;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(255, 76, 76, 0.4);
+}

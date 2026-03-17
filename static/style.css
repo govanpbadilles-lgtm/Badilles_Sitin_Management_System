@@ -43,6 +43,56 @@ a {
     z-index: 1000;     
 }
 
+/* Container sa mga links */
+.modern-nav-links {
+    display: flex;
+    align-items: center;
+    gap: 20px; /* Sakto nga distansya kada link */
+}
+
+/* Style para sa Home, Community, ug About */
+.nav-item {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 500;
+    padding: 8px 15px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Distansya sa icon ug text */
+}
+
+/* Inig tupa sa mouse sa mga normal links */
+.nav-item:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px); /* Mo-isa gamay */
+}
+
+/* Espesyal nga style para sa Login Button */
+.nav-login-btn {
+    background: linear-gradient(135deg, #15c35a, #0e9945); /* Nindot nga green */
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 10px 25px;
+    border-radius: 25px; /* Pill shape */
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 10px rgba(21, 195, 90, 0.3);
+}
+
+/* Inig tupa sa mouse sa Login button */
+.nav-login-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(21, 195, 90, 0.5);
+    background: linear-gradient(135deg, #17d663, #10a84c); /* Mo-hayag gamay */
+}
+
 /* Logo Section */
 .logo { 
     font-size: 18px; 
@@ -397,3 +447,4 @@ body.home-page {
 @keyframes toastProgress {
     100% { width: 0; }
 }
+

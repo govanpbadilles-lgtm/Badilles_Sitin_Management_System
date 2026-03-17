@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard | CCS Sit-in System</title>
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='student.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="student-page">
+
+    <nav class="navbar">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='images/uclogonav.png') }}" alt="UC Logo">
+            Student Dashboard
+        </div>
+      <div class="nav-links">
+            <a href="#"><i class="fas fa-bell"></i> Notification</a>
+            <a href="#"><i class="fas fa-home"></i> Home</a>
+            <a href="#" id="openEditProfileBtn"><i class="fas fa-user-edit"></i> Edit Profile</a>
+            <a href="#"><i class="fas fa-history"></i> History</a>
+            <a href="#"><i class="fas fa-calendar-check"></i> Reservation</a>
+            <a href="/logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </nav>
+
+    <div class="student-container">
+        <div class="student-glass-card">
+            
+            <h1 style="color: #1b4f8a; margin-top: 0; margin-bottom: 5px; font-size: 32px;">
+                Welcome, {{ student['firstname'] }}!
+            </h1>
+            <p style="color: #555; margin-bottom: 0;">Here is your student portal overview.</p>
+
+            <div class="dashboard-grid-3">
+                
+                <div class="col-card">
+                    <h2><i class="fas fa-id-card"></i> Student Info</h2>
+                    
+                    <div class="profile-section" style="text-align: center; margin-bottom: 15px; border-bottom: 1px solid #ccc; padding-bottom: 15px;">
+                        <img src="{{ url_for('static', filename='uploads/' + student['profile_pic']) if student['profile_pic'] and student['profile_pic'] != 'default_profile.png' else url_for('static', filename='images/default_profile.png') }}" 
+                             alt="Profile Photo" 
+                             style="width: 100px; height: 100px; border-radius: 50%; border: 3px solid #1b4f8a; object-fit: cover; margin-bottom: 10px;"
+                             onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'">
+                        
+                        <h3 style="color: #1b4f8a; margin: 0;">{{ student['firstname'] }} {{ student['lastname'] }}</h3>
+                    </div>
+
+                    <div class="info-row"><strong>ID No:</strong> {{ student['id_number'] }}</div>
+                    <div class="info-row"><strong>Course:</strong> {{ student['course'] }}</div>
+                    <div class="info-row"><strong>Year:</strong> {{ student['course_level'] }}</div>
+                    <div class="info-row"><strong>Email:</strong> {{ student['email'] }}</div>
+                    <div class="info-row"><strong>Address:</strong> {{ student['address'] }}</div>
+                    
+                    <div class="info-row" style="margin-top: 20px; display: flex; align-items: center; justify-content: space-between;">
+                        <strong>Sessions:</strong>
+                        <span style="background: #1b4f8a; color: white; padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 16px;">
+                            {{ student['remaining_sessions'] }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="col-card" style="background: rgba(255, 255, 255, 0.4);">
+                    <h2><i class="fas fa-bullhorn"></i> Announcements</h2>
+                    <div style="max-height: 400px; overflow-y: auto; padding-right: 5px;">
+                        {% for ann in announcements %}
+                            <div class="announcement-item" style="background: rgba(255, 255, 255, 0.9); padding: 15px; border-radius: 8px; margin-bottom: 12px; border-left: 5px solid #15c35a;">
+                                <p style="font-size: 12px; color: #555; margin-bottom: 5px; font-weight: bold;"><i class="fas fa-user-shield"></i> {{ ann['admin_name'] }} &bull; {{ ann['date_posted'] }}</p>
+                                <p style="font-size: 14px; color: #333; margin: 0; line-height: 1.5;">{{ ann['message'] }}</p>
+                            </div>
+                        {% else %}
+                            <p style="color: #666; font-style: italic;">No announcements at this time.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="col-card">
+                    <h2><i class="fas fa-gavel"></i> Rules & Regs</h2>
+                    <ul style="padding-left: 20px; font-size: 14px; color: #333; line-height: 1.6;">
+                        <li style="margin-bottom: 12px;">Maintain silence inside the laboratory.</li>
+                        <li style="margin-bottom: 12px;">No eating or drinking near the computers.</li>
+                        <li style="margin-bottom: 12px;">No installing of unauthorized software or games.</li>
+                        <li style="margin-bottom: 12px;">Proper grooming and dress code must be observed.</li>
+                        <li style="margin-bottom: 12px;">Clean your area before leaving. Push your chairs properly.</li>
+                        <li style="margin-bottom: 12px;">Log out your accounts after use.</li>
+                    </ul>
+                </div>
+
+            </div> </div>
+    </div>
+
+    <div id="toastBox"></div>
+    <style>
+        #toastBox { left: 30px; right: auto; align-items: flex-start; z-index: 9999; }
+        .toast { transform: translateX(-100%); animation: slideInToastLeft 0.5s forwards; }
+        @keyframes slideInToastLeft { 100% { transform: translateX(0); } }
+    </style>
+
+    <div id="editProfileModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;">
+        <div class="student-glass-card" style="width: 500px; padding: 30px; position: relative;">
+            <span id="closeEditProfileBtn" style="position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: #555;">&times;</span>
+            
+            <h2 style="color: #1b4f8a; margin-bottom: 20px; text-align: left;"><i class="fas fa-user-edit"></i> Edit Profile</h2>
+            
+            <form action="/update_profile" method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 15px; text-align: left;">
+                
+                <div>
+                    <label style="font-weight: bold; color: #333;">Change Profile Picture (Optional):</label><br>
+                    <input type="file" name="profile_pic" accept=".png, .jpg, .jpeg" style="margin-top: 5px;">
+                </div>
+
+                <div style="display: flex; gap: 10px;">
+                    <div style="flex: 1;">
+                        <label>First Name:</label>
+                        <input type="text" name="firstname" value="{{ student['firstname'] }}" required style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ccc;">
+                    </div>
+                    <div style="flex: 1;">
+                        <label>Last Name:</label>
+                        <input type="text" name="lastname" value="{{ student['lastname'] }}" required style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ccc;">
+                    </div>
+                </div>
+
+                <div>
+                    <label>Course:</label>
+                    <input type="text" name="course" value="{{ student['course'] }}" required style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ccc;">
+                </div>
+
+                <div>
+                    <label>Address:</label>
+                    <input type="text" name="address" value="{{ student['address'] }}" required style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ccc;">
+                </div>
+
+                <button type="submit" style="padding: 10px; background: #15c35a; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px;">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="{{ url_for('static', filename='student.js') }}"></script>
+
+</body>
+</html>
