@@ -1,4 +1,4 @@
-/* RESET & GLOBAL STYLES*/
+/* RESET & GLOBAL STYLES */
 * { 
     box-sizing: border-box; 
     margin: 0; 
@@ -7,7 +7,7 @@
 }
 
 body { 
-    background-color: #EBEBEB; /* Default fallback color */
+    background-color: #EBEBEB; 
 }
 
 /* Headings */
@@ -26,80 +26,38 @@ a {
     transition: opacity 0.3s;
 }
 
-
-   /* NAVIGATION BAR*/
+/* =========================================
+   NAVIGATION BAR & LOGO
+   ========================================= */
 .navbar {
     background-color: rgba(21, 76, 121, 0.95); 
     padding: 15px 30px;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    justify-content: space-between; 
+    align-items: center; 
     color: white;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-
-    /*STICKY NAV LOGIC*/
-    position: sticky;  
-    top: 0;            
-    z-index: 1000;     
+    
+    /* Gihimong FIXED aron mo-pilit gyud */
+    position: fixed;  
+    top: 0; 
+    left: 0; 
+    width: 100% !important; 
+    z-index: 9999;   
 }
 
-/* Container sa mga links */
-.modern-nav-links {
-    display: flex;
-    align-items: center;
-    gap: 20px; /* Sakto nga distansya kada link */
+
+body {
+    padding-top: 80px; 
 }
 
-/* Style para sa Home, Community, ug About */
-.nav-item {
-    color: #ffffff;
-    text-decoration: none;
-    font-size: 16px;
-    font-weight: 500;
-    padding: 8px 15px;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 8px; /* Distansya sa icon ug text */
-}
-
-/* Inig tupa sa mouse sa mga normal links */
-.nav-item:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-    transform: translateY(-2px); /* Mo-isa gamay */
-}
-
-/* Espesyal nga style para sa Login Button */
-.nav-login-btn {
-    background: linear-gradient(135deg, #15c35a, #0e9945); /* Nindot nga green */
-    color: white;
-    text-decoration: none;
-    font-size: 16px;
-    font-weight: bold;
-    padding: 10px 25px;
-    border-radius: 25px; /* Pill shape */
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    box-shadow: 0 4px 10px rgba(21, 195, 90, 0.3);
-}
-
-/* Inig tupa sa mouse sa Login button */
-.nav-login-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(21, 195, 90, 0.5);
-    background: linear-gradient(135deg, #17d663, #10a84c); /* Mo-hayag gamay */
-}
-
-/* Logo Section */
 .logo { 
     font-size: 18px; 
     font-weight: 500;
     display: flex;         
     align-items: center;   
-    gap: 15px;            
+    gap: 15px;
+    white-space: nowrap; /* Pugngan nga mag-linya-linya ang taas nga ngalan sa UC */
 }
 
 .logo img {
@@ -107,27 +65,83 @@ a {
     width: auto;           
 }
 
-/* Navigation Links */
-.nav-links a {
-    color: white;
-    margin-left: 20px;
-    font-size: 14px;
-    opacity: 0.9;
-}
-.nav-links a:hover { 
-    opacity: 1; 
-    text-decoration: underline; 
+/* =========================================
+   MODERN NAVBAR LINKS (Animated)
+   ========================================= */
+
+.modern-nav-links {
+    display: flex !important;
+    flex-direction: row !important; /* Pugson gyud mag-linya */
+    align-items: center !important;
+    justify-content: flex-end; 
+    gap: 20px; 
+    margin: 0;
+    padding: 0;
+    white-space: nowrap; /* Pugngan nga mangahulog ang links sa ubos */
 }
 
-/* HOME PAGE STYLES*/
-/* Background Image Setup */
+/* Style para sa Home, Community, ug About */
+.nav-item {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 500;
+    position: relative;
+    white-space: nowrap !important; /* Pugngan nga mo-ubos ang text */
+}
+
+/* Nindot nga Animated Underline inig Hover */
+.nav-item::after {
+    content: '';
+    position: absolute;
+    width: 0; 
+    height: 3px;
+    bottom: -6px; 
+    left: 0;
+    background-color: #f1c40f; 
+    border-radius: 2px;
+    transition: width 0.3s ease-in-out;
+}
+.nav-item:hover { color: #f1c40f; }
+.nav-item:hover::after { width: 100%; }
+
+/* =========================================
+   STANDOUT LOGIN BUTTON
+   ========================================= */
+.nav-login-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    background: #15c35a !important; 
+    color: white !important;
+    text-decoration: none !important;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 10px 25px;
+    border-radius: 25px; 
+    transition: all 0.3s ease;
+    white-space: nowrap !important;
+}
+
+.nav-login-btn:hover {
+    background: #12a64c !important; 
+    transform: translateY(-3px); 
+    box-shadow: 0 6px 15px rgba(21, 195, 90, 0.5);
+}
+
+/* =========================================
+   HOME PAGE STYLES
+   ========================================= */
 body.home-page {
     background-image: url('/static/images/ucbackground.jpg');
     background-size: cover;          
     background-position: center;    
     background-repeat: no-repeat;
     background-attachment: fixed;    
-    height: 100vh;                  
+    min-height: 100vh; /* KINI ANG GI-USAB: Gikan 'height' nahimong 'min-height' */                 
     margin: 0;
 }
 
@@ -189,7 +203,7 @@ body.home-page {
 
 /* Right Side: Hero Image */
 .hero-image {
-    flex: 1; /* Takes up 50% width */
+    flex: 1; 
     display: flex;
     justify-content: flex-end; 
 }
@@ -198,15 +212,13 @@ body.home-page {
     width: 100%;
     max-width: 450px;
     height: auto;
-    
-    /* Animation definition */
     animation: float 4s ease-in-out infinite; 
     filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));
 }
 
-/*  LOGIN MODAL (Popup) */
-
-/* The Dark Overlay Background */
+/* =========================================
+   LOGIN MODAL (Popup)
+   ========================================= */
 .modal {
     display: none;       
     position: fixed;     
@@ -221,7 +233,6 @@ body.home-page {
     align-items: center;
 }
 
-/* The Glass Card inside Modal */
 .modal-content.glass-effect {
     background: rgba(255, 255, 255, 0.65); 
     backdrop-filter: blur(15px);          
@@ -235,7 +246,6 @@ body.home-page {
     color: #333;
 }
 
-/* Close 'X' Button */
 .close-btn {
     position: absolute;
     top: 15px;
@@ -245,13 +255,11 @@ body.home-page {
     color: #333;
 }
 
-/* Form Styles */
 .modal-content h2 {
     color: #1b4f8a;
     margin-bottom: 25px;
 }
 
-/* Input Fields Logic */
 .input-group { margin-bottom: 15px; }
 
 .input-group label {
@@ -268,7 +276,7 @@ body.home-page {
     width: 100%;
     padding: 10px;
     border: none;
-    border-bottom: 2px solid #333; /* Underline style */
+    border-bottom: 2px solid #333; 
     background: transparent;
     outline: none;
 }
@@ -280,7 +288,6 @@ body.home-page {
     color: #333;
 }
 
-/* Footer Options */
 .options {
     display: flex;
     justify-content: space-between;
@@ -292,7 +299,7 @@ body.home-page {
 .login-btn-submit {
     width: 100%;
     padding: 12px;
-    background-color: #1a2e35; /* Dark Teal/Black */
+    background-color: #1a2e35; 
     color: white;
     border: none;
     border-radius: 5px;
@@ -308,21 +315,19 @@ body.home-page {
 }
 .register-link a { color: #1b4f8a; font-weight: bold; }
 
-
-/*  ANIMATIONS */
-
-/* Floating Animation for Hero Logo */
+/* =========================================
+   ANIMATIONS
+   ========================================= */
 @keyframes float {
     0% { transform: translateY(0px); }
-    50% { transform: translateY(-20px); } /* Moves UP */
-    100% { transform: translateY(0px); }  /* Moves DOWN */
+    50% { transform: translateY(-20px); } 
+    100% { transform: translateY(0px); }  
 }
 
-/* RESPONSIVE DESIGN (Mobile & Tablet) */
-
+/* =========================================
+   RESPONSIVE DESIGN (Mobile & Tablet)
+   ========================================= */
 @media (max-width: 900px) {
-    
-    /* Stack the Hero Section Vertically */
     .hero-content {
         flex-direction: column-reverse; 
         text-align: center;             
@@ -330,59 +335,44 @@ body.home-page {
         width: 90%;
     }
 
-    /* Make Sections Full Width */
     .hero-text, .hero-image {
         width: 100%;
         flex: none; 
     }
 
-    /* Shrink the Big Welcome Text */
     .hero-text h1 {
         font-size: 32px; 
         margin-top: 20px;
     }
 
-    .hero-text p {
-        font-size: 16px;
-    }
-
-    /* Shrink and Center the Floating Logo */
     .hero-image {
         justify-content: center;
         margin-bottom: 20px;
     }
     
-    .hero-image img {
-        max-width: 250px;
-    }
+    .hero-image img { max-width: 250px; }
 
-    /* Adjust Navbar for Small Screens */
     .navbar {
         padding: 10px 15px; 
         flex-direction: column; 
         gap: 10px;
     }
 
-    .nav-links {
+   .modern-nav-links {
+        display: flex !important;
+        flex-direction: row !important; /* Mag-linya gihapon bisag gamay ang screen */
         margin-top: 10px;
-    }
-
-    .nav-links a {
-        margin: 0 10px; 
-        font-size: 13px;
+        gap: 15px;
+        flex-wrap: wrap; /* Kung kuwang gyud ang space, adto ra siya mo-ubos */
+        justify-content: center;
     }
     
-    /* Adjust Login Modal width for mobile */
-    .modal-content.glass-effect {
-        width: 90%; 
-    }
+    .modal-content.glass-effect { width: 90%; }
 }
 
 /* =========================================
    TOAST NOTIFICATIONS (Alerts)
    ========================================= */
-
-/* The container that holds the alerts on the top right */
 #toastBox {
     position: fixed;
     top: 30px;
@@ -393,7 +383,6 @@ body.home-page {
     z-index: 9999;
 }
 
-/* The actual white alert box */
 .toast {
     width: 350px;
     height: 60px;
@@ -409,23 +398,14 @@ body.home-page {
     overflow: hidden;
     color: #333;
     font-size: 16px;
-    
-    /* Slide in animation */
     transform: translateX(100%);
     animation: slideInToast 0.5s forwards;
 }
 
-/* The icons inside the toast */
-.toast i {
-    font-size: 28px;
-    margin-right: 15px;
-}
+.toast i { font-size: 28px; margin-right: 15px; }
+.toast.success i { color: #15c35a; } 
+.toast.error i { color: #ff3333; }   
 
-/* Specific colors for Success and Error */
-.toast.success i { color: #15c35a; } /* Green check */
-.toast.error i { color: #ff3333; }   /* Red X */
-
-/* The shrinking progress bar at the bottom */
 .toast::after {
     content: '';
     position: absolute;
@@ -439,7 +419,6 @@ body.home-page {
 .toast.success::after { background: #15c35a; }
 .toast.error::after { background: #ff3333; }
 
-/* --- Toast Animations --- */
 @keyframes slideInToast {
     100% { transform: translateX(0); }
 }
@@ -447,4 +426,3 @@ body.home-page {
 @keyframes toastProgress {
     100% { width: 0; }
 }
-

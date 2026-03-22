@@ -1,28 +1,26 @@
 /* =========================================
-   ADMIN DASHBOARD STYLES
+   ADMIN DASHBOARD STYLES (PREMIUM UPGRADE)
    ========================================= */
 
 /* Main Page Layout para sa Admin */
 body.admin-page {
-    height: 100vh;
     margin: 0;
     display: flex;
     flex-direction: column;
-    overflow: hidden;  
     position: relative; 
     font-family: sans-serif;
-}
+} 
 
-/* Background Image ug Blur (Gipangitngitan nato gamay para ma-highlight ang card) */
+/* Background Image ug Blur */
 body.admin-page::before {
     content: "";
-    position: absolute;
+    position: fixed; 
     top: -20px; left: -20px; right: -20px; bottom: -20px;
     background-image: url('/static/images/ucbackground.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    filter: blur(8px) brightness(0.8); /* Added brightness para mas dark gamay */
+    filter: blur(8px) brightness(0.8); 
     z-index: -1; 
 }
 
@@ -32,18 +30,24 @@ body.admin-page::before {
     justify-content: center;
     align-items: center;
     z-index: 1;
+    
+    /* GIDUSO PAUBOS PARA DILI MATABUNAN SA FIXED NAVBAR */
+    margin-top: 100px; 
+    margin-bottom: 50px; 
 }
 
-/* Glass Card nga Custom para sa Admin */
+/* =========================================
+   PREMIUM GLASS CARD 
+   ========================================= */
 .admin-glass-card {
-    background: rgba(255, 255, 255, 0.85); /* Mas puti gamay kaysa sa register */
-    backdrop-filter: blur(15px);
-    padding: 50px;
-    width: 800px; 
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.3));
+    backdrop-filter: blur(20px);
+    padding: 40px;
+    width: 1100px; 
     max-width: 90%;
-    border-radius: 15px;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); /* Mas dako nga shadow */
-    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2); 
+    border: 1px solid rgba(255, 255, 255, 0.6); 
     position: relative;
     text-align: center;
 }
@@ -64,10 +68,9 @@ body.admin-page::before {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 10px; /* Space between icon and text */
+    gap: 10px; 
 }
 
-/* Hover effect: Mo-alsa ug mo-hayag gamay inig tungtong sa mouse */
 .admin-btn-glass:hover {
     background-color: #2464ab;
     transform: translateY(-5px);
@@ -78,12 +81,6 @@ body.admin-page::before {
     font-size: 35px;
 }
 
-/* --- BAG-ONG LAYOUT PARA SA DASHBOARD --- */
-.admin-glass-card {
-    width: 1100px; /* Gipadako nato kay daghan na sulod */
-    padding: 40px;
-}
-
 .dashboard-grid {
     display: flex;
     gap: 40px;
@@ -91,26 +88,41 @@ body.admin-page::before {
     margin-top: 30px;
 }
 
-/* Tungaon sila sa duha */
 .dashboard-left, .dashboard-right {
     flex: 1;
 }
 
-/* --- ESTILO SA STATISTICS (WALA) --- */
+/* --- PREMIUM STATISTICS (WALA) --- */
 .stat-card {
     display: flex;
     align-items: center;
-    background: rgba(255, 255, 255, 0.6);
-    padding: 20px;
-    border-radius: 12px;
+    background: white; 
+    padding: 20px 25px;
+    border-radius: 15px;
     margin-bottom: 20px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.9);
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
 }
 
 .stat-card i {
-    font-size: 45px;
-    color: #1b4f8a;
+    background: linear-gradient(135deg, #1b4f8a, #3b82f6); 
+    color: white;
+    padding: 15px;
+    border-radius: 12px;
+    font-size: 28px;
     margin-right: 20px;
+    box-shadow: 0 4px 10px rgba(27, 79, 138, 0.3);
+    width: 60px; 
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .stat-info h3 {
@@ -138,12 +150,18 @@ body.admin-page::before {
     width: 100%;
     height: 100px;
     padding: 15px;
-    border-radius: 8px;
-    border: none;
+    border-radius: 12px;
+    border: 1px solid #ccc;
     resize: none;
     font-family: inherit;
-    background: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.9);
     outline: none;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); 
+    transition: border 0.3s;
+}
+
+.announcement-form textarea:focus {
+    border: 2px solid #3b82f6;
 }
 
 .btn-post {
@@ -161,7 +179,7 @@ body.admin-page::before {
 
 .announcement-list {
     max-height: 250px;
-    overflow-y: auto; /* Para maka-scroll kung daghan na */
+    overflow-y: auto; 
     padding-right: 10px;
 }
 
@@ -177,16 +195,32 @@ body.admin-page::before {
 .ann-msg { font-size: 14px; color: #333; margin: 0; }
 
 /* =========================================
-   MODERN ADMIN NAVBAR & DROPDOWN STYLES
+   MODERN ADMIN NAVBAR (BULLETPROOF FIXED)
    ========================================= */
+.navbar {
+    position: fixed; /* Gihimo natong FIXED aron dili na gyud mokuyog sa scroll */
+    top: 0;
+    left: 0;
+    width: 100%;
+    box-sizing: border-box; 
+    z-index: 9999;
+    
+    background: rgba(27, 79, 138, 0.85); 
+    backdrop-filter: blur(15px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 40px; 
+}
 
 .nav-links {
     display: flex;
     align-items: center;
-    gap: 8px; /* Sakto nga distansya */
+    gap: 8px; 
 }
 
-/* Style para sa normal links ug dropdown button */
 .nav-links a, .dropbtn {
     color: #ffffff;
     text-decoration: none;
@@ -204,7 +238,6 @@ body.admin-page::before {
     font-family: inherit;
 }
 
-/* Hover effect */
 .nav-links a:hover:not(.logout-btn), .dropdown:hover .dropbtn {
     background-color: rgba(255, 255, 255, 0.15);
     transform: translateY(-2px);
@@ -229,7 +262,6 @@ body.admin-page::before {
     padding-bottom: 5px;
 }
 
-/* Mga links sa sulod sa dropdown */
 .dropdown-content a {
     color: #333;
     padding: 12px 16px;
@@ -242,10 +274,9 @@ body.admin-page::before {
 .dropdown-content a:hover {
     background-color: #f1f1f1;
     color: #1b4f8a;
-    transform: none; /* Dili pa-isahon ang text sulod sa dropdown */
+    transform: none; 
 }
 
-/* I-show ang dropdown inig hover */
 .dropdown:hover .dropdown-content {
     display: block;
     animation: fadeIn 0.2s ease-in;

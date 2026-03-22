@@ -12,13 +12,14 @@
     <nav class="navbar">
         <div class="logo">
             <img src="{{ url_for('static', filename='images/uclogonav.png') }}" alt="UC Logo">
-            College of Computer Studies Sit-in Monitoring System
+            <span>College of Computer Studies Sit-in Monitoring System</span>
         </div>
-        <div class="nav-links">
-            <a href="/">Home</a>
-            <a href="#">Community</a>
-            <a href="#">About</a>
-            <a href="#" id="loginLink">Login</a>
+        
+        <div class="modern-nav-links">
+            <a href="/" class="nav-item"><i class="fas fa-home"></i> Home</a>
+            <a href="#" class="nav-item"><i class="fas fa-users"></i> Community</a>
+            <a href="/about" class="nav-item"><i class="fas fa-info-circle"></i> About</a>
+            <a href="#" id="openLogin" class="nav-login-btn"><i class="fas fa-sign-in-alt"></i> Login</a>
         </div>
     </nav>
 
@@ -28,7 +29,7 @@
             <div class="hero-text">
                 <h1>Welcome to CSS<br>Sit-in Monitoring System</h1>
                 <p>Efficiently monitor and manage student laboratory sessions.</p>
-                <button class="hero-btn" onclick="document.getElementById('loginModal').style.display='flex'">Get Started</button>
+                <button class="hero-btn" id="getStartedBtn">Get Started</button>
             </div>
 
             <div class="hero-image">

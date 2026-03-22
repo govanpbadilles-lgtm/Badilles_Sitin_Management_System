@@ -4,117 +4,135 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CCS | Register</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='register.css') }}">
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=12">
+    <link rel="stylesheet" href="{{ url_for('static', filename='register.css') }}?v=12">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body class="register-page">
+<body class="home-page"> 
 
     <nav class="navbar">
-        <div class="logo">College of Computer Studies Sit-in Monitoring System</div>
-        <div class="nav-links">
-            <a href="/">Home</a>
-            <a href="#">Community</a>
-            <a href="#">About</a>
-            <a href="/">Login</a>
+        <div class="logo">
+            <img src="{{ url_for('static', filename='images/uclogonav.png') }}" alt="UC Logo">
+            <span>College of Computer Studies Sit-in Monitoring System</span>
+        </div>
+        
+        <div class="modern-nav-links">
+            <a href="/" class="nav-item"><i class="fas fa-home"></i> Home</a>
+            <a href="#" class="nav-item"><i class="fas fa-users"></i> Community</a>
+           <a href="/about" class="nav-item"><i class="fas fa-info-circle"></i> About</a>
+            <a href="/?openLogin=true" class="nav-login-btn"><i class="fas fa-sign-in-alt"></i> Login</a>
         </div>
     </nav>
 
-    <div class="register-container">
-        <div class="glass-card">
-            <a href="/" class="close-btn" style="position: absolute; top: 15px; right: 20px; text-decoration: none; color: #333; font-size: 24px;">&times;</a>
-            
-            <h2>Sign up</h2>
+    <div class="container">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1>Welcome to CSS<br>Sit-in Monitoring System</h1>
+                <p>Efficiently monitor and manage student laboratory sessions.</p>
+                <button class="hero-btn" onclick="window.location.href='/?openLogin=true'">Get Started</button>
+            </div>
+            <div class="hero-image">
+                <img src="{{ url_for('static', filename='images/ucmainccslogo.png') }}" alt="CCS Logo">
+            </div>
+        </div>
+    </div>
 
-            <form action="/register" method="POST" id="regForm">
+    <div class="reg-container">
+        <div class="reg-glass-card">
+            <a href="/" style="position: absolute; top: 15px; right: 20px; text-decoration: none; color: #333; font-size: 24px;">&times;</a>
+            <h2 style="color: #1b4f8a; margin-bottom: 25px;">Sign up</h2>
+
+            <form action="/register" method="POST" id="regForm" class="reg-form-container">
                 
-                <div class="row">
-                    <div class="input-group">
+                <div class="form-row-2">
+                    <div class="input-modern">
+                        <i class="fas fa-id-badge"></i>
                         <input type="text" name="id_number" placeholder="ID Number" required>
                     </div>
-                    <div class="input-group">
-                        <input type="text" name="lastname" placeholder="Last Name" required>
-                    </div>
-                    <div class="input-group">
-                        <input type="text" name="firstname" placeholder="First Name" required>
-                    </div>
-                    <div class="input-group">
-                        <input type="text" name="middlename" placeholder="Middle Name">
+                    <div class="input-modern">
+                        <i class="fas fa-layer-group"></i>
+                        <select name="course_level" required>
+                            <option value="" disabled selected>-- Select Year Level --</option>
+                            <option value="1">1st Year</option>
+                            <option value="2">2nd Year</option>
+                            <option value="3">3rd Year</option>
+                            <option value="4">4th Year</option>
+                        </select>
                     </div>
                 </div>
 
-                <div class="row">
-                    <div class="input-group">
-                        <select name="course" class="modern-input" required>
-                        <option value="" disabled selected> Select  Course </option>
-                        
-                        <optgroup label="Computer Studies ">
+                <div class="form-row-3">
+                    <div class="input-modern">
+                        <i class="fas fa-user"></i>
+                        <input type="text" name="firstname" placeholder="First Name" required>
+                    </div>
+                    <div class="input-modern">
+                        <i class="fas fa-user" style="color: #999;"></i>
+                        <input type="text" name="middlename" placeholder="Middle Name (Opt)">
+                    </div>
+                    <div class="input-modern">
+                        <i class="fas fa-user"></i>
+                        <input type="text" name="lastname" placeholder="Last Name" required>
+                    </div>
+                </div>
+
+                <div class="input-modern">
+                    <i class="fas fa-graduation-cap"></i>
+                    <select name="course" required>
+                        <option value="" disabled selected>-- Select Your Course --</option>
+                        <optgroup label="Computer Studies (30 Sessions)">
                             <option value="BSIT">BSIT</option>
                             <option value="BSCS">BSCS</option>
                             <option value="BSCS-AI">BSCS-AI</option>
                         </optgroup>
-
-                        <optgroup label="Other Courses ">
+                        <optgroup label="Other Courses (15 Sessions)">
                             <option value="BSCpE">BSCpE</option>
                             <option value="BSMT">BSMT</option>
                             <option value="BSCE">BSCE</option>
                             <option value="BSME">BSME</option>
                             <option value="BSEE">BSEE</option>
                             <option value="BSIE">BSIE</option>
-                            <option value="BSNAME">BSNAME</option>
-                            <option value="BEEd">BEEd</option>
                             <option value="BS Crim">BS Crim</option>
-                            <option value="BSA">BSA</option>
                             <option value="BSBA">BSBA</option>
-                            <option value="BSCA">BSCA</option>
                             <option value="BSHM">BSHM</option>
-                            <option value="AB PolSci">AB PolSci</option>
-                            <option value="AB English">AB English</option>
                             <option value="BSN">BSN</option>
-                            <option value="BS Midwifery">BS Midwifery</option>
-                            <option value="BSECE">BSECE</option>
-                            <option value="BSTM">BSTM</option>
                         </optgroup>
                     </select>
                 </div>
-                    
-                <div class="input-group">
-                        <select name="course_level" required>
-                            <option value="" disabled selected>Select Year Level</option>
-                            <option value="1st Year">1st Year</option>
-                            <option value="2nd Year">2nd Year</option>
-                            <option value="3rd Year">3rd Year</option>
-                            <option value="4th Year">4th Year</option>
-                        </select>
+
+                <div class="form-row-2">
+                    <div class="input-modern">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" name="password" id="password" placeholder="Password" required>
+                    </div>
+                    <div class="input-modern">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" name="repeat_password" id="confirm_password" placeholder="Repeat Password" required>
                     </div>
                 </div>
 
-                <div class="input-group">
-                    <input type="password" name="password" id="password" placeholder="Password" required>
-                    <i class="fas fa-lock"></i>
-                </div>
-                <div class="input-group">
-                    <input type="password" id="confirm_password" placeholder="Repeat Password" required>
-                    <i class="fas fa-lock"></i>
-                </div>
-                
-                <div class="input-group">
-                    <input type="email" name="email" placeholder="Email" required>
-                    <i class="fas fa-envelope"></i>
-                </div>
-                <div class="input-group">
-                    <input type="text" name="address" placeholder="Address" required>
-                    <i class="fas fa-map-marker-alt"></i>
+                <div class="form-row-2">
+                    <div class="input-modern">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" name="email" placeholder="Email Address" required>
+                    </div>
+                    <div class="input-modern">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <input type="text" name="address" placeholder="Complete Address" required>
+                    </div>
                 </div>
 
-                <button type="submit" class="register-btn-glass">Register</button>
+                <button type="submit" class="btn-register-modern">Register Account</button>
+                
+                <p style="text-align: center; margin-top: 15px; font-size: 14px; color: #555;">
+                    Already have an account? <a href="/?openLogin=true" style="color: #1b4f8a; font-weight: bold; text-decoration: none;">Login Here</a>
+                </p>
             </form>
-            
-            <p class="login-link">Already have an account? <a href="/?openLogin=true">Login</a></p>
         </div>
     </div>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="{{ url_for('static', filename='script.js') }}?v=3"></script>
     <div id="toastBox"></div>
 </body>
 </html>

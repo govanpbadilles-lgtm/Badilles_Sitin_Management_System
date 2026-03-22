@@ -113,6 +113,11 @@ def home():
         
     return render_template('index.html')
 
+@app.route('/about')
+def about():
+    """The About Page."""
+    return render_template('about.html')
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -313,6 +318,56 @@ def search_student():
         'lab': sitin['lab'] if sitin else 'N/A'
     })
 
+@app.route('/student_list')
+def student_list():
+    """Admin Page para makita ang tanang registered students."""
+    # I-check kung admin ba ang ni-login
+    if 'user_id' not in session or session.get('role') != 'admin':
+        return redirect(url_for('home')) 
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Kuhaon ang listahan sa students
+    students = cursor.execute('''
+        SELECT id, id_number, firstname, middlename, lastname, course, course_level, remaining_sessions 
+        FROM users 
+        WHERE role = 'student' 
+        ORDER BY lastname ASC
+    ''').fetchall()
+    
+    conn.close()
+    
+    return render_template('student_list.html', students=students)
+
+@app.route('/delete_student/<int:id>', methods=['POST'])
+def delete_student(id):
+    if 'user_id' not in session or session.get('role') != 'admin':
+        return redirect(url_for('home'))
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM users WHERE id = ?", (id,))
+    conn.commit()
+    conn.close()
+    
+    return redirect(url_for('student_list'))
+
+@app.route('/reset_sessions', methods=['POST'])
+def reset_sessions():
+    """Function para i-reset ang tanang student sessions balik sa 30"""
+    if 'user_id' not in session or session.get('role') != 'admin':
+        return redirect(url_for('home'))
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    # I-update ang tanang estudyante, ibalik sa 30 ang sessions
+    cursor.execute("UPDATE users SET remaining_sessions = 30 WHERE role = 'student'")
+    conn.commit()
+    conn.close()
+    
+    return redirect(url_for('student_list'))
+
 @app.route('/update_profile', methods=['POST'])
 def update_profile():
     """Modawat sa mga gi-edit nga info ug bag-ong profile pic."""
@@ -470,6 +525,33 @@ def time_out_sitin():
     
     # I-redirect balik sa dashboard ug magpadala og signal para sa toast
     return redirect(url_for('admin_dashboard', timeout='success'))
+
+
+
+# EDIT STUDENT ROUTE
+@app.route('/edit_student/<int:id>', methods=['POST'])
+def edit_student(id):
+    if 'user_id' not in session or session.get('role') != 'admin':
+        return redirect(url_for('home'))
+    
+    # Kuhaon ang bag-ong gi-type sa admin didto sa Edit form
+    firstname = request.form['firstname']
+    middlename = request.form.get('middlename', '')
+    lastname = request.form['lastname']
+    course = request.form['course']
+    course_level = request.form['course_level']
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('''
+        UPDATE users 
+        SET firstname = ?, middlename = ?, lastname = ?, course = ?, course_level = ?
+        WHERE id = ?
+    ''', (firstname, middlename, lastname, course, course_level, id))
+    conn.commit()
+    conn.close()
+    
+    return redirect(url_for('student_list'))
 
 if __name__ == '__main__':
     app.run(debug=True)

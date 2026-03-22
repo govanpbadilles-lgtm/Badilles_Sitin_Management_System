@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CCS | About the System</title>
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=16">
+    <link rel="stylesheet" href="{{ url_for('static', filename='register.css') }}?v=16">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        .about-content {
+            text-align: left;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        .about-content h3 {
+            color: #1b4f8a;
+            margin-top: 25px;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #1b4f8a;
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+        .developer-section {
+            background: rgba(27, 79, 138, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+            text-align: center;
+            border: 1px solid rgba(27, 79, 138, 0.2);
+        }
+    </style>
+</head>
+</head>
+<body class="home-page"> <nav class="navbar">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='images/uclogonav.png') }}" alt="UC Logo">
+            <span>College of Computer Studies Sit-in Monitoring System</span>
+        </div>
+        
+        <div class="modern-nav-links">
+            <a href="/" class="nav-item"><i class="fas fa-home"></i> Home</a>
+            <a href="#" class="nav-item"><i class="fas fa-users"></i> Community</a>
+            <a href="/about" class="nav-item" style="font-weight: bold; color: #1b4f8a;"><i class="fas fa-info-circle"></i> About</a>
+            <a href="/?openLogin=true" class="nav-login-btn"><i class="fas fa-sign-in-alt"></i> Login</a>
+        </div>
+    </nav>
+
+    <div class="reg-container" style="padding-top: 100px;">
+        <div class="reg-glass-card" style="width: 800px; text-align: center;">
+            <h1 style="color: #1b4f8a; font-size: 36px; margin-bottom: 10px;">
+                <i class="fas fa-info-circle"></i> About the System
+            </h1>
+            <p style="color: #666; font-size: 16px;">Efficiently managing laboratory resources for the College of Computer Studies.</p>
+
+            <div class="about-content">
+                <h3><i class="fas fa-bullseye"></i> Our Purpose</h3>
+                <p>The <strong>CCS Sit-in Monitoring System</strong> is a dedicated platform designed to streamline and modernize the laboratory access process for students. It replaces manual logbooks with a secure, real-time digital tracking system, ensuring that laboratory resources are utilized efficiently and fairly.</p>
+
+                <h3><i class="fas fa-gem"></i> Key Features</h3>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li><strong>Real-Time Monitoring:</strong> Admins can view active laboratory users instantly.</li>
+                    <li><strong>Session Tracking:</strong> Automatically deducts and manages the 30-session or 15-session limits based on the student's enrolled course.</li>
+                    <li><strong>Secure Authentication:</strong> Ensures that only registered and authorized CCS students can access the facilities.</li>
+                    <li><strong>Comprehensive Records:</strong> Maintains a detailed history of laboratory usage for reporting and analytics.</li>
+                </ul>
+
+                <div class="developer-section">
+                    <h2 style="color: #1b4f8a; margin-bottom: 5px;"><i class="fas fa-code"></i> Lead Developer</h2>
+                    <p style="font-size: 20px; font-weight: bold; color: #333;">Govan</p>
+                    <p style="font-size: 14px; color: #555;">IT Student | Web Developer</p>
+                    <p style="margin-top: 10px; font-style: italic; font-size: 13px;">"Committed to building innovative solutions that elevate the educational experience."</p>
+                </div>
+            </div>
+            
+            <button onclick="window.location.href='/'" class="btn-register-modern" style="width: 200px; margin-top: 30px;"><i class="fas fa-arrow-left"></i> Back to Home</button>
+        </div>
+    </div>
+
+</body>
+</html>

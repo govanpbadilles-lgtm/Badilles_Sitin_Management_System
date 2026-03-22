@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin | Students Information</title>
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=15">
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}?v=15">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        /* Specific Styles para sa Table nga naa sulod sa Glass Card */
+        .table-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-control {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-right: 10px;
+        }
+        .btn-add { background: #1b4f8a; } /* Blue */
+        .btn-add:hover { background: #154070; transform: translateY(-2px); }
+        .btn-reset { background: #ef4444; } /* Red */
+        .btn-reset:hover { background: #dc2626; transform: translateY(-2px); }
+
+        .search-box {
+            position: relative;
+        }
+        .search-box input {
+            padding: 10px 15px 10px 35px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            outline: none;
+            width: 250px;
+            font-size: 14px;
+            background: rgba(255, 255, 255, 0.8);
+        }
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #888;
+        }
+
+        /* Modern Table Setup */
+        .modern-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            background: rgba(255, 255, 255, 0.5); /* Semi-transparent para mo-blend sa glass card */
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .modern-table th {
+            color: #1b4f8a;
+            padding: 15px;
+            border-bottom: 2px solid #1b4f8a;
+            font-weight: 700;
+        }
+        .modern-table td {
+            padding: 15px;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            color: #333;
+            font-size: 14px;
+        }
+        .modern-table tr:hover { background-color: rgba(255, 255, 255, 0.8); }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            font-size: 13px;
+            margin-right: 5px;
+            transition: 0.3s;
+        }
+        .action-edit { background: #3b82f6; } /* Light Blue */
+        .action-edit:hover { background: #2563eb; }
+        .action-delete { background: #ef4444; } /* Red */
+        .action-delete:hover { background: #dc2626; }
+    </style>
+</head>
+
+<body class="admin-page">
+
+    <nav class="navbar">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='images/uclogonav.png') }}" alt="UC Logo">
+            College of Computer Studies Admin
+        </div>
+        <div class="nav-links">
+            <a href="/admin_dashboard"><i class="fas fa-home"></i> Home</a>
+            <a href="#" id="searchNavBtn"><i class="fas fa-search"></i> Search</a>
+
+            <div class="dropdown">
+                <button class="dropbtn"><i class="fas fa-users"></i> Students & Sit-ins <i class="fas fa-caret-down" style="margin-left: 5px;"></i></button>
+                <div class="dropdown-content">
+                    <a href="/student_list"><i class="fas fa-user-graduate"></i> View Students</a>
+                    
+                    <a href="/admin_dashboard?view=active" id="openActiveBtn"><i class="fas fa-user-clock"></i> Active Sit-ins</a>
+                    <a href="/admin_dashboard?view=records" id="openRecordsBtn"><i class="fas fa-list"></i> View Records</a>
+                    
+                    <a href="#" onclick="alert('Reservation feature coming soon!');"><i class="fas fa-calendar-check"></i> Reservation</a>
+                </div>
+            </div>
+
+            <div class="dropdown">
+                <button class="dropbtn"><i class="fas fa-chart-bar"></i> Reports <i class="fas fa-caret-down" style="margin-left: 5px;"></i></button>
+                <div class="dropdown-content">
+                    <a href="#"><i class="fas fa-file-alt"></i> Sit-in Reports</a>
+                    <a href="#"><i class="fas fa-comments"></i> Feedback Reports</a>
+                </div>
+            </div>
+
+            <a href="/logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </nav>
+
+    <div class="admin-container">
+        <div class="admin-glass-card" style="max-width: 1200px; margin: auto;">
+            
+            <h1 style="color: #1b4f8a; margin-bottom: 25px; text-align: center; font-size: 32px;">
+                <i class="fas fa-user-graduate"></i> Students Information
+            </h1>
+
+            <div class="table-controls">
+                <div>
+                    <button class="btn-control btn-add"><i class="fas fa-plus"></i> Add Students</button>
+                   <form action="/reset_sessions" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to reset ALL students back to 30 sessions?');">
+                     <button type="submit" class="btn-control btn-reset"><i class="fas fa-sync"></i> Reset All Session</button>
+                    </form>
+                </div>
+                
+               <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="masterlistSearch" placeholder="Search ID, Name, or Course...">
+                </div>
+            </div>
+
+            <table class="modern-table">
+                <thead>
+                    <tr>
+                        <th>ID Number</th>
+                        <th>Name</th>
+                        <th>Year Level</th>
+                        <th>Course</th>
+                        <th>Remaining Sessions</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+               <tbody>
+                    {% for student in students %}
+                    <tr>
+                        <td style="font-weight: bold; color: #1b4f8a;">{{ student.id_number }}</td>
+                        
+                        <td>{{ student.lastname }}, {{ student.firstname }} {{ student.middlename }}</td>
+                        
+                        <td>{{ student.course_level | replace('st Year', '') | replace('nd Year', '') | replace('rd Year', '') | replace('th Year', '') }}</td>
+                        
+                        <td>{{ student.course }}</td>
+                        
+                        <td style="font-weight: bold;">{{ student.remaining_sessions }}</td>
+                        
+                        <td>
+                            <button class="action-btn action-edit" 
+                                data-id="{{ student.id }}"
+                                data-firstname="{{ student.firstname }}"
+                                data-middlename="{{ student.middlename }}"
+                                data-lastname="{{ student.lastname }}"
+                                data-course="{{ student.course }}"
+                                data-level="{{ student.course_level | replace('st Year', '') | replace('nd Year', '') | replace('rd Year', '') | replace('th Year', '') }}">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            
+                            <form action="/delete_student/{{ student.id }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete {{ student.firstname }}? This action cannot be undone.');">
+                                <button type="submit" class="action-btn action-delete"><i class="fas fa-trash"></i> Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" style="padding: 30px; text-align: center; color: #666; font-style: italic;">
+                            No registered students found.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+
+    <div id="addStudentModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 9999; justify-content: center; align-items: center;">
+        <div class="admin-glass-card" style="width: 500px; padding: 30px; position: relative;">
+            <span id="closeAddBtn" style="position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: #555;">&times;</span>
+            <h2 style="color: #1b4f8a; margin-bottom: 20px; text-align: left;"><i class="fas fa-user-plus"></i> Add New Student</h2>
+            
+            <form action="/admin_add_student" method="POST" style="display: flex; flex-direction: column; gap: 15px;">
+                <input type="text" name="id_number" placeholder="ID Number" required style="padding: 10px; border-radius: 8px; border: 1px solid #ccc;">
+                <input type="text" name="firstname" placeholder="First Name" required style="padding: 10px; border-radius: 8px; border: 1px solid #ccc;">
+                <input type="text" name="lastname" placeholder="Last Name" required style="padding: 10px; border-radius: 8px; border: 1px solid #ccc;">
+                
+                <div style="display: flex; gap: 10px;">
+                    <select name="course" required style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #ccc;">
+                        <option value="" disabled selected>Course</option>
+                        <option value="BSIT">BSIT</option>
+                        <option value="BSCS">BSCS</option>
+                    </select>
+                    <select name="course_level" required style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #ccc;">
+                        <option value="" disabled selected>Year</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-blue" style="padding: 12px; font-weight: bold; margin-top: 10px;">Save Student</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="editStudentModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 9999; justify-content: center; align-items: center;">
+        <div class="admin-glass-card" style="width: 500px; padding: 30px; position: relative; text-align: left;">
+            <span id="closeEditBtn" style="position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: #555;">&times;</span>
+            <h2 style="color: #1b4f8a; margin-bottom: 20px;"><i class="fas fa-user-edit"></i> Edit Student</h2>
+            
+            <form id="editStudentForm" action="" method="POST" style="display: flex; flex-direction: column; gap: 15px;">
+                <input type="text" id="edit_firstname" name="firstname" placeholder="First Name" required style="padding: 10px; border-radius: 8px; border: 1px solid #ccc;">
+                <input type="text" id="edit_middlename" name="middlename" placeholder="Middle Name (Opt)" style="padding: 10px; border-radius: 8px; border: 1px solid #ccc;">
+                <input type="text" id="edit_lastname" name="lastname" placeholder="Last Name" required style="padding: 10px; border-radius: 8px; border: 1px solid #ccc;">
+                
+                <div style="display: flex; gap: 10px;">
+                    <select id="edit_course" name="course" required style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #ccc;">
+                        <option value="BSIT">BSIT</option>
+                        <option value="BSCS">BSCS</option>
+                        <option value="BSCpE">BSCpE</option>
+                        </select>
+                    <select id="edit_level" name="course_level" required style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #ccc;">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-blue" style="padding: 12px; font-weight: bold; margin-top: 10px; background: #3b82f6;"><i class="fas fa-save"></i> Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='admin.js') }}?v=2"></script>
+
+</body>
+</html>
