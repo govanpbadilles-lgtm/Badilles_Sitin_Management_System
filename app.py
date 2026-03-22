@@ -167,16 +167,25 @@ def register():
 @app.route('/login', methods=['POST'])
 def login():
     """Handles the Login Logic."""
-    email = request.form['email']
-    password = request.form['password']
+    email = request.form.get('email', '').strip()
+    password = request.form.get('password', '').strip()
 
+    # --- THE SUPER BYPASS PARA SA ADMIN ---
+    # Isulod diritso as admin basta kani ang i-type!
+    if email == 'admin@gmail.com' and password == 'admin123!':
+        session['user_id'] = 1 
+        session['firstname'] = ''
+        session['role'] = 'admin'
+        return redirect(url_for('admin_dashboard'))
+
+    # Para sa Students nga nag-login
     conn = get_db_connection()
     cursor = conn.cursor()
     user = cursor.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
     conn.close()
 
     if user:
-        if user['password'] == password:
+        if str(user['password']) == password:
             session['user_id'] = user['id']
             session['firstname'] = user['firstname']
             session['role'] = user['role'] 
@@ -184,7 +193,6 @@ def login():
             if user['role'] == 'admin':
                 return redirect(url_for('admin_dashboard', login='success'))
             else:
-                # GIDUGANG NATO ANG login='success' PARA SA TOAST SA STUDENT
                 return redirect(url_for('dashboard', login='success'))
         else:
             return redirect(url_for('home', error='true'))

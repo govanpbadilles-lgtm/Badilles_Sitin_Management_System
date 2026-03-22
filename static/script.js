@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (urlParams.get('error') === 'true') {
             setTimeout(() => {
                 // GI-FIX: Gi-ilisag "ID Number" ang text
-                showToast('error', 'Incorrect ID Number or password!');
+                showToast('error', 'Incorrect Email or password!');
             }, 100);
             loginModal.style.display = "flex";
             window.history.replaceState({}, document.title, "/"); 
