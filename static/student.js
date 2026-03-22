@@ -52,4 +52,72 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+});// =======================================================
+// STUDENT DASHBOARD JAVASCRIPT
+// =======================================================
+
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // Check para sa Login Success Toast
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('login') === 'success') {
+        setTimeout(() => {
+            if (typeof showToast === 'function') {
+                showToast('success', 'Logged in successfully!');
+            }
+        }, 100);
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
+    // Check para sa Update Profile Success Toast
+    if (urlParams.get('update') === 'success') {
+        setTimeout(() => {
+            if (typeof showToast === 'function') {
+                showToast('success', 'Profile updated successfully!');
+            }
+        }, 100);
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
+    // =======================================================
+    // EDIT PROFILE MODAL LOGIC (GIKAN SA NAVBAR)
+    // =======================================================
+    const openEditProfileBtn = document.getElementById('openEditProfileBtn');
+    const editProfileModal = document.getElementById('editProfileModal');
+    const closeEditProfileBtn = document.getElementById('closeEditProfileBtn');
+
+    if (openEditProfileBtn) {
+        openEditProfileBtn.addEventListener('click', (e) => {
+            e.preventDefault(); // Pugngan nga mo-scroll pataas ang screen
+            editProfileModal.style.display = 'flex';
+        });
+    }
+
+    if (closeEditProfileBtn) {
+        closeEditProfileBtn.addEventListener('click', () => {
+            editProfileModal.style.display = 'none';
+        });
+    }
+
+    // Isira ang modal kung mo-click sa gawas
+    window.addEventListener('click', function(e) {
+        if (e.target === editProfileModal) {
+            editProfileModal.style.display = 'none';
+        }
+    });
+
 });
+
+// =======================================================
+// INSTAGRAM-STYLE PROFILE PICTURE PREVIEW
+// =======================================================
+// Kini nga function naa sa gawas aron matawag diritso sa HTML (onchange)
+function previewImage(event) {
+    var reader = new FileReader();
+    reader.onload = function(){
+        // Pangitaon ang circle image tag ug ilisan ang source sa bag-ong gipili
+        var output = document.getElementById('profilePreview');
+        output.src = reader.result;
+    };
+    reader.readAsDataURL(event.target.files[0]);
+}
