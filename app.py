@@ -65,7 +65,9 @@ def init_db():
             lab TEXT,
             time_in DATETIME DEFAULT CURRENT_TIMESTAMP,
             time_out DATETIME,
-            status TEXT DEFAULT 'Active'
+            status TEXT DEFAULT 'Active',
+            feedback TEXT DEFAULT ''
+
         )
     ''')
     conn.commit()
@@ -176,7 +178,7 @@ def login():
         session['user_id'] = 1 
         session['firstname'] = ''
         session['role'] = 'admin'
-        return redirect(url_for('admin_dashboard'))
+        return redirect(url_for('admin_dashboard', login='success'))
 
     # Para sa Students nga nag-login
     conn = get_db_connection()
@@ -261,6 +263,103 @@ def admin_dashboard():
                            announcements=announcements,
                            records=records) # Gipasa nato ang records padulong sa HTML
 
+@app.route('/history')
+def history():
+    """Tibuok page para sa Sit-in History Records"""
+    # I-check kung naka-login ba (ilisi ang role check kung para ni sa student)
+    if 'user_id' not in session or session.get('role') != 'admin':
+        return redirect(url_for('home')) 
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Kuhaon ang tanang records
+    records = cursor.execute('''
+        SELECT s.*, u.firstname, u.lastname 
+        FROM sitin_records s
+        JOIN users u ON s.id_number = u.id_number
+        ORDER BY s.time_in DESC
+    ''').fetchall()
+    
+    conn.close()
+
+    # Ipasa ang data didto sa bag-ong HTML
+    return render_template('history.html', records=records)
+
+@app.route('/active_sitins')
+def active_sitins():
+    """Tibuok page para sa mga nag-Sit-in karon (Active)"""
+    if 'user_id' not in session or session.get('role') != 'admin':
+        return redirect(url_for('home')) 
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Kuhaon LANG ang mga records nga 'Active' ang status
+    active_records = cursor.execute('''
+        SELECT s.*, u.firstname, u.lastname 
+        FROM sitin_records s
+        JOIN users u ON s.id_number = u.id_number
+        WHERE s.status = 'Active'
+        ORDER BY s.time_in DESC
+    ''').fetchall()
+    
+    conn.close()
+
+    return render_template('active_sitins.html', active_records=active_records)
+
+@app.route('/reports')
+def reports():
+    """Tibuok page para sa pag-generate og Sit-in Reports"""
+    if 'user_id' not in session or session.get('role') != 'admin':
+        return redirect(url_for('home'))
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Kuhaon ang mga gi-type sa filter gikan sa URL (kung naa)
+    start_date = request.args.get('start_date', '')
+    end_date = request.args.get('end_date', '')
+    lab_filter = request.args.get('lab', '')
+    purpose_filter = request.args.get('purpose', '')
+
+    # Base nga SQL Query
+    query = '''
+        SELECT s.*, u.firstname, u.lastname, u.course 
+        FROM sitin_records s
+        JOIN users u ON s.id_number = u.id_number
+        WHERE 1=1
+    '''
+    params = []
+
+    # I-dugang ang filters kung naay gi-select ang admin
+    if start_date:
+        query += " AND date(s.time_in) >= date(?)"
+        params.append(start_date)
+    if end_date:
+        query += " AND date(s.time_in) <= date(?)"
+        params.append(end_date)
+    if lab_filter:
+        query += " AND s.lab = ?"
+        params.append(lab_filter)
+    if purpose_filter:
+        query += " AND s.purpose = ?"
+        params.append(purpose_filter)
+
+    query += " ORDER BY s.time_in DESC"
+
+    # I-execute ang final nga query
+    records = cursor.execute(query, params).fetchall()
+
+    # Kuhaon sad ang listahan sa mga Labs ug Purpose para sa Dropdown sa HTML
+    labs = cursor.execute("SELECT DISTINCT lab FROM sitin_records WHERE lab IS NOT NULL").fetchall()
+    purposes = cursor.execute("SELECT DISTINCT purpose FROM sitin_records WHERE purpose IS NOT NULL").fetchall()
+
+    conn.close()
+
+    return render_template('reports.html', records=records, labs=labs, purposes=purposes, 
+                           start_date=start_date, end_date=end_date, lab_filter=lab_filter, purpose_filter=purpose_filter)
+
 @app.route('/post_announcement', methods=['POST'])
 def post_announcement():
     """Para mo-save sa announcement padulong sa database nga naay saktong oras."""
@@ -293,7 +392,7 @@ def post_announcement():
 def logout():
     """Logs the user out by clearing the session."""
     session.clear()
-    return redirect(url_for('home'))
+    return redirect(url_for('home',logout='success'))
 
 
 @app.route('/search_student')
@@ -560,6 +659,31 @@ def edit_student(id):
     conn.close()
     
     return redirect(url_for('student_list'))
+
+@app.route('/add_feedback', methods=['POST'])
+def add_feedback():
+    """Modawat ug mo-save sa feedback gikan sa Admin"""
+    if 'user_id' not in session or session.get('role') != 'admin':
+        return redirect(url_for('home'))
+
+    record_id = request.form['record_id']
+    feedback_text = request.form['feedback']
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # I-update ang record ug i-save ang feedback
+    cursor.execute('''
+        UPDATE sitin_records 
+        SET feedback = ? 
+        WHERE id = ?
+    ''', (feedback_text, record_id))
+    
+    conn.commit()
+    conn.close()
+
+    # I-redirect balik sa history ug magpadala og signal para sa toast
+    return redirect(url_for('history', feedback='success'))
 
 if __name__ == '__main__':
     app.run(debug=True)

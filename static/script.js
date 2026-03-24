@@ -1,73 +1,81 @@
+// =======================================================
+// GLOBAL SCRIPT & TOAST NOTIFICATIONS
+// =======================================================
+
 document.addEventListener('DOMContentLoaded', function() {
     
+    // 1. GLOBAL URL CHECKER PARA SA MGA TOASTS NGA DILI MASABLAY
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    // -- Admin/Student Login Success --
+    if (urlParams.get('login') === 'success') {
+        setTimeout(() => showToast('success', 'Logged in successfully!'), 100);
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
+    // -- Logout Success --
+    if (urlParams.get('logout') === 'success') {
+        setTimeout(() => showToast('success', 'Logged out successfully!'), 100);
+        window.history.replaceState({}, document.title, window.location.pathname); 
+    }
+
+    // -- Failed Login --
+    if (urlParams.get('error') === 'true') {
+        setTimeout(() => showToast('error', 'Incorrect Email or password!'), 100);
+        // Wala gi-clear ang URL diri aron ma-abli ang modal sa ubos
+    }
+
+    // -- Registration Success --
+    if (urlParams.get('registered') === 'true') {
+        setTimeout(() => showToast('success', 'Registration successful! You can now login.'), 100);
+        // Wala gi-clear ang URL diri aron ma-abli ang modal sa ubos
+    }
+
+    // =======================================================
+    // LOGIN MODAL LOGIC (PARA SA HOME PAGE)
+    // =======================================================
     const loginModal = document.getElementById("loginModal");
 
     if (loginModal) {
-        // GI-FIX: Gi-ilisag "openLogin" aron mo-match sa imong HTML
         const loginBtn = document.getElementById("openLogin"); 
-        
-        // GI-DUGANG: Apilon nato ang "Get Started" button
         const getStartedBtn = document.getElementById("getStartedBtn"); 
-        
         const closeBtn = document.querySelector(".close-btn"); 
 
-        // Inig click sa Login button sa Navbar
+        // Open Modal Buttons
         if (loginBtn) {
-            loginBtn.addEventListener('click', function(event) {
-                event.preventDefault();       
+            loginBtn.addEventListener('click', function(e) {
+                e.preventDefault();       
                 loginModal.style.display = "flex"; 
             });
         }
 
-        // Inig click sa "Get Started" button sa tunga
         if (getStartedBtn) {
-            getStartedBtn.addEventListener('click', function(event) {
-                event.preventDefault();       
+            getStartedBtn.addEventListener('click', function(e) {
+                e.preventDefault();       
                 loginModal.style.display = "flex"; 
             });
         }
 
-        // Inig click sa "X" button
+        // Close Modal Logic
         if (closeBtn) {
-            closeBtn.addEventListener('click', function() {
-                loginModal.style.display = "none"; 
-            });
+            closeBtn.addEventListener('click', () => loginModal.style.display = "none");
         }
 
-        // Inig click sa gawas sa puti nga kahon
         window.addEventListener('click', function(event) {
-            if (event.target === loginModal) {
-                loginModal.style.display = "none";
-            }
+            if (event.target === loginModal) loginModal.style.display = "none";
         });
 
-        // --- AUTO-OPEN MODAL & SHOW TOASTS ---
-        const urlParams = new URLSearchParams(window.location.search);
-        
-        if (urlParams.get('openLogin') === 'true') {
+        // AUTO-OPEN MODAL KUNG NAAY ERROR O BAG-ONG REGISTER
+        if (urlParams.get('openLogin') === 'true' || urlParams.get('registered') === 'true' || urlParams.get('error') === 'true') {
             loginModal.style.display = "flex";
-        }
-        
-        if (urlParams.get('registered') === 'true') {
-            setTimeout(() => {
-                showToast('success', 'Registration successful! You can now login.');
-            }, 100);
-            loginModal.style.display = "flex";
-            window.history.replaceState({}, document.title, "/"); 
-        }
-
-        // --- FAILED LOGIN ---
-        if (urlParams.get('error') === 'true') {
-            setTimeout(() => {
-                // GI-FIX: Gi-ilisag "ID Number" ang text
-                showToast('error', 'Incorrect Email or password!');
-            }, 100);
-            loginModal.style.display = "flex";
-            window.history.replaceState({}, document.title, "/"); 
+            // Karon pa nato i-clear ang URL aron limpyo
+            window.history.replaceState({}, document.title, window.location.pathname); 
         }
     }
 
-    // Password matching logic para sa Registration
+    // =======================================================
+    // REGISTRATION FORM LOGIC (PASSWORD MATCHING)
+    // =======================================================
     const regForm = document.getElementById('regForm');
 
     if (regForm) {
@@ -81,20 +89,16 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-
 });
 
 // =======================================================
-// TOAST NOTIFICATION LOGIC
+// TOAST NOTIFICATION FUNCTION
 // =======================================================
-
 function showToast(type, message) {
     let toastBox = document.getElementById('toastBox');
-    
     if (!toastBox) return; 
 
     let toast = document.createElement('div');
-    
     toast.classList.add('toast');
     toast.classList.add(type);
 

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sit-in Reports | CCS</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* CSS PARA INIG PRINT, LIMPYO ANG PAPEL */
+        @media print {
+            body { background: white; }
+            .navbar, .filter-section, .btn-print, .student-page::before, .admin-page::before { display: none !important; }
+            .admin-container { padding: 0; margin: 0; }
+            .admin-glass-card { background: none; box-shadow: none; border: none; padding: 0; width: 100%; max-width: none; }
+            table { width: 100%; border-collapse: collapse; }
+            th, td { border: 1px solid #000 !important; color: #000 !important; }
+            .print-header { display: block !important; text-align: center; margin-bottom: 20px; }
+        }
+        .print-header { display: none; } /* Gitago ni kung nag-view lang sa screen */
+    </style>
+</head>
+<body class="admin-page">
+
+    <nav class="navbar">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='images/uclogonav.png') }}" alt="UC Logo">
+            College of Computer Studies Admin
+        </div>
+        <div class="nav-links">
+            <a href="/admin_dashboard"><i class="fas fa-home"></i> Home</a>
+            <a href="#" id="openSearchBtn"><i class="fas fa-search"></i> Search</a>
+
+            <div class="dropdown">
+                <button class="dropbtn"><i class="fas fa-users"></i> Students & Sit-ins <i class="fas fa-caret-down" style="margin-left: 5px;"></i></button>
+                <div class="dropdown-content">
+                    <a href="/student_list"><i class="fas fa-user-graduate"></i> View Students</a>
+                    <a href="/active_sitins"><i class="fas fa-desktop"></i> Active Sit-ins</a>
+                    <a href="/history"><i class="fas fa-history"></i> View Records</a>
+                    <a href="#"><i class="fas fa-calendar-check"></i> Reservation</a>
+                </div>
+            </div>
+
+            <div class="dropdown">
+                <button class="dropbtn" style="background: rgba(255,255,255,0.2);"><i class="fas fa-chart-bar"></i> Reports <i class="fas fa-caret-down" style="margin-left: 5px;"></i></button>
+                <div class="dropdown-content">
+                    <a href="/reports" style="background: #f1f5f9; color: #1b4f8a; font-weight: bold;"><i class="fas fa-file-alt"></i> Sit-in Reports</a>
+                    <a href="#"><i class="fas fa-comments"></i> Feedback Reports</a>
+                </div>
+            </div>
+
+            <a href="/logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </nav>
+
+    <div class="admin-container">
+        <div class="admin-glass-card" style="width: 95%; max-width: 1400px; padding: 40px;">
+            
+            <div class="print-header">
+                <h2>College of Computer Studies</h2>
+                <h3>Laboratory Sit-in Report</h3>
+                <p>Generated on: <script>document.write(new Date().toLocaleDateString());</script></p>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="color: #1b4f8a; margin: 0;"><i class="fas fa-file-invoice"></i> Sit-in Reports Generation</h2>
+                <button onclick="window.print()" class="btn-post btn-print" style="background: #15c35a; padding: 10px 20px; font-size: 16px;">
+                    <i class="fas fa-print"></i> Print / Save as PDF
+                </button>
+            </div>
+
+            <div class="filter-section" style="background: rgba(255,255,255,0.6); padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #ddd;">
+                <form action="/reports" method="GET" style="display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-end;">
+                    
+                    <div>
+                        <label style="font-size: 12px; font-weight: bold; color: #555;">Start Date:</label><br>
+                        <input type="date" name="start_date" value="{{ start_date }}" style="padding: 8px; border-radius: 5px; border: 1px solid #ccc;">
+                    </div>
+                    
+                    <div>
+                        <label style="font-size: 12px; font-weight: bold; color: #555;">End Date:</label><br>
+                        <input type="date" name="end_date" value="{{ end_date }}" style="padding: 8px; border-radius: 5px; border: 1px solid #ccc;">
+                    </div>
+
+                    <div>
+                        <label style="font-size: 12px; font-weight: bold; color: #555;">Filter by Lab:</label><br>
+                        <select name="lab" style="padding: 8px; border-radius: 5px; border: 1px solid #ccc; width: 150px;">
+                            <option value="">All Labs</option>
+                            {% for lab in labs %}
+                                <option value="{{ lab['lab'] }}" {% if lab_filter == lab['lab'] %}selected{% endif %}>{{ lab['lab'] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label style="font-size: 12px; font-weight: bold; color: #555;">Filter by Purpose:</label><br>
+                        <select name="purpose" style="padding: 8px; border-radius: 5px; border: 1px solid #ccc; width: 180px;">
+                            <option value="">All Purposes</option>
+                            {% for purp in purposes %}
+                                <option value="{{ purp['purpose'] }}" {% if purpose_filter == purp['purpose'] %}selected{% endif %}>{{ purp['purpose'] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div style="flex-grow: 1; text-align: right;">
+                        <a href="/reports" style="text-decoration: none; color: #ff4c4c; font-weight: bold; margin-right: 15px;"><i class="fas fa-times"></i> Clear Filters</a>
+                        <button type="submit" style="background: #1b4f8a; color: white; border: none; padding: 9px 20px; border-radius: 5px; cursor: pointer; font-weight: bold;">
+                            <i class="fas fa-filter"></i> Generate Result
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <p style="margin-bottom: 10px; font-weight: bold; color: #333;">Total Records Found: <span style="color: #15c35a;">{{ records|length }}</span></p>
+            
+            <div class="table-container" style="max-height: 500px; overflow-y: auto; overflow-x: auto; border-radius: 10px; border: 1px solid #ddd;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left; background: white; font-size: 14px;">
+                    <thead style="background-color: #1b4f8a; color: white; position: sticky; top: 0; z-index: 1;">
+                        <tr>
+                            <th style="padding: 12px;">Date/Time In</th>
+                            <th style="padding: 12px;">Time Out</th>
+                            <th style="padding: 12px;">ID Number</th>
+                            <th style="padding: 12px;">Student Name</th>
+                            <th style="padding: 12px;">Course</th>
+                            <th style="padding: 12px;">Lab</th>
+                            <th style="padding: 12px;">Purpose</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in records %}
+                        <tr style="border-bottom: 1px solid #ddd;">
+                            <td style="padding: 12px;">{{ row['time_in'] }}</td>
+                            <td style="padding: 12px;">{{ row['time_out'] if row['time_out'] else '---' }}</td>
+                            <td style="padding: 12px; font-weight: bold;">{{ row['id_number'] }}</td>
+                            <td style="padding: 12px;">{{ row['firstname'] }} {{ row['lastname'] }}</td>
+                            <td style="padding: 12px;">{{ row['course'] }}</td>
+                            <td style="padding: 12px;">{{ row['lab'] }}</td>
+                            <td style="padding: 12px;">{{ row['purpose'] }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" style="padding: 30px; text-align: center; color: #666; font-style: italic;">No records found for the selected filters.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>

@@ -4,7 +4,7 @@
 
 document.addEventListener('DOMContentLoaded', function() {
     
-    // 1. I-check ang URL kung unsay i-abli o i-toast
+    // 1. I-check ang URL kung unsay i-toast
     const urlParams = new URLSearchParams(window.location.search);
     
     // Para sa Toast Notification kung naay ni sit-in
@@ -16,22 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // =======================================================
-    // AUTO-OPEN MODALS KUNG GIKAN SA LAING PAGE
-    // =======================================================
-    if (urlParams.get('view') === 'active') {
-        const activeModal = document.getElementById('activeModal');
-        if (activeModal) activeModal.style.display = 'flex';
-        window.history.replaceState({}, document.title, window.location.pathname);
-    }
-    
-    if (urlParams.get('view') === 'records') {
-        const recordsModal = document.getElementById('recordsModal');
-        if (recordsModal) recordsModal.style.display = 'flex';
-        window.history.replaceState({}, document.title, window.location.pathname);
-    }
-
-    // =======================================================
-    // SEARCH MODAL LOGIC 
+    // SEARCH MODAL LOGIC (PARA TIME-IN)
     // =======================================================
     const searchNavBtn = document.getElementById('searchNavBtn');
     const searchModal = document.getElementById('searchModal');
@@ -113,59 +98,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 .catch(error => console.error('Error fetching data:', error));
         });
     }
-
-    // =======================================================
-    // VIEW RECORDS MODAL LOGIC
-    // =======================================================
-    const openRecordsBtn = document.getElementById('openRecordsBtn');
-    const recordsModal = document.getElementById('recordsModal');
-    const closeRecordsBtn = document.getElementById('closeRecordsBtn');
-
-    // Gibutangan natog "&& recordsModal" aron dili maguba ang page kung wala ang modal
-    if (openRecordsBtn && recordsModal) {
-        openRecordsBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            recordsModal.style.display = 'flex';
-        });
-    }
-
-    if (closeRecordsBtn) {
-        closeRecordsBtn.addEventListener('click', () => {
-            recordsModal.style.display = 'none';
-        });
-    }
-
-    window.addEventListener('click', function(e) {
-        if (e.target === recordsModal) {
-            recordsModal.style.display = 'none';
-        }
-    });
-
-    // =======================================================
-    // ACTIVE SIT-INS MODAL LOGIC
-    // =======================================================
-    const openActiveBtn = document.getElementById('openActiveBtn');
-    const activeModal = document.getElementById('activeModal');
-    const closeActiveBtn = document.getElementById('closeActiveBtn');
-
-    if (openActiveBtn && activeModal) {
-        openActiveBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            activeModal.style.display = 'flex';
-        });
-    }
-
-    if (closeActiveBtn) {
-        closeActiveBtn.addEventListener('click', () => {
-            activeModal.style.display = 'none';
-        });
-    }
-
-    window.addEventListener('click', function(e) {
-        if (e.target === activeModal) {
-            activeModal.style.display = 'none';
-        }
-    });
 
     // =======================================================
     // ADD STUDENT MODAL LOGIC
