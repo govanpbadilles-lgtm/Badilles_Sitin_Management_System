@@ -17,7 +17,7 @@
             <img src="{{ url_for('static', filename='images/uclogonav.png') }}" alt="UC Logo">
             College of Computer Studies Admin
         </div>
-      <div class="nav-links">
+        <div class="nav-links">
             <a href="/admin_dashboard" style="background: rgba(255,255,255,0.2);"><i class="fas fa-home"></i> Home</a>
             <a href="#" id="searchNavBtn"><i class="fas fa-search"></i> Search</a>
 
@@ -27,18 +27,18 @@
                     <a href="/student_list"><i class="fas fa-user-graduate"></i> View Students</a>
                     <a href="/active_sitins"><i class="fas fa-desktop"></i> Active Sit-ins</a>
                     <a href="/history"><i class="fas fa-history"></i> History Records</a>
-                    <a href="#"><i class="fas fa-calendar-check"></i> Reservation</a>
+                    <a href="/admin_reservations"><i class="fas fa-calendar-check"></i> Reservation</a>
                 </div>
             </div>
 
-           <div class="dropdown">
+            <div class="dropdown">
                 <button class="dropbtn"><i class="fas fa-chart-bar"></i> Reports <i class="fas fa-caret-down" style="margin-left: 5px;"></i></button>
                 <div class="dropdown-content">
                     <a href="/reports"><i class="fas fa-file-alt"></i> Sit-in Reports</a>
-                    <a href="#"><i class="fas fa-comments"></i> Feedback Reports</a>
+                    <a href="/admin_feedbacks"><i class="fas fa-comments"></i> Feedback Reports</a>
                 </div>
             </div>
-
+            <a href="/leaderboard" style="background: rgba(255,255,255,0.2);"><i class="fas fa-trophy"></i> Leaderboard</a>
             <a href="/logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </div>
     </nav>
@@ -102,25 +102,26 @@
                         {% endfor %}
                     </div>
                 </div>          
-            </div> 
+            </div>
+
+
         </div>
     </div>
         
     <div id="searchModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;">
-     <div class="admin-glass-card" style="width: 500px; padding: 30px; position: relative;">
-         <span id="closeSearchBtn" style="position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: #555;">&times;</span>
+        <div class="admin-glass-card" style="width: 500px; padding: 30px; position: relative;">
+            <span id="closeSearchBtn" style="position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: #555;">&times;</span>
 
-         <h2 style="color: #1b4f8a; margin-bottom: 20px; text-align: left;"><i class="fas fa-search"></i> Search Student</h2>
+            <h2 style="color: #1b4f8a; margin-bottom: 20px; text-align: left;"><i class="fas fa-search"></i> Search Student</h2>
 
-         <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-             <input type="text" id="searchInputID" placeholder="Enter ID Number (e.g. 12345)" style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #ccc; outline: none;">
-             <button id="executeSearchBtn" class="btn-post" style="padding: 0 20px;"><i class="fas fa-search"></i> Search</button>
-         </div>
+            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <input type="text" id="searchInputID" placeholder="Enter ID Number (e.g. 12345)" style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #ccc; outline: none;">
+                <button id="executeSearchBtn" class="btn-post" style="padding: 0 20px;"><i class="fas fa-search"></i> Search</button>
+            </div>
 
-         <div id="searchResults" style="display: none; background: rgba(255,255,255,0.8); padding: 15px; border-radius: 8px; text-align: left;">
-             </div>
-     </div>
- </div>
+            <div id="searchResults" style="display: none; background: rgba(255,255,255,0.8); padding: 15px; border-radius: 8px; text-align: left;"></div>
+        </div>
+    </div>
 
     <div id="toastBox"></div>
     <style>

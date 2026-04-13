@@ -121,3 +121,47 @@ function previewImage(event) {
     };
     reader.readAsDataURL(event.target.files[0]);
 }
+
+// =======================================================
+    // RESERVATION MODAL LOGIC
+    // =======================================================
+    const openReservationBtn = document.getElementById('openReservationBtn');
+    const reservationModal = document.getElementById('reservationModal');
+    const closeReservationBtn = document.getElementById('closeReservationBtn');
+
+    if (openReservationBtn) {
+        openReservationBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            reservationModal.style.display = 'flex';
+        });
+    }
+    if (closeReservationBtn) {
+        closeReservationBtn.addEventListener('click', () => {
+            reservationModal.style.display = 'none';
+        });
+    }
+
+    // =======================================================
+    // FEEDBACK MODAL LOGIC
+    // =======================================================
+    const openFeedbackBtn = document.getElementById('openFeedbackBtn');
+    const feedbackModal = document.getElementById('feedbackModal');
+    const closeFeedbackBtn = document.getElementById('closeFeedbackBtn');
+
+    if (openFeedbackBtn) {
+        openFeedbackBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            feedbackModal.style.display = 'flex';
+        });
+    }
+    if (closeFeedbackBtn) {
+        closeFeedbackBtn.addEventListener('click', () => {
+            feedbackModal.style.display = 'none';
+        });
+    }
+
+    // Isira ang tanan modal kung mo-click sa dark background
+    window.addEventListener('click', function(e) {
+        if (e.target === reservationModal) reservationModal.style.display = 'none';
+        if (e.target === feedbackModal) feedbackModal.style.display = 'none';
+    });

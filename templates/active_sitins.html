@@ -26,17 +26,16 @@
                 <div class="dropdown-content">
                     <a href="/student_list"><i class="fas fa-list-ul"></i> View All Students</a>
                     <a href="/active_sitins" style="background: #f1f5f9; color: #1b4f8a;"><i class="fas fa-desktop"></i> Active Sit-ins</a>
-                    <a href="/history"><i class="fas fa-history"></i> Sit-in Records/History</a>
+                    <a href="/history"><i class="fas fa-history"></i> History Records</a>
+                    <a href="/admin_reservations"><i class="fas fa-calendar-check"></i> Reservation</a>
                 </div>
             </div>
 
             <div class="dropdown">
-                <a class="dropbtn">
-                    <i class="fas fa-chart-line"></i> Reports <i class="fas fa-caret-down"></i>
-                </a>
+                <button class="dropbtn"><i class="fas fa-chart-bar"></i> Reports <i class="fas fa-caret-down" style="margin-left: 5px;"></i></button>
                 <div class="dropdown-content">
-                    <a href="#"><i class="fas fa-file-export"></i> Generate Reports</a>
-                    <a href="#"><i class="fas fa-chart-pie"></i> Lab Statistics</a>
+                    <a href="/reports"><i class="fas fa-file-alt"></i> Sit-in Reports</a>
+                    <a href="/admin_feedbacks"><i class="fas fa-comments"></i> Feedback Reports</a>
                 </div>
             </div>
 
@@ -85,7 +84,7 @@
                             <td style="padding: 15px; text-align: center;">
                                 <form action="/time_out_sitin" method="POST" style="display:inline;">
                                     <input type="hidden" name="record_id" value="{{ row['id'] }}">
-                                    <button type="submit" onclick="return confirm('Are you sure you want to Time Out {{ row['firstname'] }}? This will deduct 1 session.');" 
+                                    <button type="submit" onclick="return confirm('Are you sure you want to Time Out  {[row,firstname]}? This will deduct 1 session.');" 
                                             style="background: #ff4c4c; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; transition: 0.3s;"
                                             onmouseover="this.style.background='#cc0000'" onmouseout="this.style.background='#ff4c4c'">
                                         <i class="fas fa-sign-out-alt"></i> Time Out

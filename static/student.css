@@ -240,3 +240,57 @@ body.student-page::before {
 #profileUpload {
     display: none;
 }
+
+/* =========================================
+   PREMIUM STUDENT FEEDBACK MODAL
+   ========================================= */
+
+.premium-feedback-card {
+    background: linear-gradient(145deg, #ffffff, #f8fafc) !important;
+    border-radius: 20px !important;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15) !important;
+    border: 1px solid rgba(255,255,255,0.8) !important;
+}
+
+.feedback-icon-box {
+    width: 80px; height: 80px; 
+    background: linear-gradient(135deg, #e0f2fe, #bae6fd);
+    border-radius: 50%; 
+    display: flex; justify-content: center; align-items: center; 
+    margin: 0 auto 15px auto; 
+    color: #0284c7; font-size: 35px; 
+    box-shadow: 0 8px 16px rgba(2, 132, 199, 0.15);
+}
+
+.premium-textarea {
+    width: 100%; padding: 15px; border-radius: 12px; 
+    border: 2px solid #e2e8f0; font-family: inherit; 
+    resize: none; font-size: 15px; outline: none; 
+    transition: all 0.3s ease; background: #f1f5f9; 
+    box-sizing: border-box; color: #334155;
+}
+
+.premium-textarea:focus {
+    border-color: #3b82f6;
+    background: #ffffff;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+}
+
+.premium-submit-btn {
+    padding: 15px; 
+    background: linear-gradient(135deg, #0284c7, #2563eb); 
+    color: white; border: none; border-radius: 12px; 
+    font-weight: bold; font-size: 16px; cursor: pointer; 
+    transition: all 0.3s ease; 
+    box-shadow: 0 6px 15px rgba(37, 99, 235, 0.3);
+}
+
+.premium-submit-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(37, 99, 235, 0.4);
+}
+
+.close-feedback-hover:hover {
+    color: #ef4444 !important;
+    transform: rotate(90deg) scale(1.1);
+}

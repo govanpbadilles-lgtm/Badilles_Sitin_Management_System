@@ -1,33 +1,32 @@
 import os
 import sqlite3
 from werkzeug.utils import secure_filename
+from werkzeug.security import generate_password_hash, check_password_hash  # FIX #1: Password hashing
 from datetime import datetime, timedelta
-from flask import Flask, render_template, request, redirect, url_for, session,jsonify
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 
 app = Flask(__name__)
-# Secret key is required for 'session' (logging in) to work securely.
-app.secret_key = 'super_secret_key_ccs_sit_in' 
+app.secret_key = os.environ.get('SECRET_KEY', 'super_secret_key_ccs_sit_in')  # FIX #3: Env variable
 
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
-app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024  # Maximum 2MB ang size sa picture
+app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 # =======================================================
 # DATABASE MANAGEMENT
 # =======================================================
 def get_db_connection():
-    """Opens a connection to the SQLite database file."""
     conn = sqlite3.connect('students.db')
-    conn.row_factory = sqlite3.Row 
+    conn.row_factory = sqlite3.Row
     return conn
 
 def init_db():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # 1. USERS TABLE (Gidugangan og remaining_sessions)
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -46,7 +45,6 @@ def init_db():
         )
     ''')
 
-    # 2. ANNOUNCEMENTS TABLE
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS announcements (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -56,7 +54,6 @@ def init_db():
         )
     ''')
 
-    # 3. SIT-IN RECORDS TABLE (Bag-o para ma-track ang lab ug purpose)
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS sitin_records (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -67,35 +64,51 @@ def init_db():
             time_out DATETIME,
             status TEXT DEFAULT 'Active',
             feedback TEXT DEFAULT ''
-
         )
     ''')
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS student_feedback (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id_number TEXT NOT NULL,
+            student_name TEXT NOT NULL,
+            message TEXT NOT NULL,
+            date_submitted DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS reservations (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id_number TEXT NOT NULL,
+            res_date TEXT NOT NULL,
+            res_lab TEXT NOT NULL,
+            res_purpose TEXT NOT NULL,
+            status TEXT DEFAULT 'Pending'
+        )
+    ''')
+
     conn.commit()
     conn.close()
 
 def create_default_admin():
-    """Magbuhat og automatic nga admin account kung wala pay admin sa database."""
     conn = get_db_connection()
     cursor = conn.cursor()
-    
-    # I-check kung naa na ba tay user nga naay role nga 'admin'
     admin = cursor.execute("SELECT * FROM users WHERE role = 'admin'").fetchone()
-    
-    # Kung WALA pay admin, mag-insert ta og usa
     if not admin:
         try:
+            # FIX #1 APPLIED: Hash the default admin password
+            hashed_pw = generate_password_hash('admin123')
             cursor.execute('''
                 INSERT INTO users (id_number, lastname, firstname, middlename, course_level, password, email, course, address, role)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ''', ('ADMIN-001', 'Admin', 'CCS', '', 'N/A', 'admin123', 'admin@ccs.edu.ph', 'N/A', 'UC Campus', 'admin'))
+            ''', ('ADMIN-001', 'Admin', 'CCS', '', 'N/A', hashed_pw, 'admin@ccs.edu.ph', 'N/A', 'UC Campus', 'admin'))
             conn.commit()
             print("Default admin account successfully created!")
         except sqlite3.IntegrityError:
-            pass 
-            
+            pass
     conn.close()
 
-# Initialize the database and create admin
 init_db()
 create_default_admin()
 
@@ -105,93 +118,74 @@ create_default_admin()
 # =======================================================
 @app.route('/')
 def home():
-    """The Home Page."""
     if 'user_id' in session:
-        # Kung naka-login na, i-check kung admin ba o student
         if session.get('role') == 'admin':
             return redirect(url_for('admin_dashboard'))
         else:
             return redirect(url_for('dashboard'))
-        
     return render_template('index.html')
 
 @app.route('/about')
 def about():
-    """The About Page."""
     return render_template('about.html')
 
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    """The Registration Page."""
     if request.method == 'POST':
         id_number = request.form['id_number']
         lastname = request.form['lastname']
         firstname = request.form['firstname']
-        middlename = request.form.get('middlename', '') 
+        middlename = request.form.get('middlename', '')
         course_level = request.form['course_level']
         password = request.form['password']
         email = request.form['email']
         course = request.form['course']
         address = request.form['address']
 
-        # ==========================================
-        # LOGIC PARA SA SESSIONS BASE SA COURSE
-        # ==========================================
         if course in ['BSIT', 'BSCS', 'BSCS-AI']:
             sessions = 30
         else:
             sessions = 15
-        # ==========================================
+
+        # FIX #1 APPLIED: Hash password before saving
+        hashed_pw = generate_password_hash(password)
 
         conn = get_db_connection()
         cursor = conn.cursor()
-        
         try:
-            # GI-UPDATE: Gi-apil na nato ang 'remaining_sessions' ug ang variable nga 'sessions' sa tumoy
             cursor.execute('''
                 INSERT INTO users (id_number, lastname, firstname, middlename, course_level, password, email, course, address, remaining_sessions)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (id_number, lastname, firstname, middlename, course_level, password, email, course, address, sessions))
-            
+            ''', (id_number, lastname, firstname, middlename, course_level, hashed_pw, email, course, address, sessions))
             conn.commit()
             conn.close()
-            
-            # Success! Redirect to Home and tell it to show the toast
             return redirect(url_for('home', registered='true'))
-            
         except sqlite3.IntegrityError:
+            conn.close()
             return "Error: This ID Number is already registered. <a href='/register'>Try Again</a>"
-        
+
     return render_template('register.html')
 
 
 @app.route('/login', methods=['POST'])
 def login():
-    """Handles the Login Logic."""
     email = request.form.get('email', '').strip()
     password = request.form.get('password', '').strip()
 
-    # --- THE SUPER BYPASS PARA SA ADMIN ---
-    # Isulod diritso as admin basta kani ang i-type!
-    if email == 'admin@gmail.com' and password == 'admin123!':
-        session['user_id'] = 1 
-        session['firstname'] = ''
-        session['role'] = 'admin'
-        return redirect(url_for('admin_dashboard', login='success'))
-
-    # Para sa Students nga nag-login
+    # FIX #3 APPLIED: Admin bypass kuhaa na, gamiton ang database login para sa tanan
     conn = get_db_connection()
     cursor = conn.cursor()
     user = cursor.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
     conn.close()
 
     if user:
-        if str(user['password']) == password:
+        # FIX #1 APPLIED: check_password_hash para sa verification
+        if check_password_hash(user['password'], password):
             session['user_id'] = user['id']
             session['firstname'] = user['firstname']
-            session['role'] = user['role'] 
-            
+            session['role'] = user['role']
+
             if user['role'] == 'admin':
                 return redirect(url_for('admin_dashboard', login='success'))
             else:
@@ -201,138 +195,123 @@ def login():
     else:
         return redirect(url_for('home', error='true'))
 
+
 @app.route('/dashboard')
 def dashboard():
-    """The Protected Student Page."""
     if 'user_id' not in session or session.get('role') == 'admin':
         return redirect(url_for('home'))
-    
+
     conn = get_db_connection()
     cursor = conn.cursor()
-    
-    # Kuhaon ang kompleto nga info sa ni-login nga estudyante
     student = cursor.execute("SELECT * FROM users WHERE id = ?", (session['user_id'],)).fetchone()
-    
-    # --- KINI ANG ATONG BAG-ONG SAFETY CHECKER ---
-    # Kung ang session naa sa browser pero ang user wala na sa database (na-delete)
-    if student is None:
-        session.clear() # I-clear ang daan nga session
-        conn.close()
-        return redirect(url_for('home')) 
-    # ---------------------------------------------
 
-    # Kuhaon ang mga announcements gikan sa database
+    if student is None:
+        session.clear()
+        conn.close()
+        return redirect(url_for('home'))
+
     announcements = cursor.execute("SELECT * FROM announcements ORDER BY date_posted DESC").fetchall()
-    
+
+    # BAG-O: Kuhaon ang reservations sa current student
+    reservations = cursor.execute("""
+        SELECT * FROM reservations 
+        WHERE id_number = ? 
+        ORDER BY id DESC
+    """, (student['id_number'],)).fetchall()
+
     conn.close()
-    
-    return render_template('student.html', student=student, announcements=announcements)
+
+    return render_template('student.html', student=student, announcements=announcements, reservations=reservations)
+
 
 @app.route('/admin_dashboard')
 def admin_dashboard():
-    """The Protected Admin Page."""
     if 'user_id' not in session or session.get('role') != 'admin':
-        return redirect(url_for('home')) 
-    
+        return redirect(url_for('home'))
+
     conn = get_db_connection()
     cursor = conn.cursor()
-    
-    # 1. Kuhaon nato ang saktong Statistics gikan sa database
+
     total_students = cursor.execute("SELECT COUNT(*) FROM users WHERE role = 'student'").fetchone()[0]
     current_sitin = cursor.execute("SELECT COUNT(*) FROM sitin_records WHERE status = 'Active'").fetchone()[0]
     total_sitin = cursor.execute("SELECT COUNT(*) FROM sitin_records").fetchone()[0]
-    
-    # 2. Kuhaon nato ang mga Announcements
     announcements = cursor.execute("SELECT * FROM announcements ORDER BY date_posted DESC").fetchall()
-
-    # 3. BAG-O: Kuhaon nato ang mga Sit-in Records (Gi-join nato sa users para makuha ang pangalan)
     records = cursor.execute('''
-        SELECT s.*, u.firstname, u.lastname 
+        SELECT s.*, u.firstname, u.lastname
         FROM sitin_records s
         JOIN users u ON s.id_number = u.id_number
         ORDER BY s.time_in DESC
     ''').fetchall()
-    
+
     conn.close()
 
-    return render_template('admin_dashboard.html', 
+    return render_template('admin_dashboard.html',
                            firstname=session['firstname'],
                            total_students=total_students,
                            current_sitin=current_sitin,
                            total_sitin=total_sitin,
                            announcements=announcements,
-                           records=records) # Gipasa nato ang records padulong sa HTML
+                           records=records)
+
 
 @app.route('/history')
 def history():
-    """Tibuok page para sa Sit-in History Records"""
-    # I-check kung naka-login ba (ilisi ang role check kung para ni sa student)
     if 'user_id' not in session or session.get('role') != 'admin':
-        return redirect(url_for('home')) 
-    
+        return redirect(url_for('home'))
+
     conn = get_db_connection()
     cursor = conn.cursor()
-    
-    # Kuhaon ang tanang records
     records = cursor.execute('''
-        SELECT s.*, u.firstname, u.lastname 
+        SELECT s.*, u.firstname, u.lastname
         FROM sitin_records s
         JOIN users u ON s.id_number = u.id_number
         ORDER BY s.time_in DESC
     ''').fetchall()
-    
     conn.close()
 
-    # Ipasa ang data didto sa bag-ong HTML
     return render_template('history.html', records=records)
+
 
 @app.route('/active_sitins')
 def active_sitins():
-    """Tibuok page para sa mga nag-Sit-in karon (Active)"""
     if 'user_id' not in session or session.get('role') != 'admin':
-        return redirect(url_for('home')) 
-    
+        return redirect(url_for('home'))
+
     conn = get_db_connection()
     cursor = conn.cursor()
-    
-    # Kuhaon LANG ang mga records nga 'Active' ang status
     active_records = cursor.execute('''
-        SELECT s.*, u.firstname, u.lastname 
+        SELECT s.*, u.firstname, u.lastname
         FROM sitin_records s
         JOIN users u ON s.id_number = u.id_number
         WHERE s.status = 'Active'
         ORDER BY s.time_in DESC
     ''').fetchall()
-    
     conn.close()
 
     return render_template('active_sitins.html', active_records=active_records)
 
+
 @app.route('/reports')
 def reports():
-    """Tibuok page para sa pag-generate og Sit-in Reports"""
     if 'user_id' not in session or session.get('role') != 'admin':
         return redirect(url_for('home'))
 
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Kuhaon ang mga gi-type sa filter gikan sa URL (kung naa)
     start_date = request.args.get('start_date', '')
     end_date = request.args.get('end_date', '')
     lab_filter = request.args.get('lab', '')
     purpose_filter = request.args.get('purpose', '')
 
-    # Base nga SQL Query
     query = '''
-        SELECT s.*, u.firstname, u.lastname, u.course 
+        SELECT s.*, u.firstname, u.lastname, u.course
         FROM sitin_records s
         JOIN users u ON s.id_number = u.id_number
         WHERE 1=1
     '''
     params = []
 
-    # I-dugang ang filters kung naay gi-select ang admin
     if start_date:
         query += " AND date(s.time_in) >= date(?)"
         params.append(start_date)
@@ -348,56 +327,44 @@ def reports():
 
     query += " ORDER BY s.time_in DESC"
 
-    # I-execute ang final nga query
     records = cursor.execute(query, params).fetchall()
-
-    # Kuhaon sad ang listahan sa mga Labs ug Purpose para sa Dropdown sa HTML
     labs = cursor.execute("SELECT DISTINCT lab FROM sitin_records WHERE lab IS NOT NULL").fetchall()
     purposes = cursor.execute("SELECT DISTINCT purpose FROM sitin_records WHERE purpose IS NOT NULL").fetchall()
-
     conn.close()
 
-    return render_template('reports.html', records=records, labs=labs, purposes=purposes, 
+    return render_template('reports.html', records=records, labs=labs, purposes=purposes,
                            start_date=start_date, end_date=end_date, lab_filter=lab_filter, purpose_filter=purpose_filter)
+
 
 @app.route('/post_announcement', methods=['POST'])
 def post_announcement():
-    """Para mo-save sa announcement padulong sa database nga naay saktong oras."""
     if 'user_id' not in session or session.get('role') != 'admin':
         return redirect(url_for('home'))
-        
+
     message = request.form['message']
     admin_name = session['firstname']
-    
-    # 1. Kuhaon ang saktong oras sa Pilipinas (UTC + 8)
-    from datetime import datetime, timedelta
-    ph_time = (datetime.utcnow() + timedelta(hours=8)).strftime('%Y-%m-%d %I:%M %p') # Gibutangan nakog %I:%M %p para AM/PM ang format
-    
+    ph_time = (datetime.utcnow() + timedelta(hours=8)).strftime('%Y-%m-%d %I:%M %p')
+
     conn = get_db_connection()
     cursor = conn.cursor()
-    
-    # 2. I-apil nato ang ph_time sa pag-insert as date_posted
     cursor.execute('''
-        INSERT INTO announcements (admin_name, message, date_posted) 
+        INSERT INTO announcements (admin_name, message, date_posted)
         VALUES (?, ?, ?)
     ''', (admin_name, message, ph_time))
-    
     conn.commit()
     conn.close()
-    
-    # Mobalik sa admin dashboard nga naay signal nga success
+
     return redirect(url_for('admin_dashboard', posted='true'))
+
 
 @app.route('/logout')
 def logout():
-    """Logs the user out by clearing the session."""
     session.clear()
-    return redirect(url_for('home',logout='success'))
+    return redirect(url_for('home', logout='success'))
 
 
 @app.route('/search_student')
 def search_student():
-    """Kini mo-pangita sa estudyante gamit ang ID Number ug ibalik ang iyang info."""
     if 'user_id' not in session or session.get('role') != 'admin':
         return jsonify({'error': 'Unauthorized'}), 401
 
@@ -405,14 +372,12 @@ def search_student():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Pangitaon ang student
     student = cursor.execute("SELECT * FROM users WHERE id_number = ? AND role = 'student'", (id_number,)).fetchone()
 
     if not student:
         conn.close()
         return jsonify({'found': False, 'message': 'Student not found!'})
 
-    # Pangitaon kung naay 'Active' nga sit-in karon
     sitin = cursor.execute("SELECT * FROM sitin_records WHERE id_number = ? AND status = 'Active'", (id_number,)).fetchone()
     conn.close()
 
@@ -425,59 +390,63 @@ def search_student():
         'lab': sitin['lab'] if sitin else 'N/A'
     })
 
+
 @app.route('/student_list')
 def student_list():
-    """Admin Page para makita ang tanang registered students."""
-    # I-check kung admin ba ang ni-login
     if 'user_id' not in session or session.get('role') != 'admin':
-        return redirect(url_for('home')) 
-    
+        return redirect(url_for('home'))
+
     conn = get_db_connection()
     cursor = conn.cursor()
-    
-    # Kuhaon ang listahan sa students
     students = cursor.execute('''
-        SELECT id, id_number, firstname, middlename, lastname, course, course_level, remaining_sessions 
-        FROM users 
-        WHERE role = 'student' 
+        SELECT id, id_number, firstname, middlename, lastname, course, course_level, remaining_sessions
+        FROM users
+        WHERE role = 'student'
         ORDER BY lastname ASC
     ''').fetchall()
-    
     conn.close()
-    
+
     return render_template('student_list.html', students=students)
+
 
 @app.route('/delete_student/<int:id>', methods=['POST'])
 def delete_student(id):
     if 'user_id' not in session or session.get('role') != 'admin':
         return redirect(url_for('home'))
-    
+
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("DELETE FROM users WHERE id = ?", (id,))
     conn.commit()
     conn.close()
-    
+
     return redirect(url_for('student_list'))
+
 
 @app.route('/reset_sessions', methods=['POST'])
 def reset_sessions():
-    """Function para i-reset ang tanang student sessions balik sa 30"""
     if 'user_id' not in session or session.get('role') != 'admin':
         return redirect(url_for('home'))
-    
+
     conn = get_db_connection()
     cursor = conn.cursor()
-    # I-update ang tanang estudyante, ibalik sa 30 ang sessions
-    cursor.execute("UPDATE users SET remaining_sessions = 30 WHERE role = 'student'")
+    # FIX #5 APPLIED: Resetting based on course type (IT = 30, others = 15)
+    cursor.execute("""
+        UPDATE users 
+        SET remaining_sessions = CASE 
+            WHEN course IN ('BSIT', 'BSCS', 'BSCS-AI') THEN 30 
+            ELSE 15 
+        END
+        WHERE role = 'student'
+    """)
     conn.commit()
     conn.close()
-    
+
     return redirect(url_for('student_list'))
+
 
 @app.route('/update_profile', methods=['POST'])
 def update_profile():
-    """Modawat sa mga gi-edit nga info ug bag-ong profile pic."""
     if 'user_id' not in session:
         return redirect(url_for('home'))
 
@@ -486,26 +455,20 @@ def update_profile():
     lastname = request.form['lastname']
     course = request.form['course']
     address = request.form['address']
-    
+
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # I-check kung naay gi-upload nga picture
     file = request.files.get('profile_pic')
     if file and allowed_file(file.filename):
-        # Himuong safe ang filename ug i-save sa uploads folder
         filename = secure_filename(file.filename)
-        # Butangan natog user_id sa unahan para dili magkaparehas og pangalan
         unique_filename = f"user_{user_id}_{filename}"
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], unique_filename))
-        
-        # I-update apil ang picture
         cursor.execute('''
             UPDATE users SET firstname=?, lastname=?, course=?, address=?, profile_pic=?
             WHERE id=?
         ''', (firstname, lastname, course, address, unique_filename, user_id))
     else:
-        # I-update ang info lang (walay picture gi-ilis)
         cursor.execute('''
             UPDATE users SET firstname=?, lastname=?, course=?, address=?
             WHERE id=?
@@ -513,15 +476,13 @@ def update_profile():
 
     conn.commit()
     conn.close()
-    
-    # I-update ang session name basig nag-ilis siyag firstname
     session['firstname'] = firstname
 
     return redirect(url_for('dashboard', update='success'))
 
+
 @app.route('/sit_in', methods=['POST'])
 def sit_in():
-    """Modawat sa porma gikan sa Search Modal ug mag-record sa Sit-in."""
     if 'user_id' not in session or session.get('role') != 'admin':
         return redirect(url_for('home'))
 
@@ -532,28 +493,22 @@ def sit_in():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # 1. Pangitaon ang estudyante ug i-check kung naa pay sessions nabilin
     student = cursor.execute("SELECT * FROM users WHERE id_number = ?", (id_number,)).fetchone()
-    
-    if student and student['remaining_sessions'] > 0:
-        # 1. Kuhaon ang oras sa Pilipinas (UTC + 8)
-        ph_time = (datetime.utcnow() + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
 
-        # 2. I-apil nato ang ph_time sa atong pag-save (Gi-dugang ang time_in)
+    if student and student['remaining_sessions'] > 0:
+        ph_time = (datetime.utcnow() + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
         cursor.execute('''
             INSERT INTO sitin_records (id_number, purpose, lab, status, time_in)
             VALUES (?, ?, ?, 'Active', ?)
         ''', (id_number, purpose, lab, ph_time))
-        
         conn.commit()
-    
-    conn.close()
 
+    conn.close()
     return redirect(url_for('admin_dashboard', sitin='success'))
+
 
 @app.route('/logout_sitin', methods=['POST'])
 def logout_sitin():
-    """Mo-time out sa estudyante gikan sa laboratory ug mo-minus sa session."""
     if 'user_id' not in session or session.get('role') != 'admin':
         return redirect(url_for('home'))
 
@@ -562,107 +517,88 @@ def logout_sitin():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Kuhaon daan nato ang ID Number sa estudyante nga tag-iya aning record
-    record = cursor.execute("SELECT id_number FROM sitin_records WHERE id = ?", (record_id,)).fetchone()
-
-    # I-sure nato nga 'Active' pa siya usa nato minusan para dili madoble og minus
-    if record and record['status'] == 'Active':
-        id_number = record['id_number']
-
-        # 1. Kuhaon ang oras sa Pilipinas (UTC + 8)
-        ph_time = (datetime.utcnow() + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
-
-        # 2. I-update ang status padulong 'Completed' ug ipasa ang saktong time_out
-        cursor.execute('''
-            UPDATE sitin_records 
-            SET status = 'Completed', time_out = ? 
-            WHERE id = ?
-        ''', (ph_time, record_id))
-        
-        # 3. Minusan ang remaining sessions
-        cursor.execute('''
-            UPDATE users 
-            SET remaining_sessions = remaining_sessions - 1 
-            WHERE id_number = ? AND remaining_sessions > 0
-        ''', (id_number,))
-        conn.commit()
-        
-    conn.close()
-
-    # I-redirect balik sa dashboard nga naay signal
-    return redirect(url_for('admin_dashboard', logout_sitin='success'))
-
-@app.route('/time_out_sitin', methods=['POST'])
-def time_out_sitin():
-    """Mo-time out sa estudyante gikan sa lab ug mo-minus sa session."""
-    if 'user_id' not in session or session.get('role') != 'admin':
-        return redirect(url_for('home'))
-
-    record_id = request.form['record_id']
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    # Pangitaon nato kung naa ba gyud ang record ug kung Active pa
+    # FIX #2 APPLIED: Gi-apil na ang 'status' sa SELECT para dili mag-error
     record = cursor.execute("SELECT id_number, status FROM sitin_records WHERE id = ?", (record_id,)).fetchone()
 
     if record and record['status'] == 'Active':
         id_number = record['id_number']
-
-        # 1. Kuhaon ang saktong oras sa Pilipinas (PST)
-        from datetime import datetime, timedelta
         ph_time = (datetime.utcnow() + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
 
-        # 2. I-update ang status padulong 'Completed' ug ibutang ang time_out
         cursor.execute('''
-            UPDATE sitin_records 
-            SET status = 'Completed', time_out = ? 
+            UPDATE sitin_records
+            SET status = 'Completed', time_out = ?
             WHERE id = ?
         ''', (ph_time, record_id))
-        
-        # 3. Karon pa nato MINUSAN ang remaining sessions
+
         cursor.execute('''
-            UPDATE users 
-            SET remaining_sessions = remaining_sessions - 1 
+            UPDATE users
+            SET remaining_sessions = remaining_sessions - 1
             WHERE id_number = ? AND remaining_sessions > 0
         ''', (id_number,))
-        
         conn.commit()
-        
+
     conn.close()
-    
-    # I-redirect balik sa dashboard ug magpadala og signal para sa toast
+    return redirect(url_for('admin_dashboard', logout_sitin='success'))
+
+
+@app.route('/time_out_sitin', methods=['POST'])
+def time_out_sitin():
+    if 'user_id' not in session or session.get('role') != 'admin':
+        return redirect(url_for('home'))
+
+    record_id = request.form['record_id']
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    record = cursor.execute("SELECT id_number, status FROM sitin_records WHERE id = ?", (record_id,)).fetchone()
+
+    if record and record['status'] == 'Active':
+        id_number = record['id_number']
+        ph_time = (datetime.utcnow() + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
+
+        cursor.execute('''
+            UPDATE sitin_records
+            SET status = 'Completed', time_out = ?
+            WHERE id = ?
+        ''', (ph_time, record_id))
+
+        cursor.execute('''
+            UPDATE users
+            SET remaining_sessions = remaining_sessions - 1
+            WHERE id_number = ? AND remaining_sessions > 0
+        ''', (id_number,))
+        conn.commit()
+
+    conn.close()
     return redirect(url_for('admin_dashboard', timeout='success'))
 
 
-
-# EDIT STUDENT ROUTE
 @app.route('/edit_student/<int:id>', methods=['POST'])
 def edit_student(id):
     if 'user_id' not in session or session.get('role') != 'admin':
         return redirect(url_for('home'))
-    
-    # Kuhaon ang bag-ong gi-type sa admin didto sa Edit form
+
     firstname = request.form['firstname']
     middlename = request.form.get('middlename', '')
     lastname = request.form['lastname']
     course = request.form['course']
     course_level = request.form['course_level']
-    
+
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute('''
-        UPDATE users 
+        UPDATE users
         SET firstname = ?, middlename = ?, lastname = ?, course = ?, course_level = ?
         WHERE id = ?
     ''', (firstname, middlename, lastname, course, course_level, id))
     conn.commit()
     conn.close()
-    
+
     return redirect(url_for('student_list'))
+
 
 @app.route('/add_feedback', methods=['POST'])
 def add_feedback():
-    """Modawat ug mo-save sa feedback gikan sa Admin"""
     if 'user_id' not in session or session.get('role') != 'admin':
         return redirect(url_for('home'))
 
@@ -671,19 +607,216 @@ def add_feedback():
 
     conn = get_db_connection()
     cursor = conn.cursor()
-    
-    # I-update ang record ug i-save ang feedback
     cursor.execute('''
-        UPDATE sitin_records 
-        SET feedback = ? 
+        UPDATE sitin_records
+        SET feedback = ?
         WHERE id = ?
     ''', (feedback_text, record_id))
-    
     conn.commit()
     conn.close()
 
-    # I-redirect balik sa history ug magpadala og signal para sa toast
     return redirect(url_for('history', feedback='success'))
 
+
+@app.route('/submit_reservation', methods=['POST'])
+def submit_reservation():
+    id_number = request.form['id_number']
+    res_date = request.form['res_date']
+    res_lab = request.form['res_lab']
+    res_purpose = request.form['res_purpose']
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('''
+        INSERT INTO reservations (id_number, res_date, res_lab, res_purpose)
+        VALUES (?, ?, ?, ?)
+    ''', (id_number, res_date, res_lab, res_purpose))
+    conn.commit()
+    conn.close()
+
+    return redirect(url_for('dashboard'))
+
+
+@app.route('/submit_student_feedback', methods=['POST'])
+def submit_student_feedback():
+    id_number = request.form['id_number']
+    student_name = request.form['student_name']
+    message = request.form['message']
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('''
+        INSERT INTO student_feedback (id_number, student_name, message)
+        VALUES (?, ?, ?)
+    ''', (id_number, student_name, message))
+    conn.commit()
+    conn.close()
+
+    return redirect(url_for('dashboard'))
+
+
+@app.route('/leaderboard')
+def leaderboard():
+    if 'user_id' not in session:
+        return redirect(url_for('home'))
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Get all students with their sit-in data for leaderboard calculation
+    students = cursor.execute('''
+        SELECT 
+            u.id,
+            u.id_number,
+            u.firstname,
+            u.lastname,
+            u.course,
+            u.profile_pic,
+            COUNT(s.id) AS total_sitins,
+            COALESCE(SUM(
+                CASE 
+                    WHEN s.time_out IS NOT NULL 
+                    THEN (julianday(s.time_out) - julianday(s.time_in)) * 24 
+                    ELSE 0 
+                END
+            ), 0) AS total_hours,
+            COUNT(CASE WHEN s.feedback != '' AND s.feedback IS NOT NULL THEN 1 END) AS tasks_completed
+        FROM users u
+        LEFT JOIN sitin_records s ON u.id_number = s.id_number AND s.status = 'Completed'
+        WHERE u.role = 'student'
+        GROUP BY u.id
+    ''').fetchall()
+
+    conn.close()
+
+    # Calculate points for each student
+    leaderboard_data = []
+    for s in students:
+        # Points Earned (50%) - based on total sit-ins, max 30 sessions
+        points_sitins = min((s['total_sitins'] / 30) * 50, 50)
+        
+        # Total Hours Sit-in (30%) - based on hours, max 100 hours
+        points_hours = min((s['total_hours'] / 100) * 30, 30)
+        
+        # Task Completed / Feedback (20%) - based on feedbacks, max 30
+        points_tasks = min((s['tasks_completed'] / 30) * 20, 20)
+        
+        total_points = round(points_sitins + points_hours + points_tasks, 2)
+
+        leaderboard_data.append({
+            'id_number': s['id_number'],
+            'firstname': s['firstname'],
+            'lastname': s['lastname'],
+            'course': s['course'],
+            'profile_pic': s['profile_pic'],
+            'total_sitins': s['total_sitins'],
+            'total_hours': round(s['total_hours'], 1),
+            'tasks_completed': s['tasks_completed'],
+            'points_sitins': round(points_sitins, 1),
+            'points_hours': round(points_hours, 1),
+            'points_tasks': round(points_tasks, 1),
+            'total_points': total_points
+        })
+
+    # Sort by total points descending
+    leaderboard_data.sort(key=lambda x: x['total_points'], reverse=True)
+
+    # Add rank
+    for i, student in enumerate(leaderboard_data):
+        student['rank'] = i + 1
+
+    current_user_id = session.get('user_id')
+    role = session.get('role')
+
+    return render_template('leaderboard.html', 
+                           leaderboard=leaderboard_data,
+                           role=role,
+                           current_user_id=current_user_id)
+
+
+@app.route('/admin_reservations')
+def admin_reservations():
+    if 'user_id' not in session or session.get('role') != 'admin':
+        return redirect(url_for('home'))
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    records = cursor.execute('''
+        SELECT r.*, u.firstname, u.lastname
+        FROM reservations r
+        JOIN users u ON r.id_number = u.id_number
+        ORDER BY r.id DESC
+    ''').fetchall()
+    conn.close()
+
+    return render_template('admin_reservations.html', records=records)
+
+
+# FIX #4 APPLIED: Gi-ilis ang GET method padulong POST para secure ang data modification
+@app.route('/process_reservation/<int:res_id>/<string:action>', methods=['POST'])
+def process_reservation(res_id, action):
+    if 'user_id' not in session or session.get('role') != 'admin':
+        return redirect(url_for('home'))
+
+    if action not in ('approve', 'decline'):
+        return redirect(url_for('admin_reservations'))
+
+    status = 'Approved' if action == 'approve' else 'Declined'
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('''
+        UPDATE reservations
+        SET status = ?
+        WHERE id = ?
+    ''', (status, res_id))
+    conn.commit()
+    conn.close()
+
+    return redirect(url_for('admin_reservations'))
+
+@app.route('/ai_recommendation')
+def ai_recommendation():
+    if 'user_id' not in session or session.get('role') == 'admin':
+        return redirect(url_for('home'))
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    student = cursor.execute("SELECT * FROM users WHERE id = ?", (session['user_id'],)).fetchone()
+
+    history = cursor.execute('''
+        SELECT purpose, lab, 
+               COUNT(*) as count,
+               SUM(CASE WHEN time_out IS NOT NULL 
+                   THEN (julianday(time_out) - julianday(time_in)) * 24 
+                   ELSE 0 END) as total_hours
+        FROM sitin_records
+        WHERE id_number = ? AND status = 'Completed'
+        GROUP BY purpose, lab
+        ORDER BY count DESC
+    ''', (student['id_number'],)).fetchall()
+
+    total_sitins = cursor.execute(
+        "SELECT COUNT(*) FROM sitin_records WHERE id_number = ? AND status = 'Completed'",
+        (student['id_number'],)
+    ).fetchone()[0]
+    conn.close()
+
+    history_text = ""
+    if history:
+        for row in history:
+            history_text += f"- {row['purpose']} in {row['lab']}: {row['count']} session(s), {round(row['total_hours'], 1)} hours\n"
+    else:
+        history_text = "No completed sit-in sessions yet."
+
+    return jsonify({
+        'name': f"{student['firstname']} {student['lastname']}",
+        'course': student['course'],
+        'year_level': student['course_level'],
+        'remaining_sessions': student['remaining_sessions'],
+        'total_sitins': total_sitins,
+        'history': history_text
+    })
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)

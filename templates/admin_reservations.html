@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Reservations | CCS</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="admin-page">
+
+    <nav class="navbar">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='images/uclogonav.png') }}" alt="UC Logo">
+            College of Computer Studies Admin
+        </div>
+        <div class="nav-links">
+            <a href="/admin_dashboard"><i class="fas fa-home"></i> Home</a>
+            <a href="#" id="searchNavBtn"><i class="fas fa-search"></i> Search</a>
+
+            <div class="dropdown">
+                <button class="dropbtn" style="background: rgba(255,255,255,0.2);"><i class="fas fa-users"></i> Students & Sit-ins <i class="fas fa-caret-down" style="margin-left: 5px;"></i></button>
+                <div class="dropdown-content">
+                    <a href="/student_list"><i class="fas fa-user-graduate"></i> View Students</a>
+                    <a href="/active_sitins"><i class="fas fa-desktop"></i> Active Sit-ins</a>
+                    <a href="/history"><i class="fas fa-history"></i> History Records</a>
+                    <a href="/admin_reservations" style="background: #f1f5f9; color: #1b4f8a; font-weight: bold;"><i class="fas fa-calendar-check"></i> Reservation</a>
+                </div>
+            </div>
+
+            <div class="dropdown">
+                <button class="dropbtn"><i class="fas fa-chart-bar"></i> Reports <i class="fas fa-caret-down" style="margin-left: 5px;"></i></button>
+                <div class="dropdown-content">
+                    <a href="/reports"><i class="fas fa-file-alt"></i> Sit-in Reports</a>
+                    <a href="/admin_feedbacks"><i class="fas fa-comments"></i> Feedback Reports</a>
+                </div>
+            </div>
+
+            <a href="/logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </nav>
+
+    <div class="admin-container">
+        <div class="admin-glass-card" style="width: 95%; max-width: 1400px; padding: 40px;">
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+                <h2 style="color: #1b4f8a; margin: 0;"><i class="fas fa-calendar-alt"></i> Manage Lab Reservations</h2>
+                
+                <div style="position: relative; width: 300px; max-width: 100%;">
+                    <input type="text" id="searchReservation" onkeyup="filterReservations()" placeholder="Search Name or Lab..." 
+                           style="width: 100%; padding: 10px 15px 10px 35px; border-radius: 20px; border: 1px solid #ccc; outline: none;">
+                    <i class="fas fa-search" style="position: absolute; left: 12px; top: 12px; color: #888;"></i>
+                </div>
+            </div>
+
+            <div class="table-container" style="max-height: 500px; overflow-y: auto; overflow-x: auto; border-radius: 10px; border: 1px solid #ddd;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left; background: white;">
+                    <thead style="background-color: #1b4f8a; color: white; position: sticky; top: 0; z-index: 1;">
+                        <tr>
+                            <th style="padding: 15px;">Date</th>
+                            <th style="padding: 15px;">Student Name</th>
+                            <th style="padding: 15px;">Lab</th>
+                            <th style="padding: 15px;">Purpose</th>
+                            <th style="padding: 15px;">Status</th>
+                            <th style="padding: 15px; text-align: center;">Action</th> 
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in records %}
+                        <tr style="border-bottom: 1px solid #ddd;">
+                            <td style="padding: 15px; font-weight: bold;">{{ row['res_date'] }}</td>
+                            <td style="padding: 15px;">{{ row['firstname'] }} {{ row['lastname'] }}</td>
+                            <td style="padding: 15px;">{{ row['res_lab'] }}</td>
+                            <td style="padding: 15px;">{{ row['res_purpose'] }}</td>
+                            
+                            <td style="padding: 15px;">
+                                {% if row['status'] == 'Pending' %}
+                                    <span style="background: #ff9800; color: white; padding: 5px 10px; border-radius: 15px; font-size: 12px; font-weight: bold;">Pending</span>
+                                {% elif row['status'] == 'Approved' %}
+                                    <span style="background: #15c35a; color: white; padding: 5px 10px; border-radius: 15px; font-size: 12px; font-weight: bold;">Approved</span>
+                                {% else %}
+                                    <span style="background: #ff4c4c; color: white; padding: 5px 10px; border-radius: 15px; font-size: 12px; font-weight: bold;">Declined</span>
+                                {% endif %}
+                            </td>
+                            
+                            <td style="padding: 15px; text-align: center;">
+                                {% if row['status'] == 'Pending' %}
+                                    <!-- FIX: Gi-ilis ang <a href> (GET) ngadto sa POST forms -->
+
+                                    <!-- APPROVE BUTTON -->
+                                    <form action="/process_reservation/{{ row['id'] }}/approve" method="POST" style="display: inline;">
+                                        <button type="submit" 
+                                                style="background: #15c35a; color: white; padding: 8px 12px; border-radius: 5px; border: none; cursor: pointer; margin-right: 5px;" 
+                                                title="Approve">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                    </form>
+
+                                    <!-- DECLINE BUTTON -->
+                                    <form action="/process_reservation/{{ row['id'] }}/decline" method="POST" style="display: inline;" 
+                                          onsubmit="return confirm('Decline this reservation?');">
+                                        <button type="submit" 
+                                                style="background: #ff4c4c; color: white; padding: 8px 12px; border-radius: 5px; border: none; cursor: pointer;" 
+                                                title="Decline">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </form>
+
+                                {% else %}
+                                    <span style="color: #999; font-style: italic;">Done</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" style="padding: 30px; text-align: center; color: #666;">No reservations found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="searchModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;">
+        <div class="admin-glass-card" style="width: 500px; padding: 30px; position: relative;">
+            <span id="closeSearchBtn" style="position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: #555;">&times;</span>
+            <h2 style="color: #1b4f8a; margin-bottom: 20px; text-align: left;"><i class="fas fa-search"></i> Search Student</h2>
+            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <input type="text" id="searchInputID" placeholder="Enter ID Number (e.g. 12345)" style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #ccc; outline: none;">
+                <button id="executeSearchBtn" class="btn-post" style="padding: 0 20px;"><i class="fas fa-search"></i> Search</button>
+            </div>
+            <div id="searchResults" style="display: none; background: rgba(255,255,255,0.8); padding: 15px; border-radius: 8px; text-align: left;"></div>
+        </div>
+    </div>
+
+    <div id="toastBox"></div>
+    <style>
+        #toastBox { left: 30px; right: auto; align-items: flex-start; z-index: 9999; }
+        .toast { transform: translateX(-100%); animation: slideInToastLeft 0.5s forwards; }
+        @keyframes slideInToastLeft { 100% { transform: translateX(0); } }
+    </style>
+
+    <script>
+        function filterReservations() {
+            let input = document.getElementById("searchReservation").value.toLowerCase();
+            let table = document.querySelector("table tbody");
+            let tr = table.getElementsByTagName("tr");
+
+            for (let i = 0; i < tr.length; i++) {
+                let tdName = tr[i].getElementsByTagName("td")[1];
+                let tdLab = tr[i].getElementsByTagName("td")[2];
+
+                if (tdName || tdLab) {
+                    let nameText = tdName.textContent || tdName.innerText;
+                    let labText = tdLab.textContent || tdLab.innerText;
+
+                    if (nameText.toLowerCase().indexOf(input) > -1 || labText.toLowerCase().indexOf(input) > -1) {
+                        tr[i].style.display = ""; 
+                    } else {
+                        tr[i].style.display = "none"; 
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="{{ url_for('static', filename='admin.js') }}"></script>
+
+</body>
+</html>
