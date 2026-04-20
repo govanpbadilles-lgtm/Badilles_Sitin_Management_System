@@ -777,45 +777,49 @@ def process_reservation(res_id, action):
 
 @app.route('/ai_recommendation')
 def ai_recommendation():
-    if 'user_id' not in session or session.get('role') == 'admin':
-        return redirect(url_for('home'))
+    """Nag-generate og AI recommendations base sa data sa estudyante."""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not logged in'}), 401
 
     conn = get_db_connection()
     cursor = conn.cursor()
-    student = cursor.execute("SELECT * FROM users WHERE id = ?", (session['user_id'],)).fetchone()
 
-    history = cursor.execute('''
-        SELECT purpose, lab, 
-               COUNT(*) as count,
-               SUM(CASE WHEN time_out IS NOT NULL 
-                   THEN (julianday(time_out) - julianday(time_in)) * 24 
-                   ELSE 0 END) as total_hours
-        FROM sitin_records
-        WHERE id_number = ? AND status = 'Completed'
-        GROUP BY purpose, lab
-        ORDER BY count DESC
-    ''', (student['id_number'],)).fetchall()
+    # Kuhaon ang data sa estudyante
+    student = cursor.execute('SELECT * FROM users WHERE id = ?', (session['user_id'],)).fetchone()
+    
+    # Kuhaon ang iyang sit-in history aron maihap
+    history = cursor.execute('SELECT * FROM sitin_records WHERE id_number = ?', (student['id_number'],)).fetchall()
+    total_sitins = len(history)
 
-    total_sitins = cursor.execute(
-        "SELECT COUNT(*) FROM sitin_records WHERE id_number = ? AND status = 'Completed'",
-        (student['id_number'],)
-    ).fetchone()[0]
     conn.close()
 
-    history_text = ""
-    if history:
-        for row in history:
-            history_text += f"- {row['purpose']} in {row['lab']}: {row['count']} session(s), {round(row['total_hours'], 1)} hours\n"
+    # ==========================================
+    # MOCK AI RESPONSE (Para ma-test ang UI nimo)
+    # Puhon, pwede nimo i-connect ang Gemini API o OpenAI API diri.
+    # ==========================================
+    
+    course_tips = ""
+    if "BSIT" in student['course'].upper() or "IT" in student['course'].upper():
+        course_tips = "Focus on your Python and Flask projects. System architecture is a great skill!"
     else:
-        history_text = "No completed sit-in sessions yet."
+        course_tips = "Keep exploring and applying technology to your field of study."
 
+    mock_ai_message = f"""Hello {student['firstname']}! Here is your quick academic evaluation:
+
+• You currently have {student['remaining_sessions']} lab sessions remaining. Manage them wisely!
+• You have successfully completed {total_sitins} sit-in sessions so far. Great consistency!
+• {course_tips}
+• Tip: Don't forget to ask the lab admins if you need specific software installed for your capstone or projects.
+
+Keep up the good work in the CCS Laboratory!"""
+
+    # Ibalik ang JSON padulong sa JavaScript
     return jsonify({
-        'name': f"{student['firstname']} {student['lastname']}",
+        'name': student['firstname'],
         'course': student['course'],
-        'year_level': student['course_level'],
         'remaining_sessions': student['remaining_sessions'],
         'total_sitins': total_sitins,
-        'history': history_text
+        'recommendation': mock_ai_message
     })
 
 if __name__ == '__main__':
