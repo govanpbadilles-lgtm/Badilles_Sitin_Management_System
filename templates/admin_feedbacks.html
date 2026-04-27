@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Reservations | CCS</title>
+    <title>Admin Feedback | CCS Sit-in System</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -41,6 +41,9 @@
         .notif-empty i { font-size: 36px; display: block; margin-bottom: 10px; }
         .notif-empty p { margin: 0; font-size: 14px; }
 
+        /* ══════════════════════════════════════════
+           SLIM NAVBAR & SIDEBAR
+        ══════════════════════════════════════════ */
         body.admin-page { padding-top: 0 !important; }
         body.admin-page .navbar { position: sticky !important; top: 0 !important; }
         .navbar { height: 54px; background: #1b4f8a; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
@@ -56,8 +59,8 @@
         .hamburger-btn.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
         .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.42); z-index: 1001; backdrop-filter: blur(2px); animation: overlayFadeIn 0.25s ease; }
         .sidebar-overlay.visible { display: block; }
-        @keyframes overlayFadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .sidebar { position: fixed; top: 0; right: 0; left: auto; width: 245px; height: 100vh; background: #1b4f8a; z-index: 1002; display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); box-shadow: -4px 0 24px rgba(0,0,0,0.25); }
+        @keyframes overlayFadeIn { from { opacity: 0; } to   { opacity: 1; } }
+        .sidebar { position: fixed; top: 0; right: 0; left: auto; width: 245px; height: 100vh; background: #1b4f8a; z-index: 1002; display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: -4px 0 24px rgba(0,0,0,0.25); }
         .sidebar.open { transform: translateX(0); }
         .sidebar-user { display: flex; align-items: center; gap: 12px; padding: 22px 16px 18px; border-bottom: 1px solid rgba(255,255,255,0.12); }
         .sidebar-admin-icon { width: 48px; height: 48px; border-radius: 50%; background: rgba(255,255,255,0.18); color: white; font-size: 20px; display: flex; align-items: center; justify-content: center; border: 2px solid rgba(255,255,255,0.35); flex-shrink: 0; }
@@ -72,11 +75,112 @@
         .sidebar-divider { height: 1px; background: rgba(255,255,255,0.1); margin: 6px 16px; }
         .sidebar-section-label { padding: 10px 20px 4px; font-size: 10px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: rgba(255,255,255,0.35); }
         .sidebar-footer { padding: 14px 16px; border-top: 1px solid rgba(255,255,255,0.12); }
-        .sidebar-logout-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 10px; border-radius: 8px; background: rgba(255,75,75,0.18); color: rgba(255,175,175,1); font-size: 13px; font-weight: 600; text-decoration: none; transition: background 0.2s; }
-        .sidebar-logout-btn:hover { background: rgba(255,75,75,0.32); text-decoration: none; color: rgba(255,200,200,1); }
-        #toastBox { left: 30px; right: auto; align-items: flex-start; z-index: 9999; }
-        .toast { transform: translateX(-100%); animation: slideInToastLeft 0.5s forwards; }
-        @keyframes slideInToastLeft { 100% { transform: translateX(0); } }
+        .sidebar-logout-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 10px; border-radius: 8px; background: rgba(255, 75, 75, 0.18); color: rgba(255, 175, 175, 1); font-size: 13px; font-weight: 600; text-decoration: none; transition: background 0.2s; }
+        .sidebar-logout-btn:hover { background: rgba(255, 75, 75, 0.32); text-decoration: none; color: rgba(255, 200, 200, 1); }
+
+        /* ══════════════════════════════════════════
+           NEW UI: FEEDBACK CARDS
+        ══════════════════════════════════════════ */
+        .feedback-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .modern-feedback-card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border: 1px solid rgba(0,0,0,0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .modern-feedback-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 5px;
+            background: linear-gradient(180deg, #1b4f8a, #3b82f6); /* Modern blue gradient border */
+            border-radius: 12px 0 0 12px;
+        }
+        .modern-feedback-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+        }
+        .fb-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 15px;
+        }
+        .fb-user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .fb-avatar {
+            width: 42px;
+            height: 42px;
+            background: #e8f4fd;
+            color: #1b4f8a;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        .fb-details {
+            display: flex;
+            flex-direction: column;
+        }
+        .fb-name {
+            font-weight: 700;
+            font-size: 15px;
+            color: #222;
+        }
+        .fb-id {
+            font-size: 12px;
+            color: #777;
+            margin-top: 2px;
+        }
+        .fb-date {
+            font-size: 12px;
+            color: #888;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #f5f7fa;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-weight: 600;
+        }
+        .fb-message {
+            margin: 0;
+            font-size: 15px;
+            color: #444;
+            line-height: 1.6;
+            font-style: italic;
+        }
+        .fb-message::before {
+            content: "\201C"; /* Left double quote */
+            color: #ccc;
+            font-size: 20px;
+            margin-right: 5px;
+            font-family: serif;
+        }
+        .fb-message::after {
+            content: "\201D"; /* Right double quote */
+            color: #ccc;
+            font-size: 20px;
+            margin-left: 5px;
+            font-family: serif;
+        }
     </style>
 </head>
 <body class="admin-page">
@@ -127,13 +231,11 @@
             <a href="/student_list" class="sidebar-item"><i class="fas fa-user-graduate"></i> View Students</a>
             <a href="/active_sitins" class="sidebar-item"><i class="fas fa-desktop"></i> Active Sit-ins</a>
             <a href="/history" class="sidebar-item"><i class="fas fa-history"></i> History Records</a>
-            <a href="/admin_reservations" class="sidebar-item active"><i class="fas fa-calendar-check"></i> Reservations</a>
+            <a href="/admin_reservations" class="sidebar-item"><i class="fas fa-calendar-check"></i> Reservations</a>
             <div class="sidebar-divider"></div>
             <div class="sidebar-section-label">Reports</div>
             <a href="/reports" class="sidebar-item"><i class="fas fa-file-alt"></i> Sit-in Reports</a>
-            <a href="/admin_feedbacks" class="sidebar-item"><i class="fas fa-comments"></i> Feedback Reports</a>
-            <div class="sidebar-divider"></div>
-            <a href="/leaderboard" class="sidebar-item"><i class="fas fa-trophy"></i> Leaderboard</a>
+            <a href="/admin_feedbacks" class="sidebar-item active"><i class="fas fa-comments"></i> Feedback Reports</a>
         </nav>
         <div class="sidebar-footer">
             <a href="/logout" class="sidebar-logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
@@ -141,80 +243,54 @@
     </aside>
 
     <div class="admin-container">
-        <div class="admin-glass-card" style="width: 95%; max-width: 1400px; padding: 40px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
-                <h2 style="color: #1b4f8a; margin: 0;"><i class="fas fa-calendar-alt"></i> Manage Lab Reservations</h2>
-                <div style="position: relative; width: 300px; max-width: 100%;">
-                    <input type="text" id="searchReservation" onkeyup="filterReservations()" placeholder="Search Name or Lab..."
-                           style="width: 100%; padding: 10px 15px 10px 35px; border-radius: 20px; border: 1px solid #ccc; outline: none;">
-                    <i class="fas fa-search" style="position: absolute; left: 12px; top: 12px; color: #888;"></i>
-                </div>
+        <div class="admin-glass-card" style="width: 95%; max-width: 1000px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid rgba(27, 79, 138, 0.2); padding-bottom: 15px;">
+                <h2 style="color: #1b4f8a; margin: 0;"><i class="fas fa-comments"></i> Student Feedback Reports</h2>
+                <span style="background: #e8f4fd; color: #1b4f8a; padding: 5px 15px; border-radius: 20px; font-size: 13px; font-weight: bold;">
+                    Total: {{ feedbacks|length }}
+                </span>
             </div>
 
-            <div class="table-container" style="max-height: 500px; overflow-y: auto; overflow-x: auto; border-radius: 10px; border: 1px solid #ddd;">
-                <table style="width: 100%; border-collapse: collapse; text-align: left; background: white;">
-                    <thead style="background-color: #1b4f8a; color: white; position: sticky; top: 0; z-index: 1;">
-                        <tr>
-                            <th style="padding: 15px;">Date</th>
-                            <th style="padding: 15px;">Student Name</th>
-                            <th style="padding: 15px;">Lab</th>
-                            <th style="padding: 15px;">Purpose</th>
-                            <th style="padding: 15px;">Status</th>
-                            <th style="padding: 15px; text-align: center;">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for row in records %}
-                        <tr style="border-bottom: 1px solid #ddd;">
-                            <td style="padding: 15px; font-weight: bold;">{{ row['res_date'] }}</td>
-                            <td style="padding: 15px;">{{ row['firstname'] }} {{ row['lastname'] }}</td>
-                            <td style="padding: 15px;">{{ row['res_lab'] }}</td>
-                            <td style="padding: 15px;">{{ row['res_purpose'] }}</td>
-                            <td style="padding: 15px;">
-                                {% if row['status'] == 'Pending' %}
-                                    <span style="background: #ff9800; color: white; padding: 5px 10px; border-radius: 15px; font-size: 12px; font-weight: bold;">Pending</span>
-                                {% elif row['status'] == 'Approved' %}
-                                    <span style="background: #15c35a; color: white; padding: 5px 10px; border-radius: 15px; font-size: 12px; font-weight: bold;">Approved</span>
-                                {% else %}
-                                    <span style="background: #ff4c4c; color: white; padding: 5px 10px; border-radius: 15px; font-size: 12px; font-weight: bold;">Declined</span>
-                                {% endif %}
-                            </td>
-                            <td style="padding: 15px; text-align: center;">
-                                {% if row['status'] == 'Pending' %}
-                                    <form action="/process_reservation/{{ row['id'] }}/approve" method="POST" style="display: inline;">
-                                        <button type="submit" style="background: #15c35a; color: white; padding: 8px 12px; border-radius: 5px; border: none; cursor: pointer; margin-right: 5px;" title="Approve">
-                                            <i class="fas fa-check"></i>
-                                        </button>
-                                    </form>
-                                    <form action="/process_reservation/{{ row['id'] }}/decline" method="POST" style="display: inline;" onsubmit="return confirm('Decline this reservation?');">
-                                        <button type="submit" style="background: #ff4c4c; color: white; padding: 8px 12px; border-radius: 5px; border: none; cursor: pointer;" title="Decline">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </form>
-                                {% else %}
-                                    <span style="color: #999; font-style: italic;">Done</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% else %}
-                        <tr>
-                            <td colspan="6" style="padding: 30px; text-align: center; color: #666;">No reservations found.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+            <div class="feedback-list">
+                {% if feedbacks %}
+                    {% for fb in feedbacks %}
+                        <div class="modern-feedback-card">
+                            <div class="fb-header">
+                                <div class="fb-user-info">
+                                    <div class="fb-avatar"><i class="fas fa-user"></i></div>
+                                    <div class="fb-details">
+                                        <span class="fb-name">{{ fb['student_name'] }}</span>
+                                        <span class="fb-id">ID: {{ fb['id_number'] }}</span>
+                                    </div>
+                                </div>
+                                <div class="fb-date">
+                                    <i class="far fa-calendar-alt"></i> {{ fb['date_submitted'][:10] }}
+                                </div>
+                            </div>
+                            <p class="fb-message">{{ fb['message'] }}</p>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div style="text-align: center; padding: 60px 20px;">
+                        <i class="fas fa-comment-slash" style="font-size: 50px; color: #ccc; margin-bottom: 15px; display: block;"></i>
+                        <h3 style="color: #555; margin-bottom: 5px;">No Feedbacks Yet</h3>
+                        <p style="color: #888; font-size: 15px; margin: 0;">Student feedback reports will appear here once submitted.</p>
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>
 
     <div id="toastBox"></div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="{{ url_for('static', filename='admin.js') }}"></script>
 
     <script>
         function toggleSidebar() {
-            var sidebar = document.getElementById('sidebar');
-            var overlay = document.getElementById('sidebarOverlay');
+            var sidebar   = document.getElementById('sidebar');
+            var overlay   = document.getElementById('sidebarOverlay');
             var hamburger = document.getElementById('hamburgerBtn');
-            var isOpen = sidebar.classList.contains('open');
+            var isOpen    = sidebar.classList.contains('open');
             if (isOpen) {
                 sidebar.classList.remove('open'); overlay.classList.remove('visible'); hamburger.classList.remove('open');
             } else {
@@ -228,19 +304,6 @@
                 document.getElementById('hamburgerBtn').classList.remove('open');
             }
         });
-        function filterReservations() {
-            let input = document.getElementById("searchReservation").value.toLowerCase();
-            let tr = document.querySelector("table tbody").getElementsByTagName("tr");
-            for (let i = 0; i < tr.length; i++) {
-                let tdName = tr[i].getElementsByTagName("td")[1];
-                let tdLab = tr[i].getElementsByTagName("td")[2];
-                if (tdName || tdLab) {
-                    let nameText = tdName.textContent || tdName.innerText;
-                    let labText = tdLab.textContent || tdLab.innerText;
-                    tr[i].style.display = (nameText.toLowerCase().indexOf(input) > -1 || labText.toLowerCase().indexOf(input) > -1) ? "" : "none";
-                }
-            }
-        }
 
         // NOTIFICATIONS SCRIPT
         (function() {
@@ -352,8 +415,5 @@
             setInterval(fetchCount, POLL_INTERVAL);
         })();
     </script>
-
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
-    <script src="{{ url_for('static', filename='admin.js') }}"></script>
 </body>
 </html>

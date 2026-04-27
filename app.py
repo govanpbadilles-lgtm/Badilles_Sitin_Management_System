@@ -1,12 +1,12 @@
 import os
 import sqlite3
 from werkzeug.utils import secure_filename
-from werkzeug.security import generate_password_hash, check_password_hash  # FIX #1: Password hashing
+from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY', 'super_secret_key_ccs_sit_in')  # FIX #3: Env variable
+app.secret_key = os.environ.get('SECRET_KEY', 'super_secret_key_ccs_sit_in')
 
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024
@@ -84,7 +84,33 @@ def init_db():
             res_date TEXT NOT NULL,
             res_lab TEXT NOT NULL,
             res_purpose TEXT NOT NULL,
+            selected_pc TEXT DEFAULT '',
+            res_time TEXT DEFAULT '',
             status TEXT DEFAULT 'Pending'
+        )
+    ''')
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS admin_remarks (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            student_id TEXT NOT NULL,
+            admin_name TEXT NOT NULL,
+            remark_type TEXT NOT NULL,
+            message TEXT NOT NULL,
+            date_posted DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    # ── NOTIFICATIONS TABLE (bag-o) ──────────────────────
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS notifications (
+            id          INTEGER PRIMARY KEY AUTOINCREMENT,
+            recipient   TEXT NOT NULL,
+            type        TEXT NOT NULL,
+            message     TEXT NOT NULL,
+            link        TEXT DEFAULT '',
+            is_read     INTEGER DEFAULT 0,
+            created_at  DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     ''')
 
@@ -95,9 +121,9 @@ def create_default_admin():
     conn = get_db_connection()
     cursor = conn.cursor()
     admin = cursor.execute("SELECT * FROM users WHERE role = 'admin'").fetchone()
+    
     if not admin:
         try:
-            # FIX #1 APPLIED: Hash the default admin password
             hashed_pw = generate_password_hash('admin123')
             cursor.execute('''
                 INSERT INTO users (id_number, lastname, firstname, middlename, course_level, password, email, course, address, role)
@@ -107,10 +133,29 @@ def create_default_admin():
             print("Default admin account successfully created!")
         except sqlite3.IntegrityError:
             pass
+            
     conn.close()
+
 
 init_db()
 create_default_admin()
+
+
+# =======================================================
+# NOTIFICATION HELPER
+# =======================================================
+def create_notification(conn, recipient, notif_type, message, link=''):
+    """
+    Insert one notification row.
+    recipient = 'admin'  OR  id_number of a student
+    notif_type = 'reservation' | 'approved' | 'declined' | 'announcement'
+    """
+    ph_time = (datetime.utcnow() + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
+    conn.execute(
+        "INSERT INTO notifications (recipient, type, message, link, created_at) VALUES (?, ?, ?, ?, ?)",
+        (recipient, notif_type, message, link, ph_time)
+    )
+    conn.commit()
 
 
 # =======================================================
@@ -148,7 +193,6 @@ def register():
         else:
             sessions = 15
 
-        # FIX #1 APPLIED: Hash password before saving
         hashed_pw = generate_password_hash(password)
 
         conn = get_db_connection()
@@ -168,23 +212,44 @@ def register():
     return render_template('register.html')
 
 
-@app.route('/login', methods=['POST'])
-def login():
-    email = request.form.get('email', '').strip()
-    password = request.form.get('password', '').strip()
+@app.route('/add_admin_remark', methods=['POST'])
+def add_admin_remark():
+    if 'user_id' not in session or session.get('role') != 'admin':
+        return redirect(url_for('home'))
 
-    # FIX #3 APPLIED: Admin bypass kuhaa na, gamiton ang database login para sa tanan
+    student_id = request.form.get('student_id')
+    admin_name = session.get('firstname')
+    remark_type = request.form.get('remark_type')
+    message = request.form.get('message')
+
     conn = get_db_connection()
     cursor = conn.cursor()
-    user = cursor.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
+    cursor.execute('''
+        INSERT INTO admin_remarks (student_id, admin_name, remark_type, message)
+        VALUES (?, ?, ?, ?)
+    ''', (student_id, admin_name, remark_type, message))
+    conn.commit()
+    conn.close()
+
+    return redirect(url_for('student_list'))
+
+
+@app.route('/login', methods=['POST'])
+def login():
+    id_number = request.form.get('id_number', '').strip()
+    password = request.form.get('password', '').strip()
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    user = cursor.execute('SELECT * FROM users WHERE id_number = ?', (id_number,)).fetchone()
     conn.close()
 
     if user:
-        # FIX #1 APPLIED: check_password_hash para sa verification
         if check_password_hash(user['password'], password):
             session['user_id'] = user['id']
             session['firstname'] = user['firstname']
             session['role'] = user['role']
+            session['id_number'] = user['id_number']   # ← needed for notifications
 
             if user['role'] == 'admin':
                 return redirect(url_for('admin_dashboard', login='success'))
@@ -212,12 +277,12 @@ def dashboard():
 
     announcements = cursor.execute("SELECT * FROM announcements ORDER BY date_posted DESC").fetchall()
 
-    # BAG-O: Kuhaon ang reservations sa current student
-    reservations = cursor.execute("""
+    reservations_raw = cursor.execute("""
         SELECT * FROM reservations 
         WHERE id_number = ? 
         ORDER BY id DESC
     """, (student['id_number'],)).fetchall()
+    reservations = [dict(r) for r in reservations_raw]
 
     conn.close()
 
@@ -233,9 +298,9 @@ def admin_dashboard():
     cursor = conn.cursor()
 
     total_students = cursor.execute("SELECT COUNT(*) FROM users WHERE role = 'student'").fetchone()[0]
-    current_sitin = cursor.execute("SELECT COUNT(*) FROM sitin_records WHERE status = 'Active'").fetchone()[0]
-    total_sitin = cursor.execute("SELECT COUNT(*) FROM sitin_records").fetchone()[0]
-    announcements = cursor.execute("SELECT * FROM announcements ORDER BY date_posted DESC").fetchall()
+    current_sitin  = cursor.execute("SELECT COUNT(*) FROM sitin_records WHERE status = 'Active'").fetchone()[0]
+    total_sitin    = cursor.execute("SELECT COUNT(*) FROM sitin_records").fetchone()[0]
+    announcements  = cursor.execute("SELECT * FROM announcements ORDER BY date_posted DESC").fetchall()
     records = cursor.execute('''
         SELECT s.*, u.firstname, u.lastname
         FROM sitin_records s
@@ -291,6 +356,33 @@ def active_sitins():
     return render_template('active_sitins.html', active_records=active_records)
 
 
+@app.route('/get_occupied_pcs')
+def get_occupied_pcs():
+    """Return list of occupied PC numbers for a given lab (from active/approved reservations)."""
+    lab = request.args.get('lab', '')
+    if not lab:
+        return jsonify({'occupied': []})
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    rows = cursor.execute("""
+        SELECT selected_pc FROM reservations
+        WHERE res_lab = ? AND status IN ('Pending', 'Approved') AND selected_pc != ''
+    """, (lab,)).fetchall()
+    conn.close()
+
+    occupied = []
+    for row in rows:
+        pc = row['selected_pc']  # e.g. "PC5"
+        if pc and pc.upper().startswith('PC'):
+            try:
+                occupied.append(int(pc[2:]))
+            except ValueError:
+                pass
+
+    return jsonify({'occupied': occupied})
+
+
 @app.route('/reports')
 def reports():
     if 'user_id' not in session or session.get('role') != 'admin':
@@ -299,9 +391,9 @@ def reports():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    start_date = request.args.get('start_date', '')
-    end_date = request.args.get('end_date', '')
-    lab_filter = request.args.get('lab', '')
+    start_date    = request.args.get('start_date', '')
+    end_date      = request.args.get('end_date', '')
+    lab_filter    = request.args.get('lab', '')
     purpose_filter = request.args.get('purpose', '')
 
     query = '''
@@ -327,13 +419,14 @@ def reports():
 
     query += " ORDER BY s.time_in DESC"
 
-    records = cursor.execute(query, params).fetchall()
-    labs = cursor.execute("SELECT DISTINCT lab FROM sitin_records WHERE lab IS NOT NULL").fetchall()
+    records  = cursor.execute(query, params).fetchall()
+    labs     = cursor.execute("SELECT DISTINCT lab FROM sitin_records WHERE lab IS NOT NULL").fetchall()
     purposes = cursor.execute("SELECT DISTINCT purpose FROM sitin_records WHERE purpose IS NOT NULL").fetchall()
     conn.close()
 
     return render_template('reports.html', records=records, labs=labs, purposes=purposes,
-                           start_date=start_date, end_date=end_date, lab_filter=lab_filter, purpose_filter=purpose_filter)
+                           start_date=start_date, end_date=end_date,
+                           lab_filter=lab_filter, purpose_filter=purpose_filter)
 
 
 @app.route('/post_announcement', methods=['POST'])
@@ -341,19 +434,37 @@ def post_announcement():
     if 'user_id' not in session or session.get('role') != 'admin':
         return redirect(url_for('home'))
 
-    message = request.form['message']
+    message    = request.form['message']
     admin_name = session['firstname']
-    ph_time = (datetime.utcnow() + timedelta(hours=8)).strftime('%Y-%m-%d %I:%M %p')
+    ph_time    = (datetime.utcnow() + timedelta(hours=8)).strftime('%Y-%m-%d %I:%M %p')
 
     conn = get_db_connection()
     cursor = conn.cursor()
+
+    # Save announcement
     cursor.execute('''
         INSERT INTO announcements (admin_name, message, date_posted)
         VALUES (?, ?, ?)
     ''', (admin_name, message, ph_time))
     conn.commit()
-    conn.close()
 
+    # ── NOTIFY all students ──────────────────────────────
+    students = cursor.execute(
+        "SELECT id_number FROM users WHERE role = 'student'"
+    ).fetchall()
+
+    preview = message[:80] + ('...' if len(message) > 80 else '')
+    for s in students:
+        create_notification(
+            conn,
+            recipient  = s['id_number'],
+            notif_type = 'announcement',
+            message    = f"📢 New announcement from Admin: {preview}",
+            link       = '/dashboard'
+        )
+    # ────────────────────────────────────────────────────
+
+    conn.close()
     return redirect(url_for('admin_dashboard', posted='true'))
 
 
@@ -372,13 +483,17 @@ def search_student():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    student = cursor.execute("SELECT * FROM users WHERE id_number = ? AND role = 'student'", (id_number,)).fetchone()
+    student = cursor.execute(
+        "SELECT * FROM users WHERE id_number = ? AND role = 'student'", (id_number,)
+    ).fetchone()
 
     if not student:
         conn.close()
         return jsonify({'found': False, 'message': 'Student not found!'})
 
-    sitin = cursor.execute("SELECT * FROM sitin_records WHERE id_number = ? AND status = 'Active'", (id_number,)).fetchone()
+    sitin = cursor.execute(
+        "SELECT * FROM sitin_records WHERE id_number = ? AND status = 'Active'", (id_number,)
+    ).fetchone()
     conn.close()
 
     return jsonify({
@@ -423,6 +538,36 @@ def delete_student(id):
     return redirect(url_for('student_list'))
 
 
+@app.route('/admin_add_student', methods=['POST'])
+def admin_add_student():
+    if 'user_id' not in session or session.get('role') != 'admin':
+        return redirect(url_for('home'))
+
+    id_number    = request.form.get('id_number')
+    firstname    = request.form.get('firstname')
+    lastname     = request.form.get('lastname')
+    middlename   = request.form.get('middlename', '')
+    course       = request.form.get('course')
+    course_level = request.form.get('course_level')
+    default_pw   = generate_password_hash('default123')
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute('''
+            INSERT INTO users (id_number, lastname, firstname, middlename, course, course_level, password, role, remaining_sessions)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'student', ?)
+        ''', (id_number, lastname, firstname, middlename, course, course_level, default_pw,
+              30 if course in ('BSIT', 'BSCS', 'BSCS-AI') else 15))
+        conn.commit()
+    except Exception as e:
+        print('Error adding student:', e)
+    finally:
+        conn.close()
+
+    return redirect(url_for('student_list'))
+
+
 @app.route('/reset_sessions', methods=['POST'])
 def reset_sessions():
     if 'user_id' not in session or session.get('role') != 'admin':
@@ -430,7 +575,6 @@ def reset_sessions():
 
     conn = get_db_connection()
     cursor = conn.cursor()
-    # FIX #5 APPLIED: Resetting based on course type (IT = 30, others = 15)
     cursor.execute("""
         UPDATE users 
         SET remaining_sessions = CASE 
@@ -450,18 +594,18 @@ def update_profile():
     if 'user_id' not in session:
         return redirect(url_for('home'))
 
-    user_id = session['user_id']
+    user_id   = session['user_id']
     firstname = request.form['firstname']
-    lastname = request.form['lastname']
-    course = request.form['course']
-    address = request.form['address']
+    lastname  = request.form['lastname']
+    course    = request.form['course']
+    address   = request.form['address']
 
     conn = get_db_connection()
     cursor = conn.cursor()
 
     file = request.files.get('profile_pic')
     if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
+        filename        = secure_filename(file.filename)
         unique_filename = f"user_{user_id}_{filename}"
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], unique_filename))
         cursor.execute('''
@@ -487,8 +631,8 @@ def sit_in():
         return redirect(url_for('home'))
 
     id_number = request.form['id_number']
-    lab = request.form['lab']
-    purpose = request.form['purpose']
+    lab       = request.form['lab']
+    purpose   = request.form['purpose']
 
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -517,8 +661,9 @@ def logout_sitin():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # FIX #2 APPLIED: Gi-apil na ang 'status' sa SELECT para dili mag-error
-    record = cursor.execute("SELECT id_number, status FROM sitin_records WHERE id = ?", (record_id,)).fetchone()
+    record = cursor.execute(
+        "SELECT id_number, status FROM sitin_records WHERE id = ?", (record_id,)
+    ).fetchone()
 
     if record and record['status'] == 'Active':
         id_number = record['id_number']
@@ -550,7 +695,9 @@ def time_out_sitin():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    record = cursor.execute("SELECT id_number, status FROM sitin_records WHERE id = ?", (record_id,)).fetchone()
+    record = cursor.execute(
+        "SELECT id_number, status FROM sitin_records WHERE id = ?", (record_id,)
+    ).fetchone()
 
     if record and record['status'] == 'Active':
         id_number = record['id_number']
@@ -578,10 +725,10 @@ def edit_student(id):
     if 'user_id' not in session or session.get('role') != 'admin':
         return redirect(url_for('home'))
 
-    firstname = request.form['firstname']
-    middlename = request.form.get('middlename', '')
-    lastname = request.form['lastname']
-    course = request.form['course']
+    firstname    = request.form['firstname']
+    middlename   = request.form.get('middlename', '')
+    lastname     = request.form['lastname']
+    course       = request.form['course']
     course_level = request.form['course_level']
 
     conn = get_db_connection()
@@ -602,7 +749,7 @@ def add_feedback():
     if 'user_id' not in session or session.get('role') != 'admin':
         return redirect(url_for('home'))
 
-    record_id = request.form['record_id']
+    record_id     = request.form['record_id']
     feedback_text = request.form['feedback']
 
     conn = get_db_connection()
@@ -620,28 +767,49 @@ def add_feedback():
 
 @app.route('/submit_reservation', methods=['POST'])
 def submit_reservation():
-    id_number = request.form['id_number']
-    res_date = request.form['res_date']
-    res_lab = request.form['res_lab']
+    id_number   = request.form['id_number']
+    res_date    = request.form['res_date']
+    res_lab     = request.form['res_lab']
     res_purpose = request.form['res_purpose']
+    selected_pc = request.form.get('selected_pc', '')
+    res_time    = request.form.get('res_time', '')
 
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute('''
-        INSERT INTO reservations (id_number, res_date, res_lab, res_purpose)
-        VALUES (?, ?, ?, ?)
-    ''', (id_number, res_date, res_lab, res_purpose))
-    conn.commit()
-    conn.close()
 
+    cursor.execute('''
+        INSERT INTO reservations (id_number, res_date, res_lab, res_purpose, selected_pc, res_time)
+        VALUES (?, ?, ?, ?, ?, ?)
+    ''', (id_number, res_date, res_lab, res_purpose, selected_pc, res_time))
+    conn.commit()
+
+    # ── Get student name for notification ──
+    student = cursor.execute(
+        "SELECT firstname, lastname FROM users WHERE id_number = ?", (id_number,)
+    ).fetchone()
+    student_name = f"{student['firstname']} {student['lastname']}" if student else id_number
+
+    pc_info = f" ({selected_pc})" if selected_pc else ""
+
+    # ── NOTIFY admin ─────────────────────────────────────
+    create_notification(
+        conn,
+        recipient  = 'admin',
+        notif_type = 'reservation',
+        message    = f"📅 {student_name} requested {res_lab}{pc_info} on {res_date} for {res_purpose}.",
+        link       = '/admin_reservations'
+    )
+    # ─────────────────────────────────────────────────────
+
+    conn.close()
     return redirect(url_for('dashboard'))
 
 
 @app.route('/submit_student_feedback', methods=['POST'])
 def submit_student_feedback():
-    id_number = request.form['id_number']
+    id_number    = request.form['id_number']
     student_name = request.form['student_name']
-    message = request.form['message']
+    message      = request.form['message']
 
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -650,6 +818,18 @@ def submit_student_feedback():
         VALUES (?, ?, ?)
     ''', (id_number, student_name, message))
     conn.commit()
+
+    # ── NOTIFY ADMIN ─────────────────────────────────────
+    preview = message[:50] + ('...' if len(message) > 50 else '')
+    create_notification(
+        conn,
+        recipient  = 'admin',
+        notif_type = 'announcement',  # pwede ra 'announcement' or himo kag custom
+        message    = f"💬 New feedback from {student_name}: {preview}",
+        link       = '/admin_feedbacks'
+    )
+    # ─────────────────────────────────────────────────────
+
     conn.close()
 
     return redirect(url_for('dashboard'))
@@ -663,7 +843,6 @@ def leaderboard():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Get all students with their sit-in data for leaderboard calculation
     students = cursor.execute('''
         SELECT 
             u.id,
@@ -689,49 +868,36 @@ def leaderboard():
 
     conn.close()
 
-    # Calculate points for each student
     leaderboard_data = []
     for s in students:
-        # Points Earned (50%) - based on total sit-ins, max 30 sessions
         points_sitins = min((s['total_sitins'] / 30) * 50, 50)
-        
-        # Total Hours Sit-in (30%) - based on hours, max 100 hours
-        points_hours = min((s['total_hours'] / 100) * 30, 30)
-        
-        # Task Completed / Feedback (20%) - based on feedbacks, max 30
-        points_tasks = min((s['tasks_completed'] / 30) * 20, 20)
-        
-        total_points = round(points_sitins + points_hours + points_tasks, 2)
+        points_hours  = min((s['total_hours']  / 100) * 30, 30)
+        points_tasks  = min((s['tasks_completed'] / 30) * 20, 20)
+        total_points  = round(points_sitins + points_hours + points_tasks, 2)
 
         leaderboard_data.append({
-            'id_number': s['id_number'],
-            'firstname': s['firstname'],
-            'lastname': s['lastname'],
-            'course': s['course'],
-            'profile_pic': s['profile_pic'],
-            'total_sitins': s['total_sitins'],
-            'total_hours': round(s['total_hours'], 1),
+            'id_number':       s['id_number'],
+            'firstname':       s['firstname'],
+            'lastname':        s['lastname'],
+            'course':          s['course'],
+            'profile_pic':     s['profile_pic'],
+            'total_sitins':    s['total_sitins'],
+            'total_hours':     round(s['total_hours'], 1),
             'tasks_completed': s['tasks_completed'],
-            'points_sitins': round(points_sitins, 1),
-            'points_hours': round(points_hours, 1),
-            'points_tasks': round(points_tasks, 1),
-            'total_points': total_points
+            'points_sitins':   round(points_sitins, 1),
+            'points_hours':    round(points_hours, 1),
+            'points_tasks':    round(points_tasks, 1),
+            'total_points':    total_points
         })
 
-    # Sort by total points descending
     leaderboard_data.sort(key=lambda x: x['total_points'], reverse=True)
-
-    # Add rank
     for i, student in enumerate(leaderboard_data):
         student['rank'] = i + 1
 
-    current_user_id = session.get('user_id')
-    role = session.get('role')
-
-    return render_template('leaderboard.html', 
+    return render_template('leaderboard.html',
                            leaderboard=leaderboard_data,
-                           role=role,
-                           current_user_id=current_user_id)
+                           role=session.get('role'),
+                           current_user_id=session.get('user_id'))
 
 
 @app.route('/admin_reservations')
@@ -752,7 +918,21 @@ def admin_reservations():
     return render_template('admin_reservations.html', records=records)
 
 
-# FIX #4 APPLIED: Gi-ilis ang GET method padulong POST para secure ang data modification
+@app.route('/admin_feedbacks')
+def admin_feedbacks():
+    if 'user_id' not in session or session.get('role') != 'admin':
+        return redirect(url_for('home'))
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    feedbacks = cursor.execute(
+        "SELECT * FROM student_feedback ORDER BY date_submitted DESC"
+    ).fetchall()
+    conn.close()
+
+    return render_template('admin_feedbacks.html', feedbacks=feedbacks)
+
+
 @app.route('/process_reservation/<int:res_id>/<string:action>', methods=['POST'])
 def process_reservation(res_id, action):
     if 'user_id' not in session or session.get('role') != 'admin':
@@ -765,62 +945,146 @@ def process_reservation(res_id, action):
 
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute('''
-        UPDATE reservations
-        SET status = ?
-        WHERE id = ?
-    ''', (status, res_id))
-    conn.commit()
-    conn.close()
 
+    # Fetch reservation details before updating
+    res_row = cursor.execute(
+        "SELECT * FROM reservations WHERE id = ?", (res_id,)
+    ).fetchone()
+
+    cursor.execute(
+        "UPDATE reservations SET status = ? WHERE id = ?", (status, res_id)
+    )
+    conn.commit()
+
+    # ── NOTIFY the student ───────────────────────────────
+    if res_row:
+        pc_info = f" ({res_row['selected_pc']})" if res_row['selected_pc'] else ""
+        if action == 'approve':
+            create_notification(
+                conn,
+                recipient  = res_row['id_number'],
+                notif_type = 'approved',
+                message    = f"✅ Your reservation for {res_row['res_lab']}{pc_info} on {res_row['res_date']} has been APPROVED!",
+                link       = '/dashboard'
+            )
+        else:
+            create_notification(
+                conn,
+                recipient  = res_row['id_number'],
+                notif_type = 'declined',
+                message    = f"❌ Your reservation for {res_row['res_lab']}{pc_info} on {res_row['res_date']} was declined.",
+                link       = '/dashboard'
+            )
+    # ─────────────────────────────────────────────────────
+
+    conn.close()
     return redirect(url_for('admin_reservations'))
+
 
 @app.route('/ai_recommendation')
 def ai_recommendation():
-    """Nag-generate og AI recommendations base sa data sa estudyante."""
     if 'user_id' not in session:
         return jsonify({'error': 'Not logged in'}), 401
 
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Kuhaon ang data sa estudyante
     student = cursor.execute('SELECT * FROM users WHERE id = ?', (session['user_id'],)).fetchone()
-    
-    # Kuhaon ang iyang sit-in history aron maihap
-    history = cursor.execute('SELECT * FROM sitin_records WHERE id_number = ?', (student['id_number'],)).fetchall()
+    history = cursor.execute(
+        'SELECT * FROM sitin_records WHERE id_number = ?', (student['id_number'],)
+    ).fetchall()
     total_sitins = len(history)
-
     conn.close()
 
-    # ==========================================
-    # MOCK AI RESPONSE (Para ma-test ang UI nimo)
-    # Puhon, pwede nimo i-connect ang Gemini API o OpenAI API diri.
-    # ==========================================
-    
-    course_tips = ""
+    course_tips = "Keep exploring and applying technology to your field of study."
     if "BSIT" in student['course'].upper() or "IT" in student['course'].upper():
         course_tips = "Focus on your Python and Flask projects. System architecture is a great skill!"
-    else:
-        course_tips = "Keep exploring and applying technology to your field of study."
 
-    mock_ai_message = f"""Hello {student['firstname']}! Here is your quick academic evaluation:
+    recommendation = (
+        f"Hello {student['firstname']}! You have {student['remaining_sessions']} sessions left "
+        f"and completed {total_sitins} sit-ins. {course_tips}"
+    )
 
-• You currently have {student['remaining_sessions']} lab sessions remaining. Manage them wisely!
-• You have successfully completed {total_sitins} sit-in sessions so far. Great consistency!
-• {course_tips}
-• Tip: Don't forget to ask the lab admins if you need specific software installed for your capstone or projects.
-
-Keep up the good work in the CCS Laboratory!"""
-
-    # Ibalik ang JSON padulong sa JavaScript
     return jsonify({
-        'name': student['firstname'],
-        'course': student['course'],
+        'name':               student['firstname'],
+        'course':             student['course'],
         'remaining_sessions': student['remaining_sessions'],
-        'total_sitins': total_sitins,
-        'recommendation': mock_ai_message
+        'total_sitins':       total_sitins,
+        'recommendation':     recommendation
     })
 
+
+# =======================================================
+# NOTIFICATION ROUTES
+# =======================================================
+
+@app.route('/notifications/count')
+def notifications_count():
+    """Return unread notification count for the current user (JSON)."""
+    if 'user_id' not in session:
+        return jsonify({'count': 0})
+
+    recipient = 'admin' if session.get('role') == 'admin' else session.get('id_number', '')
+
+    conn = get_db_connection()
+    row = conn.execute(
+        "SELECT COUNT(*) AS cnt FROM notifications WHERE recipient = ? AND is_read = 0",
+        (recipient,)
+    ).fetchone()
+    conn.close()
+
+    return jsonify({'count': row['cnt'] if row else 0})
+
+
+@app.route('/notifications/list')
+def notifications_list():
+    """Return the 20 most recent notifications for the current user (JSON)."""
+    if 'user_id' not in session:
+        return jsonify([])
+
+    recipient = 'admin' if session.get('role') == 'admin' else session.get('id_number', '')
+
+    conn = get_db_connection()
+    rows = conn.execute(
+        """SELECT id, type, message, link, is_read, created_at
+           FROM notifications
+           WHERE recipient = ?
+           ORDER BY created_at DESC
+           LIMIT 20""",
+        (recipient,)
+    ).fetchall()
+    conn.close()
+
+    return jsonify([dict(r) for r in rows])
+
+
+@app.route('/notifications/read/<int:notif_id>', methods=['POST'])
+def notification_read(notif_id):
+    """Mark a single notification as read."""
+    conn = get_db_connection()
+    conn.execute("UPDATE notifications SET is_read = 1 WHERE id = ?", (notif_id,))
+    conn.commit()
+    conn.close()
+    return jsonify({'ok': True})
+
+
+@app.route('/notifications/read_all', methods=['POST'])
+def notifications_read_all():
+    """Mark all notifications as read for the current user."""
+    if 'user_id' not in session:
+        return jsonify({'ok': False})
+
+    recipient = 'admin' if session.get('role') == 'admin' else session.get('id_number', '')
+
+    conn = get_db_connection()
+    conn.execute(
+        "UPDATE notifications SET is_read = 1 WHERE recipient = ?", (recipient,)
+    )
+    conn.commit()
+    conn.close()
+    return jsonify({'ok': True})
+
+
+# =======================================================
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

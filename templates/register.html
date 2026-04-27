@@ -8,19 +8,191 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=12">
     <link rel="stylesheet" href="{{ url_for('static', filename='register.css') }}?v=12">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body.home-page {
+            font-family: 'Outfit', sans-serif;
+            min-height: 100vh;
+            overflow: hidden; /* no page scroll */
+        }
+
+        /* ── MODAL OVERLAY ── */
+        .reg-modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: rgba(8, 20, 50, 0.55);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        /* ── MODAL CARD ── */
+        .reg-modal-card {
+            position: relative;
+            width: 100%;
+            max-width: 740px;
+            max-height: 90vh;
+            overflow-y: auto;
+            background: linear-gradient(155deg, #ffffff 0%, #eef4ff 100%);
+            border-radius: 26px;
+            padding: 40px 38px 36px;
+            box-shadow:
+                0 32px 80px rgba(10,40,100,.22),
+                0 0 0 1px rgba(255,255,255,.95) inset;
+            animation: cardIn .38s cubic-bezier(.22,.68,0,1.15);
+            scrollbar-width: thin;
+            scrollbar-color: #c5d8f0 transparent;
+        }
+        .reg-modal-card::-webkit-scrollbar { width: 5px; }
+        .reg-modal-card::-webkit-scrollbar-thumb { background: #c5d8f0; border-radius: 4px; }
+
+        @keyframes cardIn {
+            from { opacity: 0; transform: translateY(24px) scale(.97); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* ── CLOSE ── */
+        .reg-close-x {
+            position: absolute; top: 16px; right: 20px;
+            font-size: 22px; color: #8a9bb5; text-decoration: none;
+            line-height: 1; transition: color .2s, transform .2s; z-index: 10;
+        }
+        .reg-close-x:hover { color: #1b4f8a; transform: rotate(90deg); }
+
+        /* ── HEADER ── */
+        .reg-card-header {
+            display: flex; align-items: center; gap: 14px;
+            margin-bottom: 24px; padding-bottom: 18px;
+            border-bottom: 1.5px solid #e0ecff;
+        }
+        .reg-icon-ring {
+            width: 50px; height: 50px; border-radius: 14px;
+            background: linear-gradient(135deg, #1b4f8a, #2e7de9);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; box-shadow: 0 8px 20px rgba(27,79,138,.28);
+        }
+        .reg-icon-ring i { color: #fff; font-size: 19px; }
+        .reg-card-header-text h2 {
+            font-size: 22px; font-weight: 700;
+            color: #0d2b55; letter-spacing: -.3px;
+        }
+        .reg-card-header-text p { font-size: 12.5px; color: #7a90aa; margin-top: 2px; }
+
+        /* ── SECTION LABEL ── */
+        .reg-section-label {
+            font-size: 10px; font-weight: 700;
+            letter-spacing: 1.2px; text-transform: uppercase; color: #2e7de9;
+            margin: 16px 0 10px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .reg-section-label::after { content: ''; flex: 1; height: 1px; background: #dde8f8; }
+
+        /* ── GRID ── */
+        .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+        .mb-12 { margin-bottom: 12px; }
+
+        @media (max-width: 560px) {
+            .form-row-2, .form-row-3 { grid-template-columns: 1fr; }
+            .reg-modal-card { padding: 28px 18px 24px; }
+        }
+
+        /* ── INPUT ── */
+        .input-modern { position: relative; }
+        .input-modern > i.field-icon {
+            position: absolute; left: 13px; top: 50%; transform: translateY(-50%);
+            color: #a0b8d8; font-size: 13px; pointer-events: none; z-index: 2;
+            transition: color .2s;
+        }
+        .input-modern input,
+        .input-modern select {
+            width: 100%;
+            padding: 11px 14px 11px 38px;
+            border: 1.5px solid #d4e1f4; border-radius: 11px;
+            font-size: 13.5px; font-family: 'Outfit', sans-serif;
+            background: #fff; color: #1a2e4a;
+            outline: none; appearance: none; -webkit-appearance: none;
+            transition: border-color .2s, box-shadow .2s;
+        }
+        .input-modern input::placeholder { color: #b0c4dc; }
+        .input-modern input:focus,
+        .input-modern select:focus {
+            border-color: #2e7de9;
+            box-shadow: 0 0 0 3px rgba(46,125,233,.12);
+        }
+        .input-modern:focus-within > i.field-icon { color: #2e7de9; }
+        .input-modern select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23a0b8d8' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 12px center;
+            padding-right: 32px;
+        }
+
+        /* ── EYE TOGGLE ── */
+        .pw-toggle {
+            position: absolute !important;
+            left: auto !important;
+            right: 12px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            pointer-events: all; cursor: pointer;
+            color: #a0b8d8; font-size: 14px; z-index: 3; transition: color .2s;
+        }
+        .pw-toggle:hover { color: #2e7de9; }
+        .input-pw-wrap input { padding-right: 40px; }
+
+        /* ── PASSWORD MATCH ── */
+        .pw-match-bar {
+            height: 3px; border-radius: 2px;
+            margin-top: 4px; background: transparent; transition: background .25s;
+        }
+        .pw-match-bar.match   { background: #22c55e; }
+        .pw-match-bar.nomatch { background: #ef4444; }
+        .pw-match-msg { font-size: 11px; font-weight: 600; margin-top: 3px; min-height: 15px; }
+        .pw-match-msg.match   { color: #16a34a; }
+        .pw-match-msg.nomatch { color: #dc2626; }
+        #confirm_password.match   { border-color: #22c55e !important; box-shadow: 0 0 0 3px rgba(34,197,94,.12) !important; }
+        #confirm_password.nomatch { border-color: #ef4444 !important; box-shadow: 0 0 0 3px rgba(239,68,68,.12) !important; }
+
+        /* ── REGISTER BTN ── */
+        .btn-register-modern {
+            width: 100%; margin-top: 20px; padding: 13.5px;
+            background: linear-gradient(135deg, #1b4f8a 0%, #2e7de9 100%);
+            color: #fff; border: none; border-radius: 13px;
+            font-size: 15px; font-weight: 700; font-family: 'Outfit', sans-serif;
+            letter-spacing: .4px; cursor: pointer;
+            transition: transform .18s, box-shadow .18s;
+            box-shadow: 0 8px 22px rgba(27,79,138,.28);
+        }
+        .btn-register-modern:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(27,79,138,.36); }
+        .btn-register-modern:active { transform: translateY(0); }
+        .btn-register-modern i { margin-right: 8px; }
+
+        .reg-login-link {
+            text-align: center; margin-top: 14px;
+            font-size: 13px; color: #7a90aa;
+        }
+        .reg-login-link a { color: #1b4f8a; font-weight: 700; text-decoration: none; }
+        .reg-login-link a:hover { text-decoration: underline; }
+    </style>
 </head>
-<body class="home-page"> 
+<body class="home-page">
 
     <nav class="navbar">
         <div class="logo">
             <img src="{{ url_for('static', filename='images/uclogonav.png') }}" alt="UC Logo">
             <span>College of Computer Studies Sit-in Monitoring System</span>
         </div>
-        
         <div class="modern-nav-links">
             <a href="/" class="nav-item"><i class="fas fa-home"></i> Home</a>
             <a href="#" class="nav-item"><i class="fas fa-users"></i> Community</a>
-           <a href="/about" class="nav-item"><i class="fas fa-info-circle"></i> About</a>
+            <a href="/about" class="nav-item"><i class="fas fa-info-circle"></i> About</a>
             <a href="/?openLogin=true" class="nav-login-btn"><i class="fas fa-sign-in-alt"></i> Login</a>
         </div>
     </nav>
@@ -38,22 +210,32 @@
         </div>
     </div>
 
-    <div class="reg-container">
-        <div class="reg-glass-card">
-            <a href="/" style="position: absolute; top: 15px; right: 20px; text-decoration: none; color: #333; font-size: 24px;">&times;</a>
-            <h2 style="color: #1b4f8a; margin-bottom: 25px;">Sign up</h2>
+    <!-- ── REGISTRATION MODAL ── -->
+    <div class="reg-modal-overlay" id="regOverlay">
+        <div class="reg-modal-card">
 
-            <form action="/register" method="POST" id="regForm" class="reg-form-container">
-                
-                <div class="form-row-2">
+            <a href="/" class="reg-close-x" title="Back to Home">&times;</a>
+
+            <div class="reg-card-header">
+                <div class="reg-icon-ring"><i class="fas fa-user-plus"></i></div>
+                <div class="reg-card-header-text">
+                    <h2>Create Your Account</h2>
+                    <p>Fill in the details below to get started</p>
+                </div>
+            </div>
+
+            <form action="/register" method="POST" id="regForm" autocomplete="off">
+
+                <div class="reg-section-label"><i class="fas fa-id-card"></i> Student Information</div>
+                <div class="form-row-2 mb-12">
                     <div class="input-modern">
-                        <i class="fas fa-id-badge"></i>
-                        <input type="text" name="id_number" placeholder="ID Number" required>
+                        <i class="fas fa-id-badge field-icon"></i>
+                        <input type="text" name="id_number" placeholder="ID Number (e.g. 2021-12345)" required>
                     </div>
                     <div class="input-modern">
-                        <i class="fas fa-layer-group"></i>
+                        <i class="fas fa-layer-group field-icon"></i>
                         <select name="course_level" required>
-                            <option value="" disabled selected>-- Select Year Level --</option>
+                            <option value="" disabled selected>-- Year Level --</option>
                             <option value="1">1st Year</option>
                             <option value="2">2nd Year</option>
                             <option value="3">3rd Year</option>
@@ -62,23 +244,23 @@
                     </div>
                 </div>
 
-                <div class="form-row-3">
+                <div class="form-row-3 mb-12">
                     <div class="input-modern">
-                        <i class="fas fa-user"></i>
+                        <i class="fas fa-user field-icon"></i>
                         <input type="text" name="firstname" placeholder="First Name" required>
                     </div>
                     <div class="input-modern">
-                        <i class="fas fa-user" style="color: #999;"></i>
+                        <i class="fas fa-user field-icon" style="color:#ccd8e8;"></i>
                         <input type="text" name="middlename" placeholder="Middle Name (Opt)">
                     </div>
                     <div class="input-modern">
-                        <i class="fas fa-user"></i>
+                        <i class="fas fa-user field-icon"></i>
                         <input type="text" name="lastname" placeholder="Last Name" required>
                     </div>
                 </div>
 
-                <div class="input-modern">
-                    <i class="fas fa-graduation-cap"></i>
+                <div class="input-modern mb-12">
+                    <i class="fas fa-graduation-cap field-icon"></i>
                     <select name="course" required>
                         <option value="" disabled selected>-- Select Your Course --</option>
                         <optgroup label="Computer Studies (30 Sessions)">
@@ -101,38 +283,109 @@
                     </select>
                 </div>
 
-                <div class="form-row-2">
+                <div class="reg-section-label"><i class="fas fa-address-card"></i> Contact Details</div>
+                <div class="form-row-2 mb-12">
                     <div class="input-modern">
-                        <i class="fas fa-lock"></i>
-                        <input type="password" name="password" id="password" placeholder="Password" required>
-                    </div>
-                    <div class="input-modern">
-                        <i class="fas fa-lock"></i>
-                        <input type="password" name="repeat_password" id="confirm_password" placeholder="Repeat Password" required>
-                    </div>
-                </div>
-
-                <div class="form-row-2">
-                    <div class="input-modern">
-                        <i class="fas fa-envelope"></i>
+                        <i class="fas fa-envelope field-icon"></i>
                         <input type="email" name="email" placeholder="Email Address" required>
                     </div>
                     <div class="input-modern">
-                        <i class="fas fa-map-marker-alt"></i>
+                        <i class="fas fa-map-marker-alt field-icon"></i>
                         <input type="text" name="address" placeholder="Complete Address" required>
                     </div>
                 </div>
 
-                <button type="submit" class="btn-register-modern">Register Account</button>
-                
-                <p style="text-align: center; margin-top: 15px; font-size: 14px; color: #555;">
-                    Already have an account? <a href="/?openLogin=true" style="color: #1b4f8a; font-weight: bold; text-decoration: none;">Login Here</a>
+                <div class="reg-section-label"><i class="fas fa-lock"></i> Security</div>
+                <div class="form-row-2" style="margin-bottom:4px;">
+                    <div>
+                        <div class="input-modern input-pw-wrap">
+                            <i class="fas fa-lock field-icon"></i>
+                            <input type="password" name="password" id="password" placeholder="Password" required>
+                            <i class="fas fa-eye pw-toggle" id="togglePw"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="input-modern input-pw-wrap">
+                            <i class="fas fa-lock field-icon"></i>
+                            <input type="password" name="repeat_password" id="confirm_password" placeholder="Confirm Password" required>
+                            <i class="fas fa-eye pw-toggle" id="toggleConfirmPw"></i>
+                        </div>
+                        <div class="pw-match-bar" id="matchBar"></div>
+                        <div class="pw-match-msg" id="matchMsg"></div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-register-modern">
+                    <i class="fas fa-user-check"></i>Create Account
+                </button>
+
+                <p class="reg-login-link">
+                    Already have an account? <a href="/?openLogin=true">Login here</a>
                 </p>
             </form>
         </div>
     </div>
 
     <script src="{{ url_for('static', filename='script.js') }}?v=3"></script>
+    <script>
+        // Click outside card = go home
+        document.getElementById('regOverlay').addEventListener('click', function(e) {
+            if (e.target === this) window.location.href = '/';
+        });
+
+        // Password toggle – main
+        const pwField  = document.getElementById('password');
+        const togglePw = document.getElementById('togglePw');
+        togglePw.addEventListener('click', () => {
+            const show = pwField.type === 'password';
+            pwField.type = show ? 'text' : 'password';
+            togglePw.className = `fas fa-${show ? 'eye-slash' : 'eye'} pw-toggle`;
+        });
+
+        // Password toggle – confirm
+        const confirmPw       = document.getElementById('confirm_password');
+        const toggleConfirmPw = document.getElementById('toggleConfirmPw');
+        toggleConfirmPw.addEventListener('click', () => {
+            const show = confirmPw.type === 'password';
+            confirmPw.type = show ? 'text' : 'password';
+            toggleConfirmPw.className = `fas fa-${show ? 'eye-slash' : 'eye'} pw-toggle`;
+        });
+
+        // Password match check
+        const matchBar = document.getElementById('matchBar');
+        const matchMsg = document.getElementById('matchMsg');
+
+        function checkMatch() {
+            const pw  = pwField.value;
+            const cpw = confirmPw.value;
+            if (!cpw) {
+                confirmPw.classList.remove('match', 'nomatch');
+                matchBar.classList.remove('match', 'nomatch');
+                matchMsg.textContent = '';
+                matchMsg.className = 'pw-match-msg';
+                return;
+            }
+            const ok = pw === cpw;
+            confirmPw.classList.toggle('match',   ok);
+            confirmPw.classList.toggle('nomatch', !ok);
+            matchBar.classList.toggle('match',    ok);
+            matchBar.classList.toggle('nomatch',  !ok);
+            matchMsg.textContent = ok ? '✓ Passwords match' : '✗ Passwords do not match';
+            matchMsg.className   = `pw-match-msg ${ok ? 'match' : 'nomatch'}`;
+        }
+
+        confirmPw.addEventListener('input', checkMatch);
+        pwField.addEventListener('input', checkMatch);
+
+        // Block submit if mismatch
+        document.getElementById('regForm').addEventListener('submit', function(e) {
+            if (pwField.value !== confirmPw.value) {
+                e.preventDefault();
+                confirmPw.focus();
+                checkMatch();
+            }
+        });
+    </script>
     <div id="toastBox"></div>
 </body>
 </html>

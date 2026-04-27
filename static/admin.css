@@ -28,23 +28,32 @@ body.admin-page::before {
     flex: 1;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     z-index: 1;
-    
-    /* GIDUSO PAUBOS PARA DILI MATABUNAN SA FIXED NAVBAR */
-    margin-top: 100px; 
-    margin-bottom: 50px; 
+    padding: 40px 24px 50px;
+    min-height: calc(100vh - 54px);
+    box-sizing: border-box;
+}
+
+/* Para sa list/table pages (student_list, history, active_sitins, etc.) */
+.admin-container--full {
+    display: block !important;
+    padding: 28px 24px 50px !important;
+    max-width: 1260px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    min-height: unset !important;
 }
 
 /* =========================================
    PREMIUM GLASS CARD 
    ========================================= */
 .admin-glass-card {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.3));
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.35));
     backdrop-filter: blur(20px);
     padding: 40px;
-    width: 1100px; 
-    max-width: 90%;
+    width: 100%;
+    max-width: 1100px;
     border-radius: 20px;
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2); 
     border: 1px solid rgba(255, 255, 255, 0.6); 
@@ -198,27 +207,50 @@ body.admin-page::before {
    MODERN ADMIN NAVBAR (BULLETPROOF FIXED)
    ========================================= */
 .navbar {
-    position: fixed; /* Gihimo natong FIXED aron dili na gyud mokuyog sa scroll */
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    box-sizing: border-box; 
+    box-sizing: border-box;
     z-index: 9999;
-    
-    background: rgba(27, 79, 138, 0.85); 
+    background: rgba(27, 79, 138, 0.85);
     backdrop-filter: blur(15px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 40px; 
+    padding: 15px 40px;
+}
+
+.menu-toggle {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30px;
+    height: 22px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+.menu-toggle span {
+    display: block;
+    height: 3px;
+    width: 100%;
+    background: #fff;
+    border-radius: 2px;
+}
+
+@media (max-width: 768px) {
+    .menu-toggle { display: flex; }
+    .nav-links { display: none; flex-direction: column; position: absolute; top: 60px; right: 20px; background: rgba(27, 79, 138, 0.95); padding: 10px 20px; border-radius: 8px; }
+    .nav-links.open { display: flex; }
+    .nav-links a { padding: 8px 0; }
 }
 
 .nav-links {
     display: flex;
     align-items: center;
-    gap: 8px; 
+    gap: 8px;
 }
 
 .nav-links a, .dropbtn {
@@ -243,14 +275,13 @@ body.admin-page::before {
     transform: translateY(-2px);
 }
 
-/* ================== DROPDOWN LOGIC ================== */
 .dropdown {
     position: relative;
     display: inline-block;
 }
 
 .dropdown-content {
-    display: none; 
+    display: none;
     position: absolute;
     background-color: #ffffff;
     min-width: 190px;
@@ -258,7 +289,7 @@ body.admin-page::before {
     border-radius: 10px;
     z-index: 999;
     top: 100%;
-    padding-top: 5px; 
+    padding-top: 5px;
     padding-bottom: 5px;
 }
 
@@ -274,7 +305,7 @@ body.admin-page::before {
 .dropdown-content a:hover {
     background-color: #f1f1f1;
     color: #1b4f8a;
-    transform: none; 
+    transform: none;
 }
 
 .dropdown:hover .dropdown-content {
@@ -287,7 +318,6 @@ body.admin-page::before {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* ================== LOGOUT BUTTON ================== */
 .nav-links .logout-btn {
     background-color: #ff4c4c;
     color: white;
