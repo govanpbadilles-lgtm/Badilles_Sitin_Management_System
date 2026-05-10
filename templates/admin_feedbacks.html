@@ -8,412 +8,551 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* ══════════════════════════════════════════
-           NOTIFICATION BELL
-        ══════════════════════════════════════════ */
-        .notif-wrapper { position: relative; display: inline-flex; align-items: center; }
-        .notif-bell-btn { background: rgba(255,255,255,0.12); border: none; color: white; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; position: relative; transition: background 0.2s, transform 0.2s; }
-        .notif-bell-btn:hover { background: rgba(255,255,255,0.25); transform: scale(1.08); }
-        .notif-bell-btn.shake { animation: bellShake 0.6s ease; }
-        @keyframes bellShake { 0%,100% { transform: rotate(0); } 20% { transform: rotate(-18deg); } 40% { transform: rotate(18deg); } 60% { transform: rotate(-10deg); } 80% { transform: rotate(10deg); } }
-        .notif-badge { position: absolute; top: -4px; right: -4px; background: #ff4c4c; color: white; font-size: 10px; font-weight: bold; min-width: 18px; height: 18px; border-radius: 9px; display: flex !important; align-items: center; justify-content: center; padding: 0 4px; border: 2px solid #1b4f8a; line-height: 1; animation: badgePop 0.3s ease; }
-        @keyframes badgePop { 0% { transform: scale(0); } 70% { transform: scale(1.3); } 100% { transform: scale(1); } }
-        .notif-dropdown { position: absolute; top: calc(100% + 12px); right: 50px; width: 340px; background: white; border-radius: 14px; box-shadow: 0 12px 40px rgba(0,0,0,0.18); z-index: 99999; overflow: hidden; animation: notifSlideIn 0.22s ease; border: 1px solid rgba(0,0,0,0.08); }
-        @keyframes notifSlideIn { from { opacity:0; transform: translateY(-10px) scale(0.97); } to { opacity:1; transform: translateY(0) scale(1); } }
-        .notif-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 10px; border-bottom: 1px solid #f0f0f0; font-size: 14px; font-weight: 700; color: #1b4f8a; }
-        .notif-read-all-btn { background: none; border: none; font-size: 12px; color: #888; cursor: pointer; font-family: inherit; transition: color 0.2s; }
-        .notif-read-all-btn:hover { color: #1b4f8a; }
-        .notif-list { max-height: 360px; overflow-y: auto; }
-        .notif-item { display: flex; align-items: flex-start; gap: 12px; padding: 13px 16px; border-bottom: 1px solid #f7f7f7; cursor: pointer; transition: background 0.15s; }
-        .notif-item:hover { background: #f8faff; }
-        .notif-item.unread { background: #eef5ff; }
-        .notif-item.unread:hover { background: #dfeeff; }
-        .notif-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; margin-top: 2px; }
-        .notif-icon.reservation { background: #fff3e0; color: #ff9800; }
-        .notif-icon.approved { background: #e8fff2; color: #15c35a; }
-        .notif-icon.declined { background: #fff0f0; color: #ff4c4c; }
-        .notif-icon.announcement { background: #e8f4fd; color: #1b4f8a; }
-        .notif-body { flex: 1; }
-        .notif-msg { font-size: 13px; color: #333; line-height: 1.4; margin: 0 0 4px 0; }
-        .notif-time { font-size: 11px; color: #aaa; }
-        .notif-unread-dot { width: 8px; height: 8px; background: #1b4f8a; border-radius: 50%; flex-shrink: 0; margin-top: 6px; }
-        .notif-empty { padding: 40px 20px; text-align: center; color: #bbb; }
-        .notif-empty i { font-size: 36px; display: block; margin-bottom: 10px; }
-        .notif-empty p { margin: 0; font-size: 14px; }
+    /* ══════════════════════════════════════════
+       BODY & NAVBAR
+    ══════════════════════════════════════════ */
+    body.admin-page { padding-top: 0 !important; }
+    body.admin-page .navbar { position: sticky !important; top: 0 !important; }
+    .navbar { height: 54px; background: #1b4f8a; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+    .nav-left { display: flex; align-items: center; gap: 10px; }
+    .nav-left img { height: 32px; width: auto; }
+    .nav-brand { color: white; font-size: 15px; font-weight: 600; letter-spacing: 0.2px; }
+    .nav-right { display: flex; align-items: center; gap: 10px; }
 
-        /* ══════════════════════════════════════════
-           SLIM NAVBAR & SIDEBAR
-        ══════════════════════════════════════════ */
-        body.admin-page { padding-top: 0 !important; }
-        body.admin-page .navbar { position: sticky !important; top: 0 !important; }
-        .navbar { height: 54px; background: #1b4f8a; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
-        .nav-left { display: flex; align-items: center; gap: 10px; }
-        .nav-left img { height: 32px; width: auto; }
-        .nav-brand { color: white; font-size: 15px; font-weight: 600; letter-spacing: 0.2px; }
-        .nav-right { display: flex; align-items: center; gap: 10px; }
-        .hamburger-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: rgba(255,255,255,0.12); cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; transition: background 0.2s; flex-shrink: 0; }
-        .hamburger-btn:hover { background: rgba(255,255,255,0.22); }
-        .hamburger-btn span { display: block; width: 16px; height: 2px; background: white; border-radius: 2px; transition: all 0.28s cubic-bezier(0.4,0,0.2,1); }
-        .hamburger-btn.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-        .hamburger-btn.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
-        .hamburger-btn.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.42); z-index: 1001; backdrop-filter: blur(2px); animation: overlayFadeIn 0.25s ease; }
-        .sidebar-overlay.visible { display: block; }
-        @keyframes overlayFadeIn { from { opacity: 0; } to   { opacity: 1; } }
-        .sidebar { position: fixed; top: 0; right: 0; left: auto; width: 245px; height: 100vh; background: #1b4f8a; z-index: 1002; display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: -4px 0 24px rgba(0,0,0,0.25); }
-        .sidebar.open { transform: translateX(0); }
-        .sidebar-user { display: flex; align-items: center; gap: 12px; padding: 22px 16px 18px; border-bottom: 1px solid rgba(255,255,255,0.12); }
-        .sidebar-admin-icon { width: 48px; height: 48px; border-radius: 50%; background: rgba(255,255,255,0.18); color: white; font-size: 20px; display: flex; align-items: center; justify-content: center; border: 2px solid rgba(255,255,255,0.35); flex-shrink: 0; }
-        .sidebar-user-info { min-width: 0; }
-        .sidebar-name { color: white; font-size: 13px; font-weight: 600; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .sidebar-sub { color: rgba(255,255,255,0.52); font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .sidebar-nav { flex: 1; padding: 10px 0; overflow-y: auto; display: flex; flex-direction: column; }
-        .sidebar-item { display: flex; align-items: center; gap: 12px; padding: 11px 20px; color: rgba(255,255,255,0.68); font-size: 13px; text-decoration: none; border-left: 3px solid transparent; transition: all 0.15s; cursor: pointer; }
-        .sidebar-item:hover { background: rgba(255,255,255,0.1); color: white; text-decoration: none; }
-        .sidebar-item.active { background: rgba(255,255,255,0.15); color: white; border-left-color: rgba(255,255,255,0.85); font-weight: 600; }
-        .sidebar-item i { width: 17px; text-align: center; font-size: 14px; flex-shrink: 0; }
-        .sidebar-divider { height: 1px; background: rgba(255,255,255,0.1); margin: 6px 16px; }
-        .sidebar-section-label { padding: 10px 20px 4px; font-size: 10px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: rgba(255,255,255,0.35); }
-        .sidebar-footer { padding: 14px 16px; border-top: 1px solid rgba(255,255,255,0.12); }
-        .sidebar-logout-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 10px; border-radius: 8px; background: rgba(255, 75, 75, 0.18); color: rgba(255, 175, 175, 1); font-size: 13px; font-weight: 600; text-decoration: none; transition: background 0.2s; }
-        .sidebar-logout-btn:hover { background: rgba(255, 75, 75, 0.32); text-decoration: none; color: rgba(255, 200, 200, 1); }
+    /* ══════════════════════════════════════════
+       HAMBURGER
+    ══════════════════════════════════════════ */
+    .hamburger-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: rgba(255,255,255,0.12); cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; transition: background 0.2s; flex-shrink: 0; }
+    .hamburger-btn:hover { background: rgba(255,255,255,0.22); }
+    .hamburger-btn span { display: block; width: 16px; height: 2px; background: white; border-radius: 2px; transition: all 0.28s cubic-bezier(0.4,0,0.2,1); }
+    .hamburger-btn.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger-btn.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .hamburger-btn.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
-        /* ══════════════════════════════════════════
-           NEW UI: FEEDBACK CARDS
-        ══════════════════════════════════════════ */
-        .feedback-list {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-top: 20px;
-        }
-        .modern-feedback-card {
-            background: #ffffff;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            border: 1px solid rgba(0,0,0,0.05);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        .modern-feedback-card::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 5px;
-            background: linear-gradient(180deg, #1b4f8a, #3b82f6); /* Modern blue gradient border */
-            border-radius: 12px 0 0 12px;
-        }
-        .modern-feedback-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
-        }
-        .fb-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 15px;
-            border-bottom: 1px solid #f0f0f0;
-            padding-bottom: 15px;
-        }
-        .fb-user-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .fb-avatar {
-            width: 42px;
-            height: 42px;
-            background: #e8f4fd;
-            color: #1b4f8a;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-        }
-        .fb-details {
-            display: flex;
-            flex-direction: column;
-        }
-        .fb-name {
-            font-weight: 700;
-            font-size: 15px;
-            color: #222;
-        }
-        .fb-id {
-            font-size: 12px;
-            color: #777;
-            margin-top: 2px;
-        }
-        .fb-date {
-            font-size: 12px;
-            color: #888;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background: #f5f7fa;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-weight: 600;
-        }
-        .fb-message {
-            margin: 0;
-            font-size: 15px;
-            color: #444;
-            line-height: 1.6;
-            font-style: italic;
-        }
-        .fb-message::before {
-            content: "\201C"; /* Left double quote */
-            color: #ccc;
-            font-size: 20px;
-            margin-right: 5px;
-            font-family: serif;
-        }
-        .fb-message::after {
-            content: "\201D"; /* Right double quote */
-            color: #ccc;
-            font-size: 20px;
-            margin-left: 5px;
-            font-family: serif;
-        }
+    /* ══════════════════════════════════════════
+       SIDEBAR
+    ══════════════════════════════════════════ */
+    .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.42); z-index: 1001; backdrop-filter: blur(2px); animation: overlayFadeIn 0.25s ease; }
+    .sidebar-overlay.visible { display: block; }
+    @keyframes overlayFadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .sidebar { position: fixed; top: 0; right: 0; left: auto; width: 245px; height: 100vh; background: #1b4f8a; z-index: 1002; display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); box-shadow: -4px 0 24px rgba(0,0,0,0.25); }
+    .sidebar.open { transform: translateX(0); }
+    .sidebar-user { display: flex; align-items: center; gap: 12px; padding: 22px 16px 18px; border-bottom: 1px solid rgba(255,255,255,0.12); }
+    .sidebar-admin-icon { width: 48px; height: 48px; border-radius: 50%; background: rgba(255,255,255,0.18); color: white; font-size: 20px; display: flex; align-items: center; justify-content: center; border: 2px solid rgba(255,255,255,0.35); flex-shrink: 0; }
+    .sidebar-user-info { min-width: 0; }
+    .sidebar-name { color: white; font-size: 13px; font-weight: 600; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sidebar-sub { color: rgba(255,255,255,0.52); font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sidebar-nav { flex: 1; padding: 10px 0; overflow-y: auto; display: flex; flex-direction: column; }
+    .sidebar-item { display: flex; align-items: center; gap: 12px; padding: 11px 20px; color: rgba(255,255,255,0.68); font-size: 13px; text-decoration: none; border-left: 3px solid transparent; transition: all 0.15s; cursor: pointer; }
+    .sidebar-item:hover { background: rgba(255,255,255,0.1); color: white; text-decoration: none; }
+    .sidebar-item.active { background: rgba(255,255,255,0.15); color: white; border-left-color: rgba(255,255,255,0.85); font-weight: 600; }
+    .sidebar-item i { width: 17px; text-align: center; font-size: 14px; flex-shrink: 0; }
+    .sidebar-divider { height: 1px; background: rgba(255,255,255,0.1); margin: 6px 16px; }
+    .sidebar-section-label { padding: 10px 20px 4px; font-size: 10px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: rgba(255,255,255,0.35); }
+    .sidebar-footer { padding: 14px 16px; border-top: 1px solid rgba(255,255,255,0.12); }
+    .sidebar-logout-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 10px; border-radius: 8px; background: rgba(255,75,75,0.18); color: rgba(255,175,175,1); font-size: 13px; font-weight: 600; text-decoration: none; transition: background 0.2s; }
+    .sidebar-logout-btn:hover { background: rgba(255,75,75,0.32); text-decoration: none; color: rgba(255,200,200,1); }
+
+    /* ══════════════════════════════════════════
+       NOTIFICATION BELL
+    ══════════════════════════════════════════ */
+    .notif-wrapper { position: relative; display: inline-flex; align-items: center; }
+    .notif-bell-btn { background: rgba(255,255,255,0.12); border: none; color: white; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; position: relative; transition: background 0.2s, transform 0.2s; }
+    .notif-bell-btn:hover { background: rgba(255,255,255,0.25); transform: scale(1.08); }
+    .notif-bell-btn.shake { animation: bellShake 0.6s ease; }
+    @keyframes bellShake { 0%,100% { transform: rotate(0); } 20% { transform: rotate(-18deg); } 40% { transform: rotate(18deg); } 60% { transform: rotate(-10deg); } 80% { transform: rotate(10deg); } }
+    .notif-badge { position: absolute; top: -4px; right: -4px; background: #ff4c4c; color: white; font-size: 10px; font-weight: bold; min-width: 18px; height: 18px; border-radius: 9px; display: flex !important; align-items: center; justify-content: center; padding: 0 4px; border: 2px solid #1b4f8a; line-height: 1; animation: badgePop 0.3s ease; }
+    @keyframes badgePop { 0% { transform: scale(0); } 70% { transform: scale(1.3); } 100% { transform: scale(1); } }
+    .notif-dropdown { position: absolute; top: calc(100% + 12px); right: 50px; width: 340px; background: white; border-radius: 14px; box-shadow: 0 12px 40px rgba(0,0,0,0.18); z-index: 99999; overflow: hidden; animation: notifSlideIn 0.22s ease; border: 1px solid rgba(0,0,0,0.08); }
+    @keyframes notifSlideIn { from { opacity:0; transform: translateY(-10px) scale(0.97); } to { opacity:1; transform: translateY(0) scale(1); } }
+    .notif-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 10px; border-bottom: 1px solid #f0f0f0; font-size: 14px; font-weight: 700; color: #1b4f8a; }
+    .notif-read-all-btn { background: none; border: none; font-size: 12px; color: #888; cursor: pointer; font-family: inherit; transition: color 0.2s; }
+    .notif-read-all-btn:hover { color: #1b4f8a; }
+    .notif-list { max-height: 360px; overflow-y: auto; }
+    .notif-item { display: flex; align-items: flex-start; gap: 12px; padding: 13px 16px; border-bottom: 1px solid #f7f7f7; cursor: pointer; transition: background 0.15s; }
+    .notif-item:hover { background: #f8faff; }
+    .notif-item.unread { background: #eef5ff; }
+    .notif-item.unread:hover { background: #dfeeff; }
+    .notif-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; margin-top: 2px; }
+    .notif-icon.reservation { background: #fff3e0; color: #ff9800; }
+    .notif-icon.approved { background: #e8fff2; color: #15c35a; }
+    .notif-icon.declined { background: #fff0f0; color: #ff4c4c; }
+    .notif-icon.announcement { background: #e8f4fd; color: #1b4f8a; }
+    .notif-body { flex: 1; }
+    .notif-msg { font-size: 13px; color: #333; line-height: 1.4; margin: 0 0 4px 0; }
+    .notif-time { font-size: 11px; color: #aaa; }
+    .notif-unread-dot { width: 8px; height: 8px; background: #1b4f8a; border-radius: 50%; flex-shrink: 0; margin-top: 6px; }
+    .notif-empty { padding: 40px 20px; text-align: center; color: #bbb; }
+    .notif-empty i { font-size: 36px; display: block; margin-bottom: 10px; }
+    .notif-empty p { margin: 0; font-size: 14px; }
+
+    /* ══════════════════════════════════════════
+       FEEDBACK CARDS
+    ══════════════════════════════════════════ */
+    .feedback-list { display: flex; flex-direction: column; gap: 14px; margin-top: 20px; }
+
+    .feedback-card {
+        background: #ffffff;
+        border-radius: 14px;
+        border: 1px solid rgba(0,0,0,0.06);
+        overflow: hidden;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        display: flex;
+    }
+    .feedback-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+
+    .feedback-card-accent { width: 5px; flex-shrink: 0; }
+    .feedback-card-body { flex: 1; padding: 18px 20px; }
+
+    .fb-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    .fb-user-row { display: flex; align-items: center; gap: 12px; }
+    .fb-avatar {
+        width: 42px; height: 42px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 15px; font-weight: 700; flex-shrink: 0;
+    }
+    .fb-name { font-weight: 700; font-size: 15px; color: #222; }
+    .fb-id { font-size: 12px; color: #888; margin-top: 2px; }
+
+    .fb-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+    .fb-rating-badge {
+        font-size: 12px; font-weight: 700; padding: 4px 12px;
+        border-radius: 20px; display: flex; align-items: center; gap: 5px;
+    }
+    .fb-date { font-size: 11px; color: #aaa; display: flex; align-items: center; gap: 5px; }
+
+    .fb-message {
+        margin: 0; font-size: 14px; color: #555;
+        line-height: 1.65; font-style: italic;
+    }
+    .fb-message::before { content: "\201C"; color: #ccc; font-size: 18px; margin-right: 3px; font-family: serif; }
+    .fb-message::after  { content: "\201D"; color: #ccc; font-size: 18px; margin-left: 3px;  font-family: serif; }
+
+    /* Rating color schemes */
+    .rating-excellent .feedback-card-accent { background: #15c35a; }
+    .rating-excellent .fb-avatar            { background: #e8fff2; color: #0f6e56; }
+    .rating-excellent .fb-rating-badge      { background: #e8fff2; color: #0f6e56; }
+
+    .rating-verygood .feedback-card-accent  { background: #3b82f6; }
+    .rating-verygood .fb-avatar             { background: #e8f4fd; color: #185fa5; }
+    .rating-verygood .fb-rating-badge       { background: #e8f4fd; color: #185fa5; }
+
+    .rating-good .feedback-card-accent      { background: #1b4f8a; }
+    .rating-good .fb-avatar                 { background: #e8f4fd; color: #1b4f8a; }
+    .rating-good .fb-rating-badge           { background: #e8f4fd; color: #1b4f8a; }
+
+    .rating-average .feedback-card-accent   { background: #ff9800; }
+    .rating-average .fb-avatar              { background: #fff3e0; color: #854f0b; }
+    .rating-average .fb-rating-badge        { background: #fff3e0; color: #854f0b; }
+
+    .rating-poor .feedback-card-accent      { background: #ff4c4c; }
+    .rating-poor .fb-avatar                 { background: #fff0f0; color: #a32d2d; }
+    .rating-poor .fb-rating-badge           { background: #fff0f0; color: #a32d2d; }
+
+    .rating-none .feedback-card-accent      { background: #ccc; }
+    .rating-none .fb-avatar                 { background: #f5f5f5; color: #888; }
+    .rating-none .fb-rating-badge           { background: #f5f5f5; color: #888; }
+
+    /* ══════════════════════════════════════════
+       STATS SECTION
+    ══════════════════════════════════════════ */
+    .fb-stats-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 10px;
+        margin-bottom: 18px;
+    }
+    .fb-stat-chip {
+        border-radius: 10px; padding: 12px;
+        border: 1px solid #e8e8e8; background: #fff;
+        text-align: center;
+    }
+    .fb-stat-chip .chip-count { font-size: 22px; font-weight: 700; margin-bottom: 2px; }
+    .fb-stat-chip .chip-label { font-size: 11px; color: #888; }
+    .chip-exc .chip-count { color: #0F6E56; }
+    .chip-vg  .chip-count { color: #185FA5; }
+    .chip-gd  .chip-count { color: #0C447C; }
+    .chip-av  .chip-count { color: #854F0B; }
+    .chip-pr  .chip-count { color: #A32D2D; }
+
+    .fb-bars { margin-bottom: 24px; }
+    .fb-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .fb-bar-row .bar-label { font-size: 12px; color: #888; width: 62px; flex-shrink: 0; }
+    .fb-bar-track { flex: 1; height: 8px; background: #f0f0f0; border-radius: 99px; overflow: hidden; }
+    .fb-bar-fill { height: 100%; border-radius: 99px; }
+    .fb-bar-row .bar-count { font-size: 12px; font-weight: 600; width: 16px; text-align: right; flex-shrink: 0; }
     </style>
 </head>
 <body class="admin-page">
 
-    <nav class="navbar">
-        <div class="nav-left">
-            <img src="{{ url_for('static', filename='images/uclogonav.png') }}" alt="UC Logo">
-            <span class="nav-brand">CCS Admin</span>
-        </div>
-        <div class="nav-right">
-            <div class="notif-wrapper" id="notifWrapper">
-                <button class="notif-bell-btn" id="notifBellBtn" onclick="toggleNotifDropdown(event)" title="Notifications">
-                    <i class="fas fa-bell"></i>
-                    <span class="notif-badge" id="notifBadge" style="display:none;">0</span>
-                </button>
-                <div class="notif-dropdown" id="notifDropdown" style="display:none;">
-                    <div class="notif-header">
-                        <span><i class="fas fa-bell"></i> Notifications</span>
-                        <button class="notif-read-all-btn" onclick="markAllRead()">Mark all read</button>
-                    </div>
-                    <div class="notif-list" id="notifList">
-                        <div class="notif-empty">
-                            <i class="fas fa-bell-slash"></i>
-                            <p>No notifications yet</p>
-                        </div>
+<!-- ══════════════════════════════════════════
+     NAVBAR
+══════════════════════════════════════════ -->
+<nav class="navbar">
+    <div class="nav-left">
+        <img src="{{ url_for('static', filename='images/uclogonav.png') }}" alt="UC Logo">
+        <span class="nav-brand">CCS Admin</span>
+    </div>
+    <div class="nav-right">
+        <div class="notif-wrapper" id="notifWrapper">
+            <button class="notif-bell-btn" id="notifBellBtn" onclick="toggleNotifDropdown(event)" title="Notifications">
+                <i class="fas fa-bell"></i>
+                <span class="notif-badge" id="notifBadge" style="display:none;">0</span>
+            </button>
+            <div class="notif-dropdown" id="notifDropdown" style="display:none;">
+                <div class="notif-header">
+                    <span><i class="fas fa-bell"></i> Notifications</span>
+                    <button class="notif-read-all-btn" onclick="markAllRead()">Mark all read</button>
+                </div>
+                <div class="notif-list" id="notifList">
+                    <div class="notif-empty">
+                        <i class="fas fa-bell-slash"></i>
+                        <p>No notifications yet</p>
                     </div>
                 </div>
             </div>
-            <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleSidebar()">
-                <span></span><span></span><span></span>
-            </button>
         </div>
+        <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleSidebar()">
+            <span></span><span></span><span></span>
+        </button>
+    </div>
+</nav>
+
+<!-- ══════════════════════════════════════════
+     SIDEBAR
+══════════════════════════════════════════ -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-user">
+        <div class="sidebar-admin-icon"><i class="fas fa-user-shield"></i></div>
+        <div class="sidebar-user-info">
+            <div class="sidebar-name">Administrator</div>
+            <div class="sidebar-sub">College of Computer Studies</div>
+        </div>
+    </div>
+    <nav class="sidebar-nav">
+        <a href="/admin_dashboard" class="sidebar-item"><i class="fas fa-home"></i> Home</a>
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-section-label">Students</div>
+        <a href="/student_list" class="sidebar-item"><i class="fas fa-user-graduate"></i> View Students</a>
+        <a href="/active_sitins" class="sidebar-item"><i class="fas fa-desktop"></i> Active Sit-ins</a>
+        <a href="/history" class="sidebar-item"><i class="fas fa-history"></i> History Records</a>
+        <a href="/admin_reservations" class="sidebar-item"><i class="fas fa-calendar-check"></i> Reservations</a>
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-section-label">Reports</div>
+        <a href="/reports" class="sidebar-item"><i class="fas fa-file-alt"></i> Sit-in Reports</a>
+        <a href="/admin_feedbacks" class="sidebar-item active"><i class="fas fa-comments"></i> Feedback Reports</a>
+        <a href="/leaderboard" class="sidebar-item"><i class="fas fa-trophy"></i> Leaderboard</a>
     </nav>
+    <div class="sidebar-footer">
+        <a href="/logout" class="sidebar-logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+</aside>
 
-    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-user">
-            <div class="sidebar-admin-icon"><i class="fas fa-user-shield"></i></div>
-            <div class="sidebar-user-info">
-                <div class="sidebar-name">Administrator</div>
-                <div class="sidebar-sub">College of Computer Studies</div>
+<!-- ══════════════════════════════════════════
+     MAIN CONTENT
+══════════════════════════════════════════ -->
+<div class="admin-container">
+    <div class="admin-glass-card" style="width: 95%; max-width: 1000px;">
+
+        <!-- Page Header -->
+        <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:2px solid rgba(27,79,138,0.2); padding-bottom:15px; margin-bottom:20px;">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <div style="width:40px;height:40px;background:#E6F1FB;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#185FA5;font-size:18px;">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <div>
+                    <h2 style="color:#1b4f8a; margin:0; font-size:18px;">Student Feedback Reports</h2>
+                    <p style="font-size:12px; color:#888; margin:2px 0 0;">College of Computer Studies · Sit-in System</p>
+                </div>
+            </div>
+            <span style="background:#e8f4fd; color:#1b4f8a; padding:5px 15px; border-radius:20px; font-size:13px; font-weight:bold;">
+                Total: {{ feedbacks|length }}
+            </span>
+        </div>
+
+        <!-- Rating Counts -->
+        {% set exc_count = feedbacks | selectattr('rating', 'equalto', 'Excellent') | list | length %}
+        {% set vg_count  = feedbacks | selectattr('rating', 'equalto', 'Very Good') | list | length %}
+        {% set gd_count  = feedbacks | selectattr('rating', 'equalto', 'Good')      | list | length %}
+        {% set av_count  = feedbacks | selectattr('rating', 'equalto', 'Average')   | list | length %}
+        {% set pr_count  = feedbacks | selectattr('rating', 'equalto', 'Poor')      | list | length %}
+        {% set max_count = [exc_count, vg_count, gd_count, av_count, pr_count] | max %}
+
+        <!-- Stat Chips -->
+        <div class="fb-stats-grid">
+            <div class="fb-stat-chip chip-exc">
+                <div class="chip-count">{{ exc_count }}</div>
+                <div class="chip-label">Excellent</div>
+            </div>
+            <div class="fb-stat-chip chip-vg">
+                <div class="chip-count">{{ vg_count }}</div>
+                <div class="chip-label">Very Good</div>
+            </div>
+            <div class="fb-stat-chip chip-gd">
+                <div class="chip-count">{{ gd_count }}</div>
+                <div class="chip-label">Good</div>
+            </div>
+            <div class="fb-stat-chip chip-av">
+                <div class="chip-count">{{ av_count }}</div>
+                <div class="chip-label">Average</div>
+            </div>
+            <div class="fb-stat-chip chip-pr">
+                <div class="chip-count">{{ pr_count }}</div>
+                <div class="chip-label">Poor</div>
             </div>
         </div>
-        <nav class="sidebar-nav">
-            <a href="/admin_dashboard" class="sidebar-item"><i class="fas fa-home"></i> Home</a>
-            <div class="sidebar-divider"></div>
-            <div class="sidebar-section-label">Students</div>
-            <a href="/student_list" class="sidebar-item"><i class="fas fa-user-graduate"></i> View Students</a>
-            <a href="/active_sitins" class="sidebar-item"><i class="fas fa-desktop"></i> Active Sit-ins</a>
-            <a href="/history" class="sidebar-item"><i class="fas fa-history"></i> History Records</a>
-            <a href="/admin_reservations" class="sidebar-item"><i class="fas fa-calendar-check"></i> Reservations</a>
-            <div class="sidebar-divider"></div>
-            <div class="sidebar-section-label">Reports</div>
-            <a href="/reports" class="sidebar-item"><i class="fas fa-file-alt"></i> Sit-in Reports</a>
-            <a href="/admin_feedbacks" class="sidebar-item active"><i class="fas fa-comments"></i> Feedback Reports</a>
-        </nav>
-        <div class="sidebar-footer">
-            <a href="/logout" class="sidebar-logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
-        </div>
-    </aside>
 
-    <div class="admin-container">
-        <div class="admin-glass-card" style="width: 95%; max-width: 1000px;">
-            <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid rgba(27, 79, 138, 0.2); padding-bottom: 15px;">
-                <h2 style="color: #1b4f8a; margin: 0;"><i class="fas fa-comments"></i> Student Feedback Reports</h2>
-                <span style="background: #e8f4fd; color: #1b4f8a; padding: 5px 15px; border-radius: 20px; font-size: 13px; font-weight: bold;">
-                    Total: {{ feedbacks|length }}
-                </span>
+        <!-- Bar Chart -->
+        <div class="fb-bars">
+            {% set bar_data = [
+                ('Excellent', exc_count, '#1D9E75', '#0F6E56'),
+                ('Very Good', vg_count,  '#378ADD', '#185FA5'),
+                ('Good',      gd_count,  '#185FA5', '#0C447C'),
+                ('Average',   av_count,  '#EF9F27', '#854F0B'),
+                ('Poor',      pr_count,  '#E24B4A', '#A32D2D')
+            ] %}
+            {% for label, count, bar_color, text_color in bar_data %}
+            <div class="fb-bar-row">
+                <span class="bar-label">{{ label }}</span>
+                <div class="fb-bar-track">
+                    <div class="fb-bar-fill" style="background:{{ bar_color }}; width:{% if max_count > 0 %}{{ (count / max_count * 100) | int }}%{% else %}0%{% endif %};"></div>
+                </div>
+                <span class="bar-count" style="color:{{ text_color }};">{{ count }}</span>
             </div>
+            {% endfor %}
+        </div>
 
-            <div class="feedback-list">
-                {% if feedbacks %}
-                    {% for fb in feedbacks %}
-                        <div class="modern-feedback-card">
-                            <div class="fb-header">
-                                <div class="fb-user-info">
-                                    <div class="fb-avatar"><i class="fas fa-user"></i></div>
-                                    <div class="fb-details">
-                                        <span class="fb-name">{{ fb['student_name'] }}</span>
-                                        <span class="fb-id">ID: {{ fb['id_number'] }}</span>
+        <!-- Feedback Cards -->
+        <div class="feedback-list">
+            {% if feedbacks %}
+                {% for fb in feedbacks %}
+
+                    {% if fb['rating'] == 'Excellent' %}
+                        {% set r_class = 'rating-excellent' %}
+                        {% set r_icon  = 'fa-star' %}
+                        {% set r_label = 'Excellent' %}
+                    {% elif fb['rating'] == 'Very Good' %}
+                        {% set r_class = 'rating-verygood' %}
+                        {% set r_icon  = 'fa-smile-beam' %}
+                        {% set r_label = 'Very Good' %}
+                    {% elif fb['rating'] == 'Good' %}
+                        {% set r_class = 'rating-good' %}
+                        {% set r_icon  = 'fa-smile' %}
+                        {% set r_label = 'Good' %}
+                    {% elif fb['rating'] == 'Average' %}
+                        {% set r_class = 'rating-average' %}
+                        {% set r_icon  = 'fa-meh' %}
+                        {% set r_label = 'Average' %}
+                    {% elif fb['rating'] == 'Poor' %}
+                        {% set r_class = 'rating-poor' %}
+                        {% set r_icon  = 'fa-frown' %}
+                        {% set r_label = 'Poor' %}
+                    {% else %}
+                        {% set r_class = 'rating-none' %}
+                        {% set r_icon  = 'fa-comment-dots' %}
+                        {% set r_label = 'No Rating' %}
+                    {% endif %}
+
+                    {% set name_parts = fb['student_name'].split() %}
+                    {% if name_parts|length >= 2 %}
+                        {% set initials = name_parts[0][0] ~ name_parts[-1][0] %}
+                    {% else %}
+                        {% set initials = fb['student_name'][:2] %}
+                    {% endif %}
+
+                    <div class="feedback-card {{ r_class }}">
+                        <div class="feedback-card-accent"></div>
+                        <div class="feedback-card-body">
+                            <div class="fb-card-header">
+                                <div class="fb-user-row">
+                                    <div class="fb-avatar">{{ initials | upper }}</div>
+                                    <div>
+                                        <div class="fb-name">{{ fb['student_name'] }}</div>
+                                        <div class="fb-id">ID: {{ fb['id_number'] }}</div>
                                     </div>
                                 </div>
-                                <div class="fb-date">
-                                    <i class="far fa-calendar-alt"></i> {{ fb['date_submitted'][:10] }}
+                                <div class="fb-meta">
+                                    <span class="fb-rating-badge">
+                                        <i class="fas {{ r_icon }}" style="font-size:11px;"></i> {{ r_label }}
+                                    </span>
+                                    <span class="fb-date">
+                                        <i class="far fa-calendar-alt"></i> {{ fb['date_submitted'][:10] }}
+                                    </span>
                                 </div>
                             </div>
                             <p class="fb-message">{{ fb['message'] }}</p>
                         </div>
-                    {% endfor %}
-                {% else %}
-                    <div style="text-align: center; padding: 60px 20px;">
-                        <i class="fas fa-comment-slash" style="font-size: 50px; color: #ccc; margin-bottom: 15px; display: block;"></i>
-                        <h3 style="color: #555; margin-bottom: 5px;">No Feedbacks Yet</h3>
-                        <p style="color: #888; font-size: 15px; margin: 0;">Student feedback reports will appear here once submitted.</p>
                     </div>
-                {% endif %}
-            </div>
+
+                {% endfor %}
+            {% else %}
+                <div style="text-align:center; padding:60px 20px;">
+                    <i class="fas fa-comment-slash" style="font-size:50px; color:#ccc; margin-bottom:15px; display:block;"></i>
+                    <h3 style="color:#555; margin-bottom:5px;">No Feedbacks Yet</h3>
+                    <p style="color:#888; font-size:15px; margin:0;">Student feedback reports will appear here once submitted.</p>
+                </div>
+            {% endif %}
         </div>
+
     </div>
+</div>
 
-    <div id="toastBox"></div>
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
-    <script src="{{ url_for('static', filename='admin.js') }}"></script>
+<div id="toastBox"></div>
 
-    <script>
-        function toggleSidebar() {
-            var sidebar   = document.getElementById('sidebar');
-            var overlay   = document.getElementById('sidebarOverlay');
-            var hamburger = document.getElementById('hamburgerBtn');
-            var isOpen    = sidebar.classList.contains('open');
-            if (isOpen) {
-                sidebar.classList.remove('open'); overlay.classList.remove('visible'); hamburger.classList.remove('open');
-            } else {
-                sidebar.classList.add('open'); overlay.classList.add('visible'); hamburger.classList.add('open');
-            }
+<!-- ══════════════════════════════════════════
+     SCRIPTS
+══════════════════════════════════════════ -->
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+<script src="{{ url_for('static', filename='admin.js') }}"></script>
+
+<script>
+/* ══════════════════════════════════════════
+   SIDEBAR
+══════════════════════════════════════════ */
+function toggleSidebar() {
+    var sidebar   = document.getElementById('sidebar');
+    var overlay   = document.getElementById('sidebarOverlay');
+    var hamburger = document.getElementById('hamburgerBtn');
+    var isOpen    = sidebar.classList.contains('open');
+    sidebar.classList.toggle('open', !isOpen);
+    overlay.classList.toggle('visible', !isOpen);
+    hamburger.classList.toggle('open', !isOpen);
+}
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        document.getElementById('sidebar').classList.remove('open');
+        document.getElementById('sidebarOverlay').classList.remove('visible');
+        document.getElementById('hamburgerBtn').classList.remove('open');
+    }
+});
+
+/* ══════════════════════════════════════════
+   NOTIFICATIONS
+══════════════════════════════════════════ */
+(function() {
+    var POLL_INTERVAL = 30000;
+    var prevCount     = 0;
+    var dropdownOpen  = false;
+    var ICONS = {
+        reservation: 'fa-calendar-check', approved: 'fa-check-circle',
+        declined: 'fa-times-circle', announcement: 'fa-bullhorn'
+    };
+
+    window.toggleNotifDropdown = function(e) {
+        e.stopPropagation();
+        var dd = document.getElementById('notifDropdown');
+        if (!dd) return;
+        dropdownOpen = !dropdownOpen;
+        dd.style.display = dropdownOpen ? 'block' : 'none';
+        if (dropdownOpen) loadNotifications();
+    };
+
+    document.addEventListener('click', function(e) {
+        var wrapper = document.getElementById('notifWrapper');
+        if (wrapper && !wrapper.contains(e.target)) {
+            var dd = document.getElementById('notifDropdown');
+            if (dd) dd.style.display = 'none';
+            dropdownOpen = false;
         }
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                document.getElementById('sidebar').classList.remove('open');
-                document.getElementById('sidebarOverlay').classList.remove('visible');
-                document.getElementById('hamburgerBtn').classList.remove('open');
-            }
-        });
+    });
 
-        // NOTIFICATIONS SCRIPT
-        (function() {
-            var POLL_INTERVAL = 30000;
-            var prevCount = 0;
-            var dropdownOpen = false;
-            var ICONS = { reservation: 'fa-calendar-check', approved: 'fa-check-circle', declined: 'fa-times-circle', announcement: 'fa-bullhorn' };
-
-            window.toggleNotifDropdown = function(e) {
-                e.stopPropagation();
-                var dd = document.getElementById('notifDropdown');
-                if (!dd) return;
-                dropdownOpen = !dropdownOpen;
-                dd.style.display = dropdownOpen ? 'block' : 'none';
-                if (dropdownOpen) loadNotifications();
-            };
-
-            document.addEventListener('click', function(e) {
-                var wrapper = document.getElementById('notifWrapper');
-                if (wrapper && !wrapper.contains(e.target)) {
-                    var dd = document.getElementById('notifDropdown');
-                    if (dd) dd.style.display = 'none';
-                    dropdownOpen = false;
+    function loadNotifications() {
+        fetch('/notifications/list')
+            .then(function(r){ return r.json(); })
+            .then(function(items) {
+                var list = document.getElementById('notifList');
+                if (!list) return;
+                if (!items || items.length === 0) {
+                    list.innerHTML = '<div class="notif-empty"><i class="fas fa-bell-slash"></i><p>No notifications yet</p></div>';
+                    return;
                 }
-            });
-
-            function loadNotifications() {
-                fetch('/notifications/list')
-                    .then(function(r){ return r.json(); })
-                    .then(function(items) {
-                        var list = document.getElementById('notifList');
-                        if (!list) return;
-                        if (!items || items.length === 0) {
-                            list.innerHTML = '<div class="notif-empty"><i class="fas fa-bell-slash"></i><p>No notifications yet</p></div>';
-                            return;
-                        }
-                        list.innerHTML = '';
-                        items.forEach(function(item) {
-                            var icon   = ICONS[item.type] || 'fa-bell';
-                            var unread = item.is_read === 0;
-                            var time   = formatTime(item.created_at);
-                            var div    = document.createElement('div');
-                            div.className = 'notif-item' + (unread ? ' unread' : '');
-                            div.innerHTML =
-                                '<div class="notif-icon ' + item.type + '"><i class="fas ' + icon + '"></i></div>' +
-                                '<div class="notif-body"><p class="notif-msg">' + escHtml(item.message) + '</p><span class="notif-time">' + time + '</span></div>' +
-                                (unread ? '<div class="notif-unread-dot"></div>' : '');
-                            div.addEventListener('click', function() {
-                                fetch('/notifications/read/' + item.id, { method: 'POST' });
-                                div.classList.remove('unread');
-                                var dot = div.querySelector('.notif-unread-dot');
-                                if (dot) dot.remove();
-                                if (item.link) window.location.href = item.link;
-                                fetchCount();
-                            });
-                            list.appendChild(div);
-                        });
-                    }).catch(function(){});
-            }
-
-            window.markAllRead = function() {
-                fetch('/notifications/read_all', { method: 'POST' }).then(function() {
-                    document.querySelectorAll('.notif-item.unread').forEach(function(el) {
-                        el.classList.remove('unread');
-                        var dot = el.querySelector('.notif-unread-dot');
+                list.innerHTML = '';
+                items.forEach(function(item) {
+                    var icon   = ICONS[item.type] || 'fa-bell';
+                    var unread = item.is_read === 0;
+                    var div    = document.createElement('div');
+                    div.className = 'notif-item' + (unread ? ' unread' : '');
+                    div.innerHTML =
+                        '<div class="notif-icon ' + item.type + '"><i class="fas ' + icon + '"></i></div>' +
+                        '<div class="notif-body"><p class="notif-msg">' + escHtml(item.message) + '</p>' +
+                        '<span class="notif-time">' + formatTime(item.created_at) + '</span></div>' +
+                        (unread ? '<div class="notif-unread-dot"></div>' : '');
+                    div.addEventListener('click', function() {
+                        fetch('/notifications/read/' + item.id, { method: 'POST' });
+                        div.classList.remove('unread');
+                        var dot = div.querySelector('.notif-unread-dot');
                         if (dot) dot.remove();
+                        if (item.link) window.location.href = item.link;
+                        fetchCount();
                     });
-                    updateBadge(0);
+                    list.appendChild(div);
                 });
-            };
+            }).catch(function(){});
+    }
 
-            function fetchCount() {
-                fetch('/notifications/count').then(function(r){ return r.json(); }).then(function(data) {
-                    var count = data.count || 0;
-                    updateBadge(count);
-                    if (count > prevCount && prevCount !== null) {
-                        var btn = document.getElementById('notifBellBtn');
-                        if (btn) {
-                            btn.classList.remove('shake');
-                            void btn.offsetWidth;
-                            btn.classList.add('shake');
-                            setTimeout(function(){ btn.classList.remove('shake'); }, 700);
-                        }
+    window.markAllRead = function() {
+        fetch('/notifications/read_all', { method: 'POST' }).then(function() {
+            document.querySelectorAll('.notif-item.unread').forEach(function(el) {
+                el.classList.remove('unread');
+                var dot = el.querySelector('.notif-unread-dot');
+                if (dot) dot.remove();
+            });
+            updateBadge(0);
+        });
+    };
+
+    function fetchCount() {
+        fetch('/notifications/count')
+            .then(function(r){ return r.json(); })
+            .then(function(data) {
+                var count = data.count || 0;
+                updateBadge(count);
+                if (count > prevCount) {
+                    var btn = document.getElementById('notifBellBtn');
+                    if (btn) {
+                        btn.classList.remove('shake');
+                        void btn.offsetWidth;
+                        btn.classList.add('shake');
+                        setTimeout(function(){ btn.classList.remove('shake'); }, 700);
                     }
-                    prevCount = count;
-                }).catch(function(){});
-            }
+                }
+                prevCount = count;
+            }).catch(function(){});
+    }
 
-            function updateBadge(count) {
-                var badge = document.getElementById('notifBadge');
-                if (!badge) return;
-                if (count > 0) { badge.style.display = 'flex'; badge.textContent = count > 99 ? '99+' : count; }
-                else { badge.style.display = 'none'; }
-            }
+    function updateBadge(count) {
+        var badge = document.getElementById('notifBadge');
+        if (!badge) return;
+        badge.style.display = count > 0 ? 'flex' : 'none';
+        badge.textContent   = count > 99 ? '99+' : count;
+    }
 
-            function formatTime(datetimeStr) {
-                if (!datetimeStr) return '';
-                var d    = new Date(datetimeStr.replace(' ', 'T'));
-                var diff = Math.floor((new Date() - d) / 1000);
-                if (diff < 60) return 'Just now';
-                if (diff < 3600) return Math.floor(diff/60) + 'm ago';
-                if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
-                return Math.floor(diff/86400) + 'd ago';
-            }
+    function formatTime(datetimeStr) {
+        if (!datetimeStr) return '';
+        var d    = new Date(datetimeStr.replace(' ','T'));
+        var diff = Math.floor((new Date() - d) / 1000);
+        if (diff < 60)    return 'Just now';
+        if (diff < 3600)  return Math.floor(diff/60) + 'm ago';
+        if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
+        return Math.floor(diff/86400) + 'd ago';
+    }
 
-            function escHtml(str) { return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    function escHtml(str) {
+        return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
 
-            fetchCount();
-            setInterval(fetchCount, POLL_INTERVAL);
-        })();
-    </script>
+    fetchCount();
+    setInterval(fetchCount, POLL_INTERVAL);
+})();
+</script>
+
 </body>
 </html>

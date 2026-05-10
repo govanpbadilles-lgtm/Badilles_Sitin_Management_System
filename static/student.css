@@ -2,14 +2,47 @@
    STUDENT DASHBOARD STYLES
    ========================================= */
 
+/* ── FIX: Override style.css global body padding ── */
 body.student-page {
     height: 100vh;
     margin: 0;
+    padding-top: 0 !important;   /* style.css sets padding-top: 80px on body — cancel it */
     display: flex;
     flex-direction: column;
-    overflow: hidden;  
-    position: relative; 
+    overflow: hidden;
+    position: relative;
     font-family: sans-serif;
+}
+
+/* ── FIX: Override style.css .navbar { position: fixed !important } ── */
+body.student-page .navbar {
+    position: sticky !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 62px !important;
+    background: #1b4f8a !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 0 20px !important;
+    z-index: 1000 !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2) !important;
+    box-sizing: border-box !important;
+}
+
+/* ── FIX: Logo dili klaro — i-dako ── */
+body.student-page .navbar .nav-left img {
+    height: 44px !important;
+    width: auto !important;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3)) !important;
+}
+
+/* ── FIX: Brand text size match sa taller navbar ── */
+body.student-page .navbar .nav-brand {
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.2px !important;
 }
 
 body.student-page::before {

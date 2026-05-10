@@ -206,7 +206,9 @@
                             <td style="padding: 15px; text-align: center;">
                                 <form action="/time_out_sitin" method="POST" style="display:inline;">
                                     <input type="hidden" name="record_id" value="{{ row['id'] }}">
-                                   <button type="submit" onclick="return confirm('Are you sure you want to Time Out {{ row.firstname }}? This will deduct 1 session.');"
+                                   <button type="submit"
+                                            data-name="{{ row['firstname'] | e }}"
+                                            onclick="return confirm('Are you sure you want to Time Out ' + this.dataset.name + '? This will deduct 1 session.');"
                                             style="background: #ff4c4c; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; transition: 0.3s;"
                                             onmouseover="this.style.background='#cc0000'" onmouseout="this.style.background='#ff4c4c'">
                                         <i class="fas fa-sign-out-alt"></i> Time Out
@@ -371,5 +373,7 @@
             setInterval(fetchCount, POLL_INTERVAL);
         })();
     </script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <div id="toastBox"></div>
 </body>
 </html>

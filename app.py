@@ -73,6 +73,7 @@ def init_db():
             id_number TEXT NOT NULL,
             student_name TEXT NOT NULL,
             message TEXT NOT NULL,
+            rating TEXT DEFAULT '',
             date_submitted DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     ''')
@@ -101,7 +102,6 @@ def init_db():
         )
     ''')
 
-    # ── NOTIFICATIONS TABLE (bag-o) ──────────────────────
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS notifications (
             id          INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -145,11 +145,6 @@ create_default_admin()
 # NOTIFICATION HELPER
 # =======================================================
 def create_notification(conn, recipient, notif_type, message, link=''):
-    """
-    Insert one notification row.
-    recipient = 'admin'  OR  id_number of a student
-    notif_type = 'reservation' | 'approved' | 'declined' | 'announcement'
-    """
     ph_time = (datetime.utcnow() + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
     conn.execute(
         "INSERT INTO notifications (recipient, type, message, link, created_at) VALUES (?, ?, ?, ?, ?)",
@@ -249,7 +244,7 @@ def login():
             session['user_id'] = user['id']
             session['firstname'] = user['firstname']
             session['role'] = user['role']
-            session['id_number'] = user['id_number']   # ← needed for notifications
+            session['id_number'] = user['id_number']
 
             if user['role'] == 'admin':
                 return redirect(url_for('admin_dashboard', login='success'))
@@ -268,26 +263,99 @@ def dashboard():
 
     conn = get_db_connection()
     cursor = conn.cursor()
-    student = cursor.execute("SELECT * FROM users WHERE id = ?", (session['user_id'],)).fetchone()
+
+    student = cursor.execute(
+        "SELECT * FROM users WHERE id = ?", (session['user_id'],)
+    ).fetchone()
 
     if student is None:
         session.clear()
         conn.close()
         return redirect(url_for('home'))
 
-    announcements = cursor.execute("SELECT * FROM announcements ORDER BY date_posted DESC").fetchall()
+    announcements = cursor.execute(
+        "SELECT * FROM announcements ORDER BY date_posted DESC"
+    ).fetchall()
 
     reservations_raw = cursor.execute("""
-        SELECT * FROM reservations 
-        WHERE id_number = ? 
+        SELECT * FROM reservations
+        WHERE id_number = ?
         ORDER BY id DESC
     """, (student['id_number'],)).fetchall()
     reservations = [dict(r) for r in reservations_raw]
 
+    # ── SIT-IN SUMMARY ──────────────────────────────────
+    # NOTE: sitin_records has no 'date' or 'pc_number' column.
+    # Date is extracted from time_in. Status is 'Active' or 'Completed'.
+    summary_row = cursor.execute("""
+        SELECT
+            COUNT(*)                                                        AS num_sessions,
+            ROUND(SUM(
+                CASE WHEN time_out IS NOT NULL
+                THEN (julianday(time_out) - julianday(time_in)) * 24
+                ELSE 0 END
+            ), 1)                                                           AS total_hours,
+            ROUND(AVG(
+                CASE WHEN time_out IS NOT NULL
+                THEN (julianday(time_out) - julianday(time_in)) * 60
+                ELSE NULL END
+            ), 0)                                                           AS avg_minutes,
+            MAX(
+                CASE WHEN time_out IS NOT NULL
+                THEN (julianday(time_out) - julianday(time_in)) * 60
+                ELSE NULL END
+            )                                                               AS longest_minutes
+        FROM sitin_records
+        WHERE id_number = ? AND status = 'Completed'
+    """, (student['id_number'],)).fetchone()
+
+    sitin_summary = {
+        'total_sessions' : summary_row['num_sessions']        or 0,
+        'total_hours'    : summary_row['total_hours']         or 0,
+        'avg_duration'   : int(summary_row['avg_minutes']     or 0),
+        'longest_session': int(summary_row['longest_minutes'] or 0),
+    }
+
+    # ── SIT-IN HISTORY ──────────────────────────────────
+    # 'date'      → extracted from time_in via strftime
+    # 'pc_number' → not in table, padded manually as '—'
+    # status values in DB: 'Active' or 'Completed'
+    history_raw = cursor.execute("""
+        SELECT
+            strftime('%Y-%m-%d', time_in)  AS date,
+            strftime('%I:%M %p', time_in)  AS time_in,
+            CASE WHEN time_out IS NOT NULL
+                 THEN strftime('%I:%M %p', time_out)
+                 ELSE NULL END             AS time_out,
+            CASE WHEN time_out IS NOT NULL
+                 THEN CAST(ROUND(
+                     (julianday(time_out) - julianday(time_in)) * 60
+                 ) AS INTEGER) || ' min'
+                 ELSE NULL END            AS duration,
+            lab,
+            purpose,
+            status
+        FROM sitin_records
+        WHERE id_number = ?
+        ORDER BY time_in DESC
+    """, (student['id_number'],)).fetchall()
+
+    # Pad missing pc_number column
+    sitin_history = []
+    for row in history_raw:
+        r = dict(row)
+        r['pc_number'] = '—'
+        sitin_history.append(r)
+
     conn.close()
 
-    return render_template('student.html', student=student, announcements=announcements, reservations=reservations)
-
+    return render_template('student.html',
+        student       = dict(student),
+        announcements = announcements,
+        reservations  = reservations,
+        sitin_summary = sitin_summary,
+        sitin_history = sitin_history,
+    )
 
 @app.route('/admin_dashboard')
 def admin_dashboard():
@@ -301,22 +369,67 @@ def admin_dashboard():
     current_sitin  = cursor.execute("SELECT COUNT(*) FROM sitin_records WHERE status = 'Active'").fetchone()[0]
     total_sitin    = cursor.execute("SELECT COUNT(*) FROM sitin_records").fetchone()[0]
     announcements  = cursor.execute("SELECT * FROM announcements ORDER BY date_posted DESC").fetchall()
-    records = cursor.execute('''
+    records        = cursor.execute('''
         SELECT s.*, u.firstname, u.lastname
         FROM sitin_records s
         JOIN users u ON s.id_number = u.id_number
         ORDER BY s.time_in DESC
     ''').fetchall()
 
+    # ── Analytics: Line Chart (last 7 days) ──────────────
+    daily_rows = cursor.execute("""
+        SELECT date(time_in) AS day, COUNT(*) AS cnt
+        FROM sitin_records
+        WHERE date(time_in) >= date('now', '-6 days')
+        GROUP BY day
+        ORDER BY day ASC
+    """).fetchall()
+
+    from datetime import date, timedelta
+    today      = date.today()
+    date_range = [(today - timedelta(days=i)).isoformat() for i in range(6, -1, -1)]
+    daily_map  = {row['day']: row['cnt'] for row in daily_rows}
+    daily_labels = [d[5:] for d in date_range]          # e.g. "05-10"
+    daily_data   = [daily_map.get(d, 0) for d in date_range]
+
+    # ── Analytics: Bar Chart (per lab) ───────────────────
+    lab_rows = cursor.execute("""
+        SELECT lab, COUNT(*) AS cnt
+        FROM sitin_records
+        WHERE lab IS NOT NULL AND lab != ''
+        GROUP BY lab
+        ORDER BY cnt DESC
+    """).fetchall()
+    lab_labels = [r['lab'] for r in lab_rows]
+    lab_data   = [r['cnt'] for r in lab_rows]
+
+    # ── Analytics: Pie Chart (per purpose) ───────────────
+    purpose_rows = cursor.execute("""
+        SELECT purpose, COUNT(*) AS cnt
+        FROM sitin_records
+        WHERE purpose IS NOT NULL AND purpose != ''
+        GROUP BY purpose
+        ORDER BY cnt DESC
+    """).fetchall()
+    purpose_labels = [r['purpose'] for r in purpose_rows]
+    purpose_data   = [r['cnt'] for r in purpose_rows]
+
     conn.close()
 
     return render_template('admin_dashboard.html',
-                           firstname=session['firstname'],
-                           total_students=total_students,
-                           current_sitin=current_sitin,
-                           total_sitin=total_sitin,
-                           announcements=announcements,
-                           records=records)
+        firstname      = session['firstname'],
+        total_students = total_students,
+        current_sitin  = current_sitin,
+        total_sitin    = total_sitin,
+        announcements  = announcements,
+        records        = records,
+        daily_labels   = daily_labels,
+        daily_data     = daily_data,
+        lab_labels     = lab_labels,
+        lab_data       = lab_data,
+        purpose_labels = purpose_labels,
+        purpose_data   = purpose_data,
+    )
 
 
 @app.route('/history')
@@ -358,7 +471,6 @@ def active_sitins():
 
 @app.route('/get_occupied_pcs')
 def get_occupied_pcs():
-    """Return list of occupied PC numbers for a given lab (from active/approved reservations)."""
     lab = request.args.get('lab', '')
     if not lab:
         return jsonify({'occupied': []})
@@ -373,7 +485,7 @@ def get_occupied_pcs():
 
     occupied = []
     for row in rows:
-        pc = row['selected_pc']  # e.g. "PC5"
+        pc = row['selected_pc']
         if pc and pc.upper().startswith('PC'):
             try:
                 occupied.append(int(pc[2:]))
@@ -391,9 +503,9 @@ def reports():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    start_date    = request.args.get('start_date', '')
-    end_date      = request.args.get('end_date', '')
-    lab_filter    = request.args.get('lab', '')
+    start_date     = request.args.get('start_date', '')
+    end_date       = request.args.get('end_date', '')
+    lab_filter     = request.args.get('lab', '')
     purpose_filter = request.args.get('purpose', '')
 
     query = '''
@@ -441,14 +553,12 @@ def post_announcement():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Save announcement
     cursor.execute('''
         INSERT INTO announcements (admin_name, message, date_posted)
         VALUES (?, ?, ?)
     ''', (admin_name, message, ph_time))
     conn.commit()
 
-    # ── NOTIFY all students ──────────────────────────────
     students = cursor.execute(
         "SELECT id_number FROM users WHERE role = 'student'"
     ).fetchall()
@@ -462,7 +572,6 @@ def post_announcement():
             message    = f"📢 New announcement from Admin: {preview}",
             link       = '/dashboard'
         )
-    # ────────────────────────────────────────────────────
 
     conn.close()
     return redirect(url_for('admin_dashboard', posted='true'))
@@ -783,7 +892,6 @@ def submit_reservation():
     ''', (id_number, res_date, res_lab, res_purpose, selected_pc, res_time))
     conn.commit()
 
-    # ── Get student name for notification ──
     student = cursor.execute(
         "SELECT firstname, lastname FROM users WHERE id_number = ?", (id_number,)
     ).fetchone()
@@ -791,7 +899,6 @@ def submit_reservation():
 
     pc_info = f" ({selected_pc})" if selected_pc else ""
 
-    # ── NOTIFY admin ─────────────────────────────────────
     create_notification(
         conn,
         recipient  = 'admin',
@@ -799,7 +906,6 @@ def submit_reservation():
         message    = f"📅 {student_name} requested {res_lab}{pc_info} on {res_date} for {res_purpose}.",
         link       = '/admin_reservations'
     )
-    # ─────────────────────────────────────────────────────
 
     conn.close()
     return redirect(url_for('dashboard'))
@@ -810,28 +916,26 @@ def submit_student_feedback():
     id_number    = request.form['id_number']
     student_name = request.form['student_name']
     message      = request.form['message']
+    rating       = request.form.get('rating', '')
 
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute('''
-        INSERT INTO student_feedback (id_number, student_name, message)
-        VALUES (?, ?, ?)
-    ''', (id_number, student_name, message))
+        INSERT INTO student_feedback (id_number, student_name, message, rating)
+        VALUES (?, ?, ?, ?)
+    ''', (id_number, student_name, message, rating))
     conn.commit()
 
-    # ── NOTIFY ADMIN ─────────────────────────────────────
     preview = message[:50] + ('...' if len(message) > 50 else '')
     create_notification(
         conn,
         recipient  = 'admin',
-        notif_type = 'announcement',  # pwede ra 'announcement' or himo kag custom
-        message    = f"💬 New feedback from {student_name}: {preview}",
+        notif_type = 'announcement',
+        message    = f"💬 New feedback from {student_name} ({rating}): {preview}",
         link       = '/admin_feedbacks'
     )
-    # ─────────────────────────────────────────────────────
 
     conn.close()
-
     return redirect(url_for('dashboard'))
 
 
@@ -946,7 +1050,6 @@ def process_reservation(res_id, action):
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Fetch reservation details before updating
     res_row = cursor.execute(
         "SELECT * FROM reservations WHERE id = ?", (res_id,)
     ).fetchone()
@@ -956,7 +1059,6 @@ def process_reservation(res_id, action):
     )
     conn.commit()
 
-    # ── NOTIFY the student ───────────────────────────────
     if res_row:
         pc_info = f" ({res_row['selected_pc']})" if res_row['selected_pc'] else ""
         if action == 'approve':
@@ -975,7 +1077,6 @@ def process_reservation(res_id, action):
                 message    = f"❌ Your reservation for {res_row['res_lab']}{pc_info} on {res_row['res_date']} was declined.",
                 link       = '/dashboard'
             )
-    # ─────────────────────────────────────────────────────
 
     conn.close()
     return redirect(url_for('admin_reservations'))
@@ -1020,7 +1121,6 @@ def ai_recommendation():
 
 @app.route('/notifications/count')
 def notifications_count():
-    """Return unread notification count for the current user (JSON)."""
     if 'user_id' not in session:
         return jsonify({'count': 0})
 
@@ -1038,7 +1138,6 @@ def notifications_count():
 
 @app.route('/notifications/list')
 def notifications_list():
-    """Return the 20 most recent notifications for the current user (JSON)."""
     if 'user_id' not in session:
         return jsonify([])
 
@@ -1060,7 +1159,6 @@ def notifications_list():
 
 @app.route('/notifications/read/<int:notif_id>', methods=['POST'])
 def notification_read(notif_id):
-    """Mark a single notification as read."""
     conn = get_db_connection()
     conn.execute("UPDATE notifications SET is_read = 1 WHERE id = ?", (notif_id,))
     conn.commit()
@@ -1070,7 +1168,6 @@ def notification_read(notif_id):
 
 @app.route('/notifications/read_all', methods=['POST'])
 def notifications_read_all():
-    """Mark all notifications as read for the current user."""
     if 'user_id' not in session:
         return jsonify({'ok': False})
 

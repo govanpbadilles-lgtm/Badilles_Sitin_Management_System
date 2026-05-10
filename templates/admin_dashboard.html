@@ -548,6 +548,51 @@ body.admin-page {
                 </div>
             </div>          
         </div>
+
+        <!-- ══════════════════════════════════════════
+             ANALYTICS SECTION
+        ══════════════════════════════════════════ -->
+        <div style="margin-top:30px; border-top:2px solid rgba(27,79,138,0.12); padding-top:24px;">
+            <h2 style="color:#1b4f8a; margin:0 0 18px 0; font-size:20px; display:flex; align-items:center; gap:8px;">
+                <i class="fas fa-chart-bar"></i> Analytics Overview
+            </h2>
+
+            <!-- Line Chart -->
+            <div class="analytics-chart-card" style="margin-bottom:16px;">
+                <div class="analytics-chart-title">
+                    <i class="fas fa-chart-line"></i> Sit-ins per Day
+                    <span style="font-size:12px; color:#aaa; font-weight:400; margin-left:6px;">(last 7 days)</span>
+                </div>
+                <div class="analytics-legend">
+                    <span><span class="aleg-box" style="background:#1b4f8a;"></span> Sit-ins</span>
+                </div>
+                <div style="position:relative; width:100%; height:200px;">
+                    <canvas id="lineChart" role="img" aria-label="Line chart showing daily sit-ins for the last 7 days">Daily sit-in trend for the past week.</canvas>
+                </div>
+            </div>
+
+            <!-- Bar + Pie -->
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                <div class="analytics-chart-card">
+                    <div class="analytics-chart-title"><i class="fas fa-flask"></i> Sit-ins per Lab</div>
+                    <div class="analytics-legend">
+                        <span><span class="aleg-box" style="background:#1b4f8a;"></span> Count</span>
+                    </div>
+                    <div style="position:relative; width:100%; height:230px;">
+                        <canvas id="barChart" role="img" aria-label="Bar chart showing sit-ins per laboratory">Sit-ins per lab breakdown.</canvas>
+                    </div>
+                </div>
+                <div class="analytics-chart-card">
+                    <div class="analytics-chart-title"><i class="fas fa-laptop-code"></i> Sit-ins per Purpose</div>
+                    <div class="analytics-legend" id="pieLegend"></div>
+                    <div style="position:relative; width:100%; height:210px;">
+                        <canvas id="pieChart" role="img" aria-label="Pie chart showing sit-ins by purpose">Sit-ins by purpose breakdown.</canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- END ANALYTICS -->
+
     </div>
 </div>
 
@@ -571,10 +616,136 @@ body.admin-page {
     #toastBox { left: 30px; right: auto; align-items: flex-start; z-index: 9999; }
     .toast { transform: translateX(-100%); animation: slideInToastLeft 0.5s forwards; }
     @keyframes slideInToastLeft { 100% { transform: translateX(0); } }
+
+    /* ── Analytics Chart Cards ── */
+    .analytics-chart-card {
+        background: white;
+        border-radius: 12px;
+        padding: 18px 20px;
+        border: 1px solid rgba(0,0,0,0.06);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .analytics-chart-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: #1b4f8a;
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+    }
+    .analytics-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 10px;
+        font-size: 12px;
+        color: #666;
+    }
+    .analytics-legend span { display: flex; align-items: center; gap: 5px; }
+    .aleg-box { width: 10px; height: 10px; border-radius: 2px; display: inline-block; flex-shrink: 0; }
 </style>
 
 <script src="{{ url_for('static', filename='script.js') }}"></script>
 <script src="{{ url_for('static', filename='admin.js') }}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+
+
+<script>
+
+/* ══════════════════════════════════════════
+   ANALYTICS CHARTS
+══════════════════════════════════════════ */
+var dailyLabels   = JSON.parse('{{ daily_labels   | tojson | safe }}' || '[]');
+var dailyData     = JSON.parse('{{ daily_data     | tojson | safe }}' || '[]');
+var labLabels     = JSON.parse('{{ lab_labels     | tojson | safe }}' || '[]');
+var labData       = JSON.parse('{{ lab_data       | tojson | safe }}' || '[]');
+var purposeLabels = JSON.parse('{{ purpose_labels | tojson | safe }}' || '[]');
+var purposeData   = JSON.parse('{{ purpose_data   | tojson | safe }}' || '[]');
+var PIE_COLORS    = ['#1b4f8a','#15c35a','#ff9800','#e53935','#9c27b0','#00838f','#f06292'];
+
+/* Line Chart */
+new Chart(document.getElementById('lineChart'), {
+    type: 'line',
+    data: {
+        labels: dailyLabels,
+        datasets: [{
+            label: 'Sit-ins',
+            data: dailyData,
+            borderColor: '#1b4f8a',
+            backgroundColor: 'rgba(27,79,138,0.08)',
+            borderWidth: 2,
+            pointBackgroundColor: '#1b4f8a',
+            pointRadius: 4,
+            tension: 0.35,
+            fill: true,
+            pointStyle: 'circle'
+        }]
+    },
+    options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+            x: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { font: { size: 11 }, autoSkip: false, maxRotation: 0 } },
+            y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { font: { size: 11 }, precision: 0 } }
+        }
+    }
+});
+
+/* Bar Chart */
+new Chart(document.getElementById('barChart'), {
+    type: 'bar',
+    data: {
+        labels: labLabels,
+        datasets: [{
+            label: 'Sit-ins',
+            data: labData,
+            backgroundColor: 'rgba(27,79,138,0.75)',
+            borderColor: '#1b4f8a',
+            borderWidth: 1,
+            borderRadius: 4
+        }]
+    },
+    options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+            x: { grid: { display: false }, ticks: { font: { size: 10 }, maxRotation: 35, autoSkip: false } },
+            y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { font: { size: 11 }, precision: 0 } }
+        }
+    }
+});
+
+/* Pie Chart */
+new Chart(document.getElementById('pieChart'), {
+    type: 'pie',
+    data: {
+        labels: purposeLabels,
+        datasets: [{
+            data: purposeData,
+            backgroundColor: PIE_COLORS.slice(0, purposeLabels.length),
+            borderWidth: 2,
+            borderColor: '#fff'
+        }]
+    },
+    options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } }
+    }
+});
+
+/* Pie Legend */
+var total    = purposeData.reduce(function(a,b){ return a+b; }, 0);
+var legendEl = document.getElementById('pieLegend');
+purposeLabels.forEach(function(lbl, i) {
+    var pct  = total > 0 ? Math.round(purposeData[i] / total * 100) : 0;
+    var span = document.createElement('span');
+    span.innerHTML =
+        '<span class="aleg-box" style="background:' + PIE_COLORS[i % PIE_COLORS.length] + ';"></span>' +
+        lbl + ' ' + pct + '%';
+    legendEl.appendChild(span);
+});
+</script>
 
 <script>
 /* ── SIDEBAR TOGGLE ── */
