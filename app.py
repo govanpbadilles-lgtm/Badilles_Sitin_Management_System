@@ -103,6 +103,16 @@ def init_db():
     ''')
 
     cursor.execute('''
+        CREATE TABLE IF NOT EXISTS lab_software (
+            id          INTEGER PRIMARY KEY AUTOINCREMENT,
+            lab         TEXT NOT NULL,
+            software    TEXT NOT NULL,
+            added_by    TEXT NOT NULL,
+            date_added  DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    cursor.execute('''
         CREATE TABLE IF NOT EXISTS notifications (
             id          INTEGER PRIMARY KEY AUTOINCREMENT,
             recipient   TEXT NOT NULL,
@@ -1180,6 +1190,98 @@ def notifications_read_all():
     conn.commit()
     conn.close()
     return jsonify({'ok': True})
+
+@app.route('/admin_software')
+def admin_software():
+    if 'user_id' not in session or session.get('role') != 'admin':
+        return redirect(url_for('home'))
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Fetch all software grouped per lab
+    rows = cursor.execute("""
+        SELECT * FROM lab_software
+        ORDER BY lab ASC, software ASC
+    """).fetchall()
+    conn.close()
+
+    # Group by lab
+    labs_order = ['Lab 524','Lab 526','Lab 528','Lab 530','Lab 542','Lab 544','Mac Lab']
+    software_by_lab = {lab: [] for lab in labs_order}
+    for row in rows:
+        if row['lab'] in software_by_lab:
+            software_by_lab[row['lab']].append(dict(row))
+        else:
+            software_by_lab[row['lab']] = [dict(row)]
+
+    return render_template('admin_software.html',
+        firstname       = session.get('firstname', 'Admin'),
+        software_by_lab = software_by_lab,
+        labs_order      = labs_order,
+    )
+
+
+@app.route('/add_software', methods=['POST'])
+def add_software():
+    if 'user_id' not in session or session.get('role') != 'admin':
+        return redirect(url_for('home'))
+
+    lab      = request.form.get('lab', '').strip()
+    software = request.form.get('software', '').strip()
+
+    if not lab or not software:
+        return redirect(url_for('admin_software'))
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Check for duplicate in same lab
+    existing = cursor.execute("""
+        SELECT id FROM lab_software WHERE lab = ? AND LOWER(software) = LOWER(?)
+    """, (lab, software)).fetchone()
+
+    if not existing:
+        ph_time = (datetime.utcnow() + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
+        cursor.execute("""
+            INSERT INTO lab_software (lab, software, added_by, date_added)
+            VALUES (?, ?, ?, ?)
+        """, (lab, software, session.get('firstname', 'Admin'), ph_time))
+        conn.commit()
+
+    conn.close()
+    return redirect(url_for('admin_software', added='true'))
+
+
+@app.route('/delete_software/<int:sw_id>', methods=['POST'])
+def delete_software(sw_id):
+    if 'user_id' not in session or session.get('role') != 'admin':
+        return redirect(url_for('home'))
+
+    conn = get_db_connection()
+    conn.execute("DELETE FROM lab_software WHERE id = ?", (sw_id,))
+    conn.commit()
+    conn.close()
+
+    return redirect(url_for('admin_software', deleted='true'))
+
+
+@app.route('/get_lab_software')
+def get_lab_software():
+    """JSON endpoint — used by student dashboard to show software per lab."""
+    lab = request.args.get('lab', '')
+    if not lab:
+        return jsonify([])
+
+    conn = get_db_connection()
+    rows = conn.execute("""
+        SELECT software FROM lab_software
+        WHERE lab = ?
+        ORDER BY software ASC
+    """, (lab,)).fetchall()
+    conn.close()
+
+    return jsonify([r['software'] for r in rows])
 
 
 # =======================================================
