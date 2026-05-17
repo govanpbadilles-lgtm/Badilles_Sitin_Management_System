@@ -300,30 +300,41 @@ def dashboard():
     summary_row = cursor.execute("""
         SELECT
             COUNT(*)                                                        AS num_sessions,
-            ROUND(SUM(
+            COALESCE(CAST(ROUND(SUM(
                 CASE WHEN time_out IS NOT NULL
-                THEN (julianday(time_out) - julianday(time_in)) * 24
+                THEN (julianday(time_out) - julianday(time_in)) * 1440
                 ELSE 0 END
-            ), 1)                                                           AS total_hours,
-            ROUND(AVG(
+            )) AS INTEGER), 0)                                              AS total_minutes,
+            COALESCE(CAST(ROUND(AVG(
                 CASE WHEN time_out IS NOT NULL
-                THEN (julianday(time_out) - julianday(time_in)) * 60
+                THEN (julianday(time_out) - julianday(time_in)) * 1440
                 ELSE NULL END
-            ), 0)                                                           AS avg_minutes,
-            MAX(
+            )) AS INTEGER), 0)                                              AS avg_minutes,
+            COALESCE(CAST(ROUND(MAX(
                 CASE WHEN time_out IS NOT NULL
-                THEN (julianday(time_out) - julianday(time_in)) * 60
+                THEN (julianday(time_out) - julianday(time_in)) * 1440
                 ELSE NULL END
-            )                                                               AS longest_minutes
+            )) AS INTEGER), 0)                                              AS longest_minutes
         FROM sitin_records
         WHERE id_number = ? AND status = 'Completed'
     """, (student['id_number'],)).fetchone()
 
+    def fmt_duration(total_min):
+        """Format minutes into 'Xh Ym' or 'Ym' string."""
+        total_min = int(total_min or 0)
+        h, m = divmod(total_min, 60)
+        if h > 0 and m > 0:
+            return f"{h}h {m}m"
+        elif h > 0:
+            return f"{h}h 0m"
+        else:
+            return f"{m}m"
+
     sitin_summary = {
-        'total_sessions' : summary_row['num_sessions']        or 0,
-        'total_hours'    : summary_row['total_hours']         or 0,
-        'avg_duration'   : int(summary_row['avg_minutes']     or 0),
-        'longest_session': int(summary_row['longest_minutes'] or 0),
+        'total_sessions' : summary_row['num_sessions']   or 0,
+        'total_hours'    : fmt_duration(summary_row['total_minutes']),
+        'avg_duration'   : fmt_duration(summary_row['avg_minutes']),
+        'longest_session': fmt_duration(summary_row['longest_minutes']),
     }
 
     # ── SIT-IN HISTORY ──────────────────────────────────
@@ -337,11 +348,16 @@ def dashboard():
             CASE WHEN time_out IS NOT NULL
                  THEN strftime('%I:%M %p', time_out)
                  ELSE NULL END             AS time_out,
-            CASE WHEN time_out IS NOT NULL
-                 THEN CAST(ROUND(
-                     (julianday(time_out) - julianday(time_in)) * 60
-                 ) AS INTEGER) || ' min'
-                 ELSE NULL END            AS duration,
+            CASE WHEN time_out IS NOT NULL THEN
+                CASE
+                    WHEN CAST(ROUND((julianday(time_out) - julianday(time_in)) * 1440) AS INTEGER) >= 60
+                    THEN CAST(CAST(ROUND((julianday(time_out) - julianday(time_in)) * 1440) AS INTEGER) / 60 AS TEXT)
+                         || 'h '
+                         || CAST(CAST(ROUND((julianday(time_out) - julianday(time_in)) * 1440) AS INTEGER) % 60 AS TEXT)
+                         || 'm'
+                    ELSE CAST(CAST(ROUND((julianday(time_out) - julianday(time_in)) * 1440) AS INTEGER) AS TEXT) || 'm'
+                END
+            ELSE NULL END AS duration,
             lab,
             purpose,
             status

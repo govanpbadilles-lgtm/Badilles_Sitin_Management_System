@@ -130,7 +130,39 @@
         .lb-search { position: relative; }
         .lb-search input { padding: 9px 15px 9px 35px; border-radius: 20px; border: 1px solid #ccc; outline: none; font-size: 14px; width: 230px; }
         .lb-search i { position: absolute; left: 12px; top: 11px; color: #888; }
-        @media (max-width: 700px) { .podium-section { flex-wrap: wrap; } .leaderboard-card { padding: 20px; } }
+
+        /* ══════════════════════════════════════════
+           MOBILE RESPONSIVE
+        ══════════════════════════════════════════ */
+        @media (max-width: 768px) {
+            .leaderboard-container { margin-top: 20px; padding: 0 10px; }
+            .leaderboard-card { padding: 20px 14px; }
+            .lb-header h1 { font-size: 24px; }
+            .podium-section { gap: 12px; flex-wrap: wrap; justify-content: center; }
+            .podium-block { width: 90px; }
+            .podium-1 .podium-block { height: 100px; }
+            .podium-2 .podium-block { height: 75px; }
+            .podium-3 .podium-block { height: 55px; }
+            .podium-avatar { width: 60px; height: 60px; }
+            .podium-1 .podium-avatar { width: 75px; height: 75px; }
+            .podium-name { font-size: 12px; max-width: 90px; }
+            .lb-table { font-size: 12px; }
+            .lb-table th, .lb-table td { padding: 8px 8px; }
+            .lb-search input { width: 180px; }
+            .notif-dropdown { right: -60px !important; width: 300px !important; }
+            div[style*="overflow-x"] { border-radius: 8px; }
+            .lb-table { min-width: 700px; }
+        }
+        @media (max-width: 480px) {
+            .leaderboard-card { padding: 14px 10px; }
+            .lb-header h1 { font-size: 20px; }
+            .lb-header p { font-size: 12px; }
+            .legend-bar { gap: 10px; }
+            .legend-item { font-size: 11px; }
+            .lb-controls { flex-direction: column; align-items: flex-start; }
+            .lb-search input { width: 100%; }
+            .notif-dropdown { right: -80px !important; width: 270px !important; }
+        }
     </style>
 </head>
 

@@ -380,6 +380,63 @@ body.admin-page {
 .notif-empty { padding: 40px 20px; text-align: center; color: #bbb; }
 .notif-empty i { font-size: 36px; display: block; margin-bottom: 10px; }
 .notif-empty p { margin: 0; font-size: 14px; }
+
+/* ══════════════════════════════════════════
+   MOBILE RESPONSIVE
+══════════════════════════════════════════ */
+@media (max-width: 768px) {
+    .navbar {
+        height: 50px !important;
+    }
+    .nav-brand {
+        font-size: 12px !important;
+    }
+    .admin-container {
+        padding: 15px 10px !important;
+    }
+    .admin-glass-card {
+        padding: 20px 14px !important;
+    }
+    .admin-glass-card h1 {
+        font-size: 22px !important;
+    }
+    .admin-glass-card > p {
+        font-size: 14px !important;
+    }
+    .dashboard-grid {
+        flex-direction: column !important;
+        gap: 20px !important;
+    }
+    .dashboard-left, .dashboard-right {
+        width: 100% !important;
+    }
+    .stat-card {
+        padding: 14px !important;
+    }
+    .stat-card i {
+        font-size: 24px !important;
+    }
+    .stat-info h3 {
+        font-size: 22px !important;
+    }
+    .notif-dropdown {
+        right: -60px !important;
+        width: 300px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .admin-glass-card h1 {
+        font-size: 18px !important;
+    }
+    .stat-card {
+        padding: 10px !important;
+    }
+    .notif-dropdown {
+        right: -80px !important;
+        width: 270px !important;
+    }
+}
 </style>
 </head>
 
@@ -475,9 +532,6 @@ body.admin-page {
 
         <a href="/leaderboard" class="sidebar-item">
             <i class="fas fa-trophy"></i> Leaderboard
-        </a>
-        <a href="/analytics" class="sidebar-item">
-            <i class="fas fa-chart-bar"></i> Analytics
         </a>
         <a href="/admin_software" class="sidebar-item">
             <i class="fas fa-boxes"></i> Software List
@@ -919,6 +973,7 @@ window.addEventListener('click', function(e) {
     setInterval(fetchCount, POLL_INTERVAL);
 })();
 </script>
-
+ <script src="{{ url_for('static', filename='bible_verse.js') }}"></script>
+ <div id="toastBox"></div>
 </body>
 </html>

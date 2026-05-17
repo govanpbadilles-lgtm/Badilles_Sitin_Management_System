@@ -330,3 +330,91 @@ body.admin-page::before {
     background-color: #e60000;
     box-shadow: 0 4px 10px rgba(255, 76, 76, 0.3);
 }
+
+/* =========================================
+   RESPONSIVE — ADMIN PAGES
+   ========================================= */
+@media (max-width: 768px) {
+    .admin-container {
+        padding: 16px 10px 30px;
+        min-height: auto;
+    }
+
+    .admin-glass-card {
+        padding: 20px 14px !important;
+        border-radius: 14px;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .dashboard-grid {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .dashboard-left, .dashboard-right {
+        width: 100% !important;
+        min-width: unset !important;
+    }
+
+    .admin-btn-glass {
+        font-size: 14px;
+        padding: 14px;
+    }
+
+    .admin-btn-glass i {
+        font-size: 24px;
+    }
+
+    /* Tables */
+    .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table-container table {
+        min-width: 600px;
+    }
+
+    .table-container th,
+    .table-container td {
+        padding: 10px 8px !important;
+        font-size: 12px !important;
+    }
+
+    /* Notification dropdown fix */
+    .notif-dropdown {
+        right: -60px !important;
+        width: 300px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .admin-container {
+        padding: 10px 6px 20px;
+    }
+
+    .admin-glass-card {
+        padding: 14px 10px !important;
+        border-radius: 10px;
+    }
+
+    .admin-glass-card h2 {
+        font-size: 18px !important;
+    }
+
+    .notif-dropdown {
+        right: -80px !important;
+        width: 270px !important;
+    }
+
+    .table-container table {
+        min-width: 500px;
+    }
+
+    .table-container th,
+    .table-container td {
+        padding: 8px 6px !important;
+        font-size: 11px !important;
+    }
+}

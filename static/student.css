@@ -1,17 +1,17 @@
 /* =========================================
-   STUDENT DASHBOARD STYLES
+   STUDENT DASHBOARD STYLES — RESPONSIVE
    ========================================= */
 
 /* ── FIX: Override style.css global body padding ── */
 body.student-page {
     height: 100vh;
     margin: 0;
-    padding-top: 0 !important;   /* style.css sets padding-top: 80px on body — cancel it */
+    padding-top: 0 !important;
     display: flex;
     flex-direction: column;
     overflow: hidden;
     position: relative;
-    font-family: sans-serif;
+    font-family: 'Inter', 'Segoe UI', sans-serif;
 }
 
 /* ── FIX: Override style.css .navbar { position: fixed !important } ── */
@@ -31,14 +31,14 @@ body.student-page .navbar {
     box-sizing: border-box !important;
 }
 
-/* ── FIX: Logo dili klaro — i-dako ── */
+/* ── FIX: Logo ── */
 body.student-page .navbar .nav-left img {
     height: 44px !important;
     width: auto !important;
     filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3)) !important;
 }
 
-/* ── FIX: Brand text size match sa taller navbar ── */
+/* ── FIX: Brand text ── */
 body.student-page .navbar .nav-brand {
     font-size: 16px !important;
     font-weight: 600 !important;
@@ -64,33 +64,31 @@ body.student-page::before {
     align-items: center;
     z-index: 1;
     padding: 20px;
+    overflow-y: auto;
 }
 
 .student-glass-card {
     background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(15px);
-    padding: 40px; /* Gipadak-an nato ang space sa sulod */
-    
-    /* KINI ANG MGA GIDAKO NATO */
-    width: 1500px; /* Gikan sa 1200px, gihimo natong 1500px para mas lapad */
-    max-width: 98%; /* Mu-stretch siya padulong sa kilid sa screen */
-    max-height: 95vh; /* Gitas-on: Hapita na niya sakupa ang tibuok screen paubos */
-    
+    padding: 35px;
+    width: 100%;
+    max-width: 1500px;
+    max-height: 95vh;
     border-radius: 15px;
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(255, 255, 255, 0.18);
     display: flex;
     flex-direction: column;
+    overflow-y: auto;
 }
 
 /* KINI ANG PARA SA 3-COLUMN LAYOUT */
 .dashboard-grid-3 {
     display: grid;
-    /* GIBALIK NATO: Left = 1 part, Center = 1.5 parts, Right = 1 part */
     grid-template-columns: 1fr 1.5fr 1fr; 
-    gap: 30px; /* Sakto ra nga space kada column */
+    gap: 25px;
     margin-top: 20px;
-    overflow-y: auto; 
+    overflow-y: unset;
     padding-right: 10px;
 }
 
@@ -110,12 +108,12 @@ body.student-page::before {
     padding-bottom: 5px;
 }
 
-/* WALA: Student Info */
+/* Student Info */
 .info-row { margin-bottom: 10px; font-size: 15px; color: #333; }
 .info-row strong { color: #1b4f8a; display: inline-block; width: 70px; }
 .session-badge { background: #1b4f8a; color: white; padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 18px; }
 
-/* TUNGA: Announcements */
+/* Announcements */
 .announcement-item {
     background: rgba(255, 255, 255, 0.9);
     padding: 15px;
@@ -126,7 +124,7 @@ body.student-page::before {
 .ann-meta { font-size: 12px; color: #555; margin-bottom: 5px; font-weight: bold; }
 .ann-msg { font-size: 14px; color: #333; margin: 0; line-height: 1.5; }
 
-/* TUO: Rules */
+/* Rules */
 .rules-list { padding-left: 20px; font-size: 14px; color: #333; line-height: 1.6; }
 .rules-list li { margin-bottom: 12px; }
 
@@ -164,30 +162,28 @@ body.student-page::before {
 
 .nav-links {
     display: flex;
-    gap: 10px; /* Sakto nga distansya kada link */
+    gap: 10px;
     align-items: center;
 }
 
 .nav-links a {
     text-decoration: none;
-    color: #ffffff; /* Puti nga text para klaro sa dark background */
+    color: #ffffff;
     font-size: 15px;
     font-weight: 500;
     padding: 8px 15px;
-    border-radius: 20px; /* Pill-shape ang background inig hover */
+    border-radius: 20px;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
-    gap: 8px; /* Distansya sa icon ug sa text */
+    gap: 8px;
 }
 
-/* Hover effect para sa mga normal nga links */
 .nav-links a:hover:not(.logout-btn) {
-    background-color: rgba(255, 255, 255, 0.15); /* Mo-hayag gamay inig tupa sa mouse */
-    transform: translateY(-2px); /* Mo-isa siya pataas gamay */
+    background-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
 }
 
-/* Espesyal nga design para sa Logout Button */
 .nav-links .logout-btn {
     background-color: #ff4c4c;
     color: white;
@@ -195,7 +191,7 @@ body.student-page::before {
     padding: 8px 20px;
     border-radius: 20px;
     box-shadow: 0 4px 10px rgba(255, 76, 76, 0.3);
-    margin-left: 10px; /* I-distansya gamay palayo sa uban links */
+    margin-left: 10px;
 }
 
 .nav-links .logout-btn:hover {
@@ -219,7 +215,6 @@ body.student-page::before {
     width: 130px; 
     height: 130px;
     border-radius: 50%;
-    /* Gradient border ring murag Instagram story */
     background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); 
     padding: 4px; 
     box-shadow: 0 8px 25px rgba(0,0,0,0.2);
@@ -238,7 +233,6 @@ body.student-page::before {
     transition: filter 0.3s ease;
 }
 
-/* KINI ANG CAMERA ICON SA KILID */
 .camera-btn {
     position: absolute;
     bottom: 5px;
@@ -258,18 +252,15 @@ body.student-page::before {
     z-index: 10;
 }
 
-/* Mo-dako ug mo-green inig tungtong sa mouse */
 .camera-btn:hover {
     background-color: #15c35a; 
     transform: scale(1.15);
 }
 
-/* Kung i-hover niya ang picture, murag mo-darken gamay para ma-klaro nga pwede i-click */
 .profile-pic-container:hover img {
     filter: brightness(0.85);
 }
 
-/* E-HIDE ANG BATI NGA DEFAULT FILE INPUT */
 #profileUpload {
     display: none;
 }
@@ -326,4 +317,256 @@ body.student-page::before {
 .close-feedback-hover:hover {
     color: #ef4444 !important;
     transform: rotate(90deg) scale(1.1);
+}
+
+/* =========================================
+   LAB SOFTWARE SECTION (Student Side)
+   ========================================= */
+.lab-sw-section {
+    margin-top: 20px;
+    background: linear-gradient(135deg, #f0f7ff, #e8f4fd);
+    border-radius: 12px;
+    padding: 16px 18px;
+    border: 1px solid #b3d4f5;
+}
+.lab-sw-section h4 {
+    margin: 0 0 10px 0;
+    color: #1b4f8a;
+    font-size: 14px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.lab-sw-select {
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1.5px solid #c8dff5;
+    font-size: 13px;
+    font-family: inherit;
+    outline: none;
+    background: white;
+    margin-bottom: 10px;
+}
+.lab-sw-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    min-height: 30px;
+}
+.lab-sw-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: white;
+    border: 1px solid #c8dff5;
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 12px;
+    color: #1b4f8a;
+    font-weight: 500;
+}
+.lab-sw-tag i {
+    font-size: 10px;
+    color: #3b82f6;
+}
+.lab-sw-empty {
+    font-size: 12px;
+    color: #999;
+    font-style: italic;
+}
+
+/* =========================================
+   RESPONSIVE DESIGN — MOBILE & TABLET
+   ========================================= */
+
+/* Tablet (768px and below) */
+@media (max-width: 768px) {
+    body.student-page {
+        overflow-y: auto;
+        height: auto;
+        min-height: 100vh;
+    }
+
+    body.student-page .navbar {
+        height: 54px !important;
+        padding: 0 12px !important;
+    }
+
+    body.student-page .navbar .nav-left img {
+        height: 32px !important;
+    }
+
+    body.student-page .navbar .nav-brand {
+        font-size: 13px !important;
+    }
+
+    .student-container {
+        padding: 12px;
+        align-items: flex-start;
+    }
+
+    .student-glass-card {
+        padding: 20px 16px;
+        max-height: none;
+        border-radius: 12px;
+    }
+
+    .student-glass-card h1 {
+        font-size: 24px !important;
+    }
+
+    .dashboard-grid-3 {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .col-card {
+        padding: 16px;
+    }
+
+    .col-card h2 {
+        font-size: 17px;
+    }
+
+    /* Summary stats: 2x2 grid */
+    .summary-stats-row {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 10px !important;
+    }
+
+    .summary-stat-card {
+        padding: 12px 14px !important;
+    }
+
+    .summary-stat-num {
+        font-size: 16px !important;
+    }
+
+    .summary-stat-lbl {
+        font-size: 10px !important;
+    }
+
+    .summary-stat-icon {
+        width: 38px !important;
+        height: 38px !important;
+        font-size: 15px !important;
+    }
+
+    /* Sessions table */
+    .sessions-table {
+        font-size: 12px !important;
+    }
+
+    .sessions-table thead th {
+        padding: 8px 10px !important;
+        font-size: 10px !important;
+    }
+
+    .sessions-table tbody td {
+        padding: 8px 10px !important;
+    }
+
+    /* Profile photo smaller */
+    .profile-pic-container {
+        width: 100px;
+        height: 100px;
+    }
+
+    .camera-btn {
+        width: 32px;
+        height: 32px;
+    }
+}
+
+/* Phone (480px and below) */
+@media (max-width: 480px) {
+    body.student-page .navbar .nav-brand {
+        font-size: 11px !important;
+        max-width: 130px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .student-container {
+        padding: 8px;
+    }
+
+    .student-glass-card {
+        padding: 14px 10px;
+        border-radius: 10px;
+    }
+
+    .student-glass-card h1 {
+        font-size: 20px !important;
+    }
+
+    .student-glass-card > p {
+        font-size: 13px !important;
+    }
+
+    /* Summary stats: single column */
+    .summary-stats-row {
+        grid-template-columns: 1fr 1fr !important;
+    }
+
+    .summary-stat-num {
+        font-size: 14px !important;
+    }
+
+    .summary-stat-icon {
+        width: 34px !important;
+        height: 34px !important;
+        font-size: 13px !important;
+        border-radius: 8px !important;
+    }
+
+    .summary-stat-card {
+        gap: 10px !important;
+        padding: 10px 12px !important;
+    }
+
+    .col-card {
+        padding: 12px;
+    }
+
+    .info-row {
+        font-size: 13px;
+    }
+
+    .info-row strong {
+        width: 60px;
+        font-size: 12px;
+    }
+
+    /* Sessions table - hide less important columns */
+    .sessions-table thead th:nth-child(5),
+    .sessions-table tbody td:nth-child(5) {
+        display: none;
+    }
+
+    .sessions-table {
+        font-size: 11px !important;
+    }
+
+    .sessions-table thead th {
+        padding: 6px 6px !important;
+        font-size: 9px !important;
+        letter-spacing: 0 !important;
+    }
+
+    .sessions-table thead th i {
+        display: none;
+    }
+
+    .sessions-table tbody td {
+        padding: 6px 6px !important;
+    }
+
+    .session-badge-status {
+        font-size: 9px !important;
+        padding: 3px 6px !important;
+    }
 }

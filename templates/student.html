@@ -538,6 +538,119 @@
     .session-badge-status.done {
         background: #f0f0f0; color: #666;
     }
+
+    /* ══════════════════════════════════════════
+       ZEBRA STRIPING FOR SESSIONS TABLE
+    ══════════════════════════════════════════ */
+    .sessions-table tbody tr:nth-child(even) {
+        background: #fafbff;
+    }
+    .sessions-table tbody tr:nth-child(even):hover {
+        background: #f0f4ff;
+    }
+
+    /* ══════════════════════════════════════════
+       MOBILE RESPONSIVE OVERRIDES
+    ══════════════════════════════════════════ */
+    @media (max-width: 768px) {
+        /* Notification dropdown */
+        .notif-dropdown {
+            right: -60px !important;
+            width: 300px !important;
+        }
+
+        /* Reservation modal */
+        .res-modal-wrapper {
+            width: 100% !important;
+            max-width: 95vw !important;
+            padding: 20px 16px !important;
+            border-radius: 14px !important;
+        }
+        .lab-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 8px !important;
+        }
+        .pc-grid {
+            grid-template-columns: repeat(5, 1fr) !important;
+            gap: 5px !important;
+            padding: 10px !important;
+        }
+        .pc-item {
+            font-size: 8px !important;
+        }
+        .pc-item i {
+            font-size: 11px !important;
+        }
+        .res-tab {
+            font-size: 12px !important;
+            padding: 9px !important;
+        }
+        .res-step-title {
+            font-size: 14px !important;
+        }
+
+        /* Feedback modal */
+        .feedback-modal-wrapper {
+            width: 100% !important;
+            max-width: 95vw !important;
+        }
+        .feedback-modal-body {
+            padding: 16px !important;
+        }
+        .fb-name-row {
+            flex-direction: column !important;
+        }
+        .fb-rating-grid {
+            gap: 6px !important;
+        }
+        .fb-rating-label {
+            min-width: 60px !important;
+            padding: 8px 4px 6px !important;
+            font-size: 11px !important;
+        }
+        .fb-rating-label i {
+            font-size: 15px !important;
+        }
+
+        /* AI Modal */
+        .student-glass-card[style*="width:560px"] {
+            width: 95vw !important;
+            max-width: 95vw !important;
+            padding: 20px !important;
+        }
+
+        /* Sessions table wrapper */
+        .sessions-table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .notif-dropdown {
+            right: -80px !important;
+            width: 280px !important;
+        }
+        .lab-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+        }
+        .pc-grid {
+            grid-template-columns: repeat(4, 1fr) !important;
+        }
+        .res-btn-row {
+            flex-direction: column !important;
+        }
+        .res-btn-back, .res-btn-submit {
+            width: 100% !important;
+        }
+        .stat-mini {
+            min-width: 80px !important;
+            padding: 8px !important;
+        }
+        .stat-mini .num {
+            font-size: 16px !important;
+        }
+    }
     </style>
 </head>
 <body class="student-page">
@@ -672,6 +785,8 @@
                     <li style="margin-bottom:12px;">Clean your area before leaving. Push your chairs properly.</li>
                     <li style="margin-bottom:12px;">Log out your accounts after use.</li>
                 </ul>
+
+
             </div>
 
         </div>
@@ -688,8 +803,8 @@
                         <i class="fas fa-clock"></i>
                     </div>
                     <div class="summary-stat-info">
-                        <div class="summary-stat-num">{{ sitin_summary.total_hours if sitin_summary else '0' }} hrs</div>
-                        <div class="summary-stat-lbl">Total Sit-in Hours</div>
+                        <div class="summary-stat-num">{{ sitin_summary.total_hours if sitin_summary else '0m' }}</div>
+                        <div class="summary-stat-lbl">Total Sit-in Time</div>
                     </div>
                 </div>
                 <div class="summary-stat-card">
@@ -706,8 +821,8 @@
                         <i class="fas fa-chart-line"></i>
                     </div>
                     <div class="summary-stat-info">
-                        <div class="summary-stat-num">{{ sitin_summary.avg_duration if sitin_summary else '0' }} min</div>
-                        <div class="summary-stat-lbl">Average Session Duration</div>
+                        <div class="summary-stat-num">{{ sitin_summary.avg_duration if sitin_summary else '0m' }}</div>
+                        <div class="summary-stat-lbl">Avg. Session Duration</div>
                     </div>
                 </div>
                 <div class="summary-stat-card">
@@ -715,7 +830,7 @@
                         <i class="fas fa-trophy"></i>
                     </div>
                     <div class="summary-stat-info">
-                        <div class="summary-stat-num">{{ sitin_summary.longest_session if sitin_summary else '0' }} min</div>
+                        <div class="summary-stat-num">{{ sitin_summary.longest_session if sitin_summary else '0m' }}</div>
                         <div class="summary-stat-lbl">Longest Session</div>
                     </div>
                 </div>
@@ -856,6 +971,18 @@
                         <div class="lab-card" onclick="selectLab(this,'Mac Lab')"><i class="fab fa-apple"></i><span>Mac Lab</span><small>40 PCs</small></div>
                     </div>
                     <input type="hidden" name="res_lab" id="selectedLabInput" required>
+
+                    <!-- Software Panel (shown after selecting a lab) -->
+                    <div id="resSoftwarePanel" style="display:none; margin-bottom:18px; background:linear-gradient(135deg,#f0f7ff,#e8f4fd); border:1px solid #b3d4f5; border-radius:12px; padding:14px 16px;">
+                        <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+                            <i class="fas fa-laptop-code" style="color:#1b4f8a; font-size:14px;"></i>
+                            <span style="font-size:13px; font-weight:700; color:#1b4f8a;">Available Software in <span id="resSoftwareLab"></span></span>
+                        </div>
+                        <div id="resSoftwareList" style="display:flex; flex-wrap:wrap; gap:6px; min-height:26px;">
+                            <span style="font-size:12px; color:#999; font-style:italic;"><i class="fas fa-spinner fa-spin"></i> Loading...</span>
+                        </div>
+                    </div>
+
                     <button type="button" class="res-btn-next" id="btnStep1Next" onclick="goToStep(2)" disabled>
                         Next: Choose PC <i class="fas fa-arrow-right"></i>
                     </button>
@@ -1070,6 +1197,38 @@
 
 <script>
 /* ══════════════════════════════════════════
+   LAB SOFTWARE LOADER
+══════════════════════════════════════════ */
+function loadLabSoftware(labName) {
+    var list = document.getElementById('labSoftwareList');
+    if (!labName) {
+        list.innerHTML = '<span class="lab-sw-empty">Select a lab to see software</span>';
+        return;
+    }
+    list.innerHTML = '<span class="lab-sw-empty"><i class="fas fa-spinner fa-spin"></i> Loading...</span>';
+    fetch('/get_lab_software?lab=' + encodeURIComponent(labName))
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (!data || data.length === 0) {
+                list.innerHTML = '<span class="lab-sw-empty">No software listed for this lab</span>';
+                return;
+            }
+            list.innerHTML = '';
+            data.forEach(function(sw) {
+                var tag = document.createElement('span');
+                tag.className = 'lab-sw-tag';
+                tag.innerHTML = '<i class="fas fa-check-circle"></i> ' + sw;
+                list.appendChild(tag);
+            });
+        })
+        .catch(function() {
+            list.innerHTML = '<span class="lab-sw-empty">Failed to load software</span>';
+        });
+}
+</script>
+
+<script>
+/* ══════════════════════════════════════════
    SIDEBAR
 ══════════════════════════════════════════ */
 function toggleSidebar() {
@@ -1159,6 +1318,33 @@ window.addEventListener('click', function(e) {
         document.getElementById('labNameDisplay').textContent = labName;
         document.getElementById('summaryLab').textContent     = labName;
         document.getElementById('btnStep1Next').disabled      = false;
+
+        // Show software panel and fetch software for selected lab
+        var panel    = document.getElementById('resSoftwarePanel');
+        var labLabel = document.getElementById('resSoftwareLab');
+        var swList   = document.getElementById('resSoftwareList');
+        labLabel.textContent = labName;
+        swList.innerHTML = '<span style="font-size:12px;color:#999;font-style:italic;"><i class="fas fa-spinner fa-spin"></i> Loading...</span>';
+        panel.style.display = 'block';
+
+        fetch('/get_lab_software?lab=' + encodeURIComponent(labName))
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (!data || data.length === 0) {
+                    swList.innerHTML = '<span style="font-size:12px;color:#999;font-style:italic;">No software listed for this lab.</span>';
+                    return;
+                }
+                swList.innerHTML = '';
+                data.forEach(function(sw) {
+                    var tag = document.createElement('span');
+                    tag.className = 'lab-sw-tag';
+                    tag.innerHTML = '<i class="fas fa-check-circle"></i> ' + sw;
+                    swList.appendChild(tag);
+                });
+            })
+            .catch(function() {
+                swList.innerHTML = '<span style="font-size:12px;color:#cc0000;font-style:italic;">Could not load software list.</span>';
+            });
     };
 
     var occupiedPcs = {
@@ -1365,6 +1551,7 @@ var loadRecommendations;
     setInterval(fetchCount, POLL_INTERVAL);
 })();
 </script>
-
+ <script src="{{ url_for('static', filename='bible_verse.js') }}"></script>
+ <div id="toastBox"></div>
 </body>
 </html>
