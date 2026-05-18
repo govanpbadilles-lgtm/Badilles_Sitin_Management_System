@@ -97,15 +97,42 @@
         .search-box input::placeholder { color: #b0bec5; }
 
         .modern-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        .modern-table thead th { padding: 13px 16px; background: #f8fafc; color: #7a8ea8; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; border-bottom: 1px solid #eef2f7; white-space: nowrap; }
+
+        /* ── TABLE ALIGNMENT FIX ── */
+        /* All headers: left-aligned, consistent padding */
+        .modern-table thead th {
+            padding: 13px 16px;
+            background: #f8fafc;
+            color: #7a8ea8;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+            border-bottom: 1px solid #eef2f7;
+            white-space: nowrap;
+            text-align: left;
+        }
+        /* Date header — match the extra left padding of its data cell */
         .modern-table thead th:first-child { padding-left: 20px; }
+        /* Action header — centered to match action buttons cell */
         .modern-table thead th:last-child { text-align: center; padding-right: 20px; }
+
         .modern-table tbody tr { border-bottom: 1px solid #f5f7fb; transition: background 0.1s; }
         .modern-table tbody tr:last-child { border-bottom: none; }
         .modern-table tbody tr:hover { background: #f8faff; }
-        .modern-table tbody td { padding: 13px 16px; color: #374151; vertical-align: middle; }
+
+        /* All data cells: left-aligned, consistent padding to match headers */
+        .modern-table tbody td {
+            padding: 13px 16px;
+            color: #374151;
+            vertical-align: middle;
+            text-align: left;
+        }
+        /* Date cell — extra left padding */
         .modern-table tbody td:first-child { padding-left: 20px; font-weight: 600; color: #1a3f72; }
+        /* Action cell — centered to match its header */
         .modern-table tbody td:last-child { text-align: center; padding-right: 20px; }
+        /* ── END ALIGNMENT FIX ── */
 
         .student-name { font-weight: 500; color: #1f2937; }
         .lab-badge { display: inline-flex; align-items: center; padding: 4px 10px; background: #eef2f7; color: #4a6fa5; font-size: 11px; font-weight: 700; border-radius: 6px; letter-spacing: 0.3px; }
