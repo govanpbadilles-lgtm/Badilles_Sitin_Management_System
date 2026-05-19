@@ -173,11 +173,14 @@
             <img src="{{ url_for('static', filename='images/uclogonav.png') }}" alt="UC Logo">
             {% if role == 'admin' %}
             <span class="nav-brand">CCS Admin</span>
-            {% else %}
+            {% elif role == 'student' %}
             <span class="nav-brand">Student Dashboard</span>
+            {% else %}
+            <span class="nav-brand">CCS Public Portal</span>
             {% endif %}
         </div>
         <div class="nav-right">
+            {% if session.get('user_id') %}
             <div class="notif-wrapper" id="notifWrapper">
                 <button class="notif-bell-btn" id="notifBellBtn" onclick="toggleNotifDropdown(event)" title="Notifications">
                     <i class="fas fa-bell"></i>
@@ -196,6 +199,11 @@
                     </div>
                 </div>
             </div>
+            {% else %}
+            <a href="/?openLogin=true" style="color: white; text-decoration: none; font-size: 13px; font-weight: 600; padding: 6px 14px; border-radius: 20px; background: rgba(255,255,255,0.15); transition: background 0.2s;">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </a>
+            {% endif %}
             <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleSidebar()">
                 <span></span><span></span><span></span>
             </button>
@@ -209,17 +217,22 @@
             <div class="sidebar-admin-icon">
                 {% if role == 'admin' %}
                 <i class="fas fa-user-shield"></i>
-                {% else %}
+                {% elif role == 'student' %}
                 <i class="fas fa-user-graduate"></i>
+                {% else %}
+                <i class="fas fa-user-circle"></i>
                 {% endif %}
             </div>
             <div class="sidebar-user-info">
                 {% if role == 'admin' %}
                 <div class="sidebar-name">Administrator</div>
                 <div class="sidebar-sub">College of Computer Studies</div>
-                {% else %}
+                {% elif role == 'student' %}
                 <div class="sidebar-name">Student Portal</div>
                 <div class="sidebar-sub">CCS Sit-in System</div>
+                {% else %}
+                <div class="sidebar-name">Guest User</div>
+                <div class="sidebar-sub">Public Access</div>
                 {% endif %}
             </div>
         </div>
@@ -239,15 +252,26 @@
             <a href="/admin_feedbacks" class="sidebar-item"><i class="fas fa-comments"></i> Feedback Reports</a>
             <div class="sidebar-divider"></div>
             <a href="/leaderboard" class="sidebar-item active"><i class="fas fa-trophy"></i> Leaderboard</a>
-            {% else %}
+            {% elif role == 'student' %}
             <a href="/dashboard" class="sidebar-item"><i class="fas fa-home"></i> Home</a>
             <div class="sidebar-divider"></div>
             <a href="/leaderboard" class="sidebar-item active"><i class="fas fa-trophy"></i> Leaderboard</a>
+            <a href="/about" class="sidebar-item"><i class="fas fa-info-circle"></i> About</a>
+            {% else %}
+            <a href="/" class="sidebar-item"><i class="fas fa-home"></i> Home</a>
+            <a href="/leaderboard" class="sidebar-item active"><i class="fas fa-trophy"></i> Leaderboard</a>
+            <a href="/about" class="sidebar-item"><i class="fas fa-info-circle"></i> About</a>
+            <div class="sidebar-divider"></div>
+            <a href="/register" class="sidebar-item"><i class="fas fa-user-plus"></i> Register</a>
             {% endif %}
         </nav>
 
         <div class="sidebar-footer">
+            {% if session.get('user_id') %}
             <a href="/logout" class="sidebar-logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            {% else %}
+            <a href="/?openLogin=true" class="sidebar-logout-btn" style="background: rgba(21, 195, 90, 0.18); color: #15c35a;"><i class="fas fa-sign-in-alt"></i> Login</a>
+            {% endif %}
         </div>
     </aside>
 

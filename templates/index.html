@@ -209,6 +209,7 @@
         <div class="modern-nav-links">
             <a href="/" class="nav-item"><i class="fas fa-home"></i> Home</a>
             <a href="#" class="nav-item"><i class="fas fa-users"></i> Community</a>
+            <a href="/leaderboard" class="nav-item"><i class="fas fa-trophy"></i> Leaderboard</a>
             <a href="/about" class="nav-item"><i class="fas fa-info-circle"></i> About</a>
             <a href="#" id="openLogin" class="nav-login-btn"><i class="fas fa-sign-in-alt"></i> Login</a>
         </div>
@@ -276,26 +277,25 @@
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
     <script>
-        // ── Open / Close Modal ──
-        const modal       = document.getElementById('loginModal');
-        const openBtn     = document.getElementById('openLogin');
-        const getStarted  = document.getElementById('getStartedBtn');
-        const closeBtn    = document.getElementById('closeModal');
+        // ── Open / Close Login Modal ──
+        const modal      = document.getElementById('loginModal');
+        const openBtn    = document.getElementById('openLogin');
+        const getStarted = document.getElementById('getStartedBtn');
+        const closeBtn   = document.getElementById('closeModal');
 
-        function openModal() { modal.classList.add('active'); }
+        function openModal()  { modal.classList.add('active'); }
         function closeModal() { modal.classList.remove('active'); }
 
         openBtn.addEventListener('click', e => { e.preventDefault(); openModal(); });
         getStarted.addEventListener('click', openModal);
         closeBtn.addEventListener('click', closeModal);
         modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
-        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); } });
 
-        // Auto-open if redirected with ?openLogin=true
         if (new URLSearchParams(location.search).get('openLogin') === 'true') openModal();
 
         // ── Password toggle ──
-        const loginPw = document.getElementById('loginPassword');
+        const loginPw       = document.getElementById('loginPassword');
         const toggleLoginPw = document.getElementById('toggleLoginPw');
         toggleLoginPw.addEventListener('click', () => {
             const show = loginPw.type === 'password';
@@ -303,7 +303,8 @@
             toggleLoginPw.className = show ? 'fas fa-eye-slash' : 'fas fa-eye';
         });
     </script>
-    
+
+
     <div id="toastBox"></div>
 </body>
 </html>

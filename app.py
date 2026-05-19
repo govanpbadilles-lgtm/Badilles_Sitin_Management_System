@@ -1011,9 +1011,6 @@ def submit_student_feedback():
 
 @app.route('/leaderboard')
 def leaderboard():
-    if 'user_id' not in session:
-        return redirect(url_for('home'))
-
     conn = get_db_connection()
     cursor = conn.cursor()
 
@@ -1072,6 +1069,63 @@ def leaderboard():
                            leaderboard=leaderboard_data,
                            role=session.get('role'),
                            current_user_id=session.get('user_id'))
+
+@app.route('/api/public/leaderboard')
+def public_leaderboard():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    students = cursor.execute('''
+        SELECT 
+            u.id_number,
+            u.firstname,
+            u.lastname,
+            u.course,
+            u.profile_pic,
+            COUNT(s.id) AS total_sitins,
+            COALESCE(SUM(
+                CASE 
+                    WHEN s.time_out IS NOT NULL 
+                    THEN (julianday(s.time_out) - julianday(s.time_in)) * 24 
+                    ELSE 0 
+                END
+            ), 0) AS total_hours,
+            COUNT(CASE WHEN s.feedback != '' AND s.feedback IS NOT NULL THEN 1 END) AS tasks_completed
+        FROM users u
+        LEFT JOIN sitin_records s ON u.id_number = s.id_number AND s.status = 'Completed'
+        WHERE u.role = 'student'
+        GROUP BY u.id
+    ''').fetchall()
+
+    conn.close()
+
+    leaderboard_data = []
+    for s in students:
+        points_sitins = min((s['total_sitins'] / 30) * 50, 50)
+        points_hours  = min((s['total_hours']  / 100) * 30, 30)
+        points_tasks  = min((s['tasks_completed'] / 30) * 20, 20)
+        total_points  = round(points_sitins + points_hours + points_tasks, 2)
+
+        leaderboard_data.append({
+            'id_number':       s['id_number'],
+            'firstname':       s['firstname'],
+            'lastname':        s['lastname'],
+            'course':          s['course'],
+            'profile_pic':     s['profile_pic'],
+            'total_sitins':    s['total_sitins'],
+            'total_hours':     round(s['total_hours'], 1),
+            'tasks_completed': s['tasks_completed'],
+            'points_sitins':   round(points_sitins, 1),
+            'points_hours':    round(points_hours, 1),
+            'points_tasks':    round(points_tasks, 1),
+            'total_points':    total_points,
+        })
+
+    leaderboard_data.sort(key=lambda x: x['total_points'], reverse=True)
+    for i, student in enumerate(leaderboard_data):
+        student['rank'] = i + 1
+
+    return jsonify(leaderboard_data)
 
 
 @app.route('/admin_reservations')
