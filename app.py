@@ -149,9 +149,50 @@ def create_default_admin():
             
     conn.close()
 
+def seed_students():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    students = [
+        ('23749626', 'Aranas', 'Maria Nina', 'A', '2nd Year', 'maria@gmail.com', 'BSIT', 'Cebu'),
+        ('24963025', 'Taburnal', 'Emmanuel Brylle', 'B', '2nd Year', 'emman@gmail.com', 'BSCS', 'Cebu'),
+        ('24653022', 'Froilan', 'Mark', '1st Year', 'mark@gmail.com', 'BSIT', 'Bohol'),
+        ('26262230', 'Bellita', 'Engel', 'D', '3rd Year', 'bellita@gmail.com', 'BSCS-AI', 'Cebu'),
+        ('23749627', 'Escuadro', 'April', 'E', '4th Year', 'escudaro@gmail.com', 'BSIT', 'Cebu'),
+        ('25306750', 'Seaborge', 'Ancline April', 'F', '1st Year', 'april@gmail.com', 'BSBA', 'Cebu'),
+        ('24365630', 'Ylaya', 'Neo', 'G', '2nd Year', 'leo@gmail.com', 'BSIT', 'Cebu'),
+        ('21325648', 'Guinita', 'Earl', 'H', '3rd Year', 'guinita@gmail.com', 'BSCS', 'Cebu'),
+        ('22432456', 'Antoque', 'Ronan', 'I', '4th Year', 'antoque@gmail.com', 'BSIT', 'Toledo'),
+        ('24356523', 'Libradilla', 'John Cedrick', 'J', '2nd Year', 'libradilla@gmail.com', 'BSCS-AI', 'Cebu'),
+    ]
+
+    for s in students:
+        try:
+            hashed_pw = generate_password_hash('student123')
+
+            cursor.execute('''
+                INSERT INTO users
+                (id_number, lastname, firstname, middlename, course_level,
+                 password, email, course, address, role, remaining_sessions)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'student', ?)
+            ''', (
+                s[0], s[1], s[2], s[3], s[4],
+                hashed_pw,
+                s[5], s[6], s[7],
+                30 if s[6] in ('BSIT', 'BSCS', 'BSCS-AI') else 15
+            ))
+
+        except sqlite3.IntegrityError:
+            pass
+
+    conn.commit()
+    conn.close()
+    print("10 students added!")
+
 
 init_db()
 create_default_admin()
+seed_students()
 
 
 # =======================================================
