@@ -226,14 +226,22 @@ def init_db():
     for sql in tables:
         cur.execute(sql)
 
+    # Commit initial table creations
+    conn.commit()
+
     # Migrations for existing databases
     try:
         cur.execute("ALTER TABLE admin_tasks ADD COLUMN priority TEXT DEFAULT 'Medium'")
+        conn.commit()
     except Exception:
+        if USE_PG: conn.rollback()
         pass
+
     try:
         cur.execute("ALTER TABLE admin_tasks ADD COLUMN due_date TEXT")
+        conn.commit()
     except Exception:
+        if USE_PG: conn.rollback()
         pass
 
     if USE_PG:
