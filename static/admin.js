@@ -207,17 +207,13 @@ document.addEventListener('DOMContentLoaded', function() {
     if (masterlistSearch) {
         masterlistSearch.addEventListener('keyup', function() {
             let filter = this.value.toLowerCase();
-            let rows = document.querySelectorAll('.modern-table tbody tr');
+            let rows = document.querySelectorAll('.students-table tbody tr, .modern-table tbody tr');
 
             rows.forEach(row => {
                 if (row.cells.length === 1) return; 
 
                 let rowText = row.textContent.toLowerCase();
-                if (rowText.includes(filter)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
+                row.style.display = rowText.includes(filter) ? '' : 'none';
             });
         });
     }

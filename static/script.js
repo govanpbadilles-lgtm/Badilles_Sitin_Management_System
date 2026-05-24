@@ -92,6 +92,108 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // =======================================================
+// GLOBAL NOTIFICATIONS SYSTEM
+// =======================================================
+(function() {
+    const fetchCount = () => {
+        const badge = document.getElementById('notifBadge');
+        if (!badge) return;
+        fetch('/notifications/count')
+            .then(r => r.json())
+            .then(data => {
+                badge.style.display = data.count > 0 ? 'flex' : 'none';
+                badge.textContent = data.count;
+            })
+            .catch(err => console.error("Notif Error:", err));
+    };
+    
+    // Initial fetch if badge exists
+    if (document.getElementById('notifBadge')) {
+        fetchCount();
+        setInterval(fetchCount, 30000);
+    }
+})();
+
+function toggleNotifDropdown(e) {
+    if (e) e.stopPropagation();
+    const dd = document.getElementById('notifDropdown');
+    if (!dd) return;
+    
+    const isOpen = dd.style.display === 'block';
+    dd.style.display = isOpen ? 'none' : 'block';
+    
+    if (!isOpen) loadNotifications();
+}
+
+function loadNotifications() {
+    const list = document.getElementById('notifList');
+    if (!list) return;
+    
+    list.innerHTML = '<div class="notif-empty"><p><i class="fas fa-spinner fa-spin"></i> Loading...</p></div>';
+    
+    fetch('/notifications/list')
+        .then(r => r.json())
+        .then(items => {
+            if (!items.length) {
+                list.innerHTML = '<div class="notif-empty"><i class="fas fa-bell-slash"></i><p>No notifications yet</p></div>';
+                return;
+            }
+            
+            list.innerHTML = '';
+            items.forEach(item => {
+                const div = document.createElement('a');
+                div.href = item.link || '#';
+                div.className = 'notif-item' + (item.is_read ? '' : ' unread');
+                
+                let iconClass = 'fa-bell';
+                if (item.type === 'reservation') iconClass = 'fa-calendar-check';
+                else if (item.type === 'approved') iconClass = 'fa-check-circle';
+                else if (item.type === 'declined') iconClass = 'fa-times-circle';
+                else if (item.type === 'announcement') iconClass = 'fa-bullhorn';
+
+                div.innerHTML = `
+                    <div class="notif-icon ${item.type || ''}">
+                        <i class="fas ${iconClass}"></i>
+                    </div>
+                    <div class="notif-body">
+                        <p class="notif-msg">${item.message}</p>
+                        <span class="notif-time">${item.created_at || ''}</span>
+                    </div>
+                    ${!item.is_read ? '<div class="notif-unread-dot"></div>' : ''}
+                `;
+                
+                div.onclick = (e) => {
+                    if (item.link) e.preventDefault();
+                    fetch('/notifications/read/' + item.id, { method: 'POST' })
+                        .then(() => {
+                            if (item.link) window.location.href = item.link;
+                            else loadNotifications();
+                        });
+                };
+                list.appendChild(div);
+            });
+        })
+        .catch(err => {
+            list.innerHTML = '<div class="notif-empty"><p>Error loading notifications</p></div>';
+        });
+}
+
+function markAllRead() {
+    fetch('/notifications/read_all', { method: 'POST' })
+        .then(() => {
+            loadNotifications();
+            const badge = document.getElementById('notifBadge');
+            if (badge) badge.style.display = 'none';
+        });
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', () => {
+    const dd = document.getElementById('notifDropdown');
+    if (dd) dd.style.display = 'none';
+});
+
+// =======================================================
 // TOAST NOTIFICATION FUNCTION
 // =======================================================
 function showToast(type, message) {

@@ -50,11 +50,13 @@
 
 <body class="admin-page">
 
-    <!-- SLIM NAVBAR -->
+    <!-- ══════════════════════════════════════════
+         SLIM NAVBAR
+    ══════════════════════════════════════════ -->
     <nav class="navbar">
         <div class="nav-left">
             <img src="{{ url_for('static', filename='images/uclogonav.png') }}" alt="UC Logo">
-            <span class="nav-brand">CCS Admin</span>
+            <span class="nav-brand">{{ get_navbar_title() }}</span>
         </div>
         <div class="nav-right">
             <div class="notif-wrapper" id="notifWrapper">
@@ -68,7 +70,10 @@
                         <button class="notif-read-all-btn" onclick="markAllRead()">Mark all read</button>
                     </div>
                     <div class="notif-list" id="notifList">
-                        <div class="notif-empty"><i class="fas fa-bell-slash"></i><p>No notifications yet</p></div>
+                        <div class="notif-empty">
+                            <i class="fas fa-bell-slash"></i>
+                            <p>No notifications yet</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -78,37 +83,89 @@
         </div>
     </nav>
 
+    <!-- ══════════════════════════════════════════
+         SIDEBAR OVERLAY + SIDEBAR (RIGHT)
+    ══════════════════════════════════════════ -->
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
     <aside class="sidebar" id="sidebar">
+        <!-- Admin Info -->
         <div class="sidebar-user">
-            <div class="sidebar-avatar"><i class="fas fa-user-shield"></i></div>
+            <div class="sidebar-avatar">
+                <i class="fas fa-user-shield"></i>
+            </div>
             <div class="sidebar-user-info">
                 <div class="sidebar-name">Admin {{ session.get('firstname', 'User') }}</div>
                 <div class="sidebar-sub">Administrator</div>
             </div>
         </div>
+
+        <!-- Nav Links -->
         <nav class="sidebar-nav">
-            <a href="/admin_dashboard" class="sidebar-item"><i class="fas fa-home"></i> Home</a>
-            <a href="#" class="sidebar-item" id="sb-search"><i class="fas fa-search"></i> Search Student</a>
+            <a href="/admin_dashboard" class="sidebar-item {% if request.path == '/admin_dashboard' %}active{% endif %}">
+                <i class="fas fa-home"></i> Home
+            </a>
+            <a href="#" class="sidebar-item" id="sb-search">
+                <i class="fas fa-search"></i> Search Student
+            </a>
+
             <div class="sidebar-divider"></div>
             <div class="sidebar-section-label">Students & Sit-ins</div>
-            <a href="/student_list" class="sidebar-item {% if request.path == '/student_list' %}active{% endif %}"><i class="fas fa-user-graduate"></i> View Students</a>
-            <a href="/active_sitins" class="sidebar-item"><i class="fas fa-desktop"></i> Active Sit-ins</a>
-            <a href="/history" class="sidebar-item"><i class="fas fa-history"></i> History Records</a>
-            <a href="/admin_reservations" class="sidebar-item"><i class="fas fa-calendar-check"></i> Reservations</a>
+
+            <a href="/student_list" class="sidebar-item {% if request.path == '/student_list' %}active{% endif %}">
+                <i class="fas fa-user-graduate"></i> View Students
+            </a>
+            <a href="/active_sitins" class="sidebar-item {% if request.path == '/active_sitins' %}active{% endif %}">
+                <i class="fas fa-desktop"></i> Active Sit-ins
+            </a>
+            <a href="/history" class="sidebar-item {% if request.path == '/history' %}active{% endif %}">
+                <i class="fas fa-history"></i> History Records
+            </a>
+            <a href="/admin_reservations" class="sidebar-item {% if request.path == '/admin_reservations' %}active{% endif %}">
+                <i class="fas fa-calendar-check"></i> Reservations
+            </a>
+            <a href="/admin_award_points" class="sidebar-item {% if request.path == '/admin_award_points' %}active{% endif %}">
+                <i class="fas fa-award"></i> Award Points
+            </a>
+            <a href="/admin_manage_tasks" class="sidebar-item {% if request.path == '/admin_manage_tasks' %}active{% endif %}">
+                <i class="fas fa-tasks"></i> Manage Tasks
+            </a>
+
             <div class="sidebar-divider"></div>
             <div class="sidebar-section-label">Reports</div>
-            <a href="/reports" class="sidebar-item"><i class="fas fa-file-alt"></i> Sit-in Reports</a>
-            <a href="/admin_feedbacks" class="sidebar-item"><i class="fas fa-comments"></i> Feedback Reports</a>
+
+            <a href="/reports" class="sidebar-item {% if request.path == '/reports' %}active{% endif %}">
+                <i class="fas fa-file-alt"></i> Sit-in Reports
+            </a>
+            <a href="/admin_feedbacks" class="sidebar-item {% if request.path == '/admin_feedbacks' %}active{% endif %}">
+                <i class="fas fa-comments"></i> Feedback Reports
+            </a>
+
             <div class="sidebar-divider"></div>
-            <a href="/leaderboard" class="sidebar-item"><i class="fas fa-trophy"></i> Rankings</a>
-            <a href="/admin_software" class="sidebar-item"><i class="fas fa-boxes"></i> Software List</a>
-            <a href="#" class="sidebar-item" id="sb-pc-mgmt"><i class="fas fa-laptop-medical"></i> PC Maintenance</a>
-            <a href="#" class="sidebar-item" id="sb-ai"><i class="fas fa-robot"></i> AI Assistant</a>
+            <div class="sidebar-section-label">General</div>
+
+            <a href="/leaderboard" class="sidebar-item {% if request.path == '/leaderboard' %}active{% endif %}">
+                <i class="fas fa-trophy"></i> Leaderboard
+            </a>
+            <a href="/admin_software" class="sidebar-item {% if request.path == '/admin_software' %}active{% endif %}">
+                <i class="fas fa-boxes"></i> Software List
+            </a>
+            <a href="/community" class="sidebar-item {% if request.path == '/community' %}active{% endif %}">
+                <i class="fas fa-users"></i> Community Hub
+            </a>
+            <a href="#" class="sidebar-item" id="sb-pc-mgmt">
+                <i class="fas fa-laptop-medical"></i> PC Maintenance
+            </a>
+            <a href="#" class="sidebar-item" id="sb-ai">
+                <i class="fas fa-robot"></i> AI Assistant
+            </a>
         </nav>
+
+        <!-- Logout -->
         <div class="sidebar-footer">
-            <a href="/logout" class="sidebar-logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            <a href="/logout" class="sidebar-logout-btn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
         </div>
     </aside>
 
@@ -300,7 +357,70 @@
                 <button class="close-btn" id="closePcMgmtBtn">&times;</button>
             </div>
             <div class="modal-body" style="overflow-y: auto; max-height: calc(90vh - 130px);">
-                <div id="pcGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; padding: 15px; background: #f8fafc; border-radius: 16px; border: 1px solid #e2e8f0; min-height: 300px;"></div>
+                <div style="margin-bottom: 25px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <label for="labSelect" style="font-weight: 700; color: #475569; font-size: 14px;">Select Laboratory:</label>
+                        <select id="labSelect" onchange="loadPcStatuses()" style="padding: 10px 15px; border-radius: 8px; border: 1.5px solid #e2e8f0; outline: none; background: white; font-family: inherit; font-weight: 500;">
+                            <option value="Lab 524">Lab 524</option>
+                            <option value="Lab 526">Lab 526</option>
+                            <option value="Lab 528">Lab 528</option>
+                            <option value="Lab 530">Lab 530</option>
+                            <option value="Lab 542">Lab 542</option>
+                            <option value="Lab 544">Lab 544</option>
+                        </select>
+                    </div>
+                    <div style="font-size: 13px; color: #64748b; background: #f1f5f9; padding: 6px 14px; border-radius: 20px; border: 1px solid #e2e8f0;">
+                        <i class="fas fa-info-circle"></i> Click on a PC to toggle status.
+                    </div>
+                </div>
+
+                <div id="pcGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 15px; padding: 15px; background: #f8fafc; border-radius: 16px; border: 1px solid #e2e8f0; min-height: 300px;">
+                    <!-- PCs loaded via JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PC EDIT MODAL -->
+    <div id="editPcModal" class="modal">
+        <div class="modal-content glass-effect" style="max-width: 480px;">
+            <div class="modal-header">
+                <h2 id="editPcTitle"><i class="fas fa-edit"></i> Manage PC</h2>
+                <button class="close-btn" id="closeEditPcBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="editPcForm">
+                    <input type="hidden" id="editPcLab">
+                    <input type="hidden" id="editPcNumber">
+                    <div style="margin-bottom: 20px;">
+                        <label style="font-weight: 700; display: block; margin-bottom: 8px; color: #475569; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Condition / Status:</label>
+                        <select id="editPcStatus" style="width: 100%; padding: 12px; border-radius: 8px; border: 1.5px solid #e2e8f0; background: #fff; font-family: inherit;">
+                            <option value="Working">Working</option>
+                            <option value="Not Working">Not Working</option>
+                            <option value="Under Maintenance">Under Maintenance</option>
+                            <option value="No Internet Connection">No Internet Connection</option>
+                            <option value="Hardware Issue">Hardware Issue</option>
+                            <option value="Software Issue">Software Issue</option>
+                        </select>
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <label style="font-weight: 700; display: block; margin-bottom: 8px; color: #475569; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Availability:</label>
+                        <div style="display: flex; gap: 25px; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                            <label style="cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 600; color: #334155;"><input type="radio" name="availability" value="Enabled" id="availEnabled"> Enabled</label>
+                            <label style="cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 600; color: #334155;"><input type="radio" name="availability" value="Disabled" id="availDisabled"> Disabled</label>
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <label style="font-weight: 700; display: block; margin-bottom: 8px; color: #475569; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Remarks / Notes:</label>
+                        <textarea id="editPcRemarks" style="width: 100%; height: 100px; padding: 12px; border-radius: 8px; border: 1.5px solid #e2e8f0; resize: none; font-family: inherit; font-size: 14px;" placeholder="Add details about the issue..."></textarea>
+                    </div>
+                    <p style="font-size: 12px; color: #94a3b8; margin-bottom: 25px; background: #f1f5f9; padding: 8px 12px; border-radius: 6px;">
+                        <i class="fas fa-clock"></i> Last Updated: <span id="editPcLastUpdated" style="font-weight: 600; color: #475569;">—</span>
+                    </p>
+                    <button type="submit" class="btn-post" style="width: 100%; height: 48px; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                        <i class="fas fa-save"></i> Update PC Status
+                    </button>
+                </form>
             </div>
         </div>
     </div>

@@ -98,8 +98,29 @@
     <nav class="navbar">
         <div class="logo">
             <img src="{{ url_for('static', filename='images/uclogonav.png') }}" alt="UC Logo">
-            <span>College of Computer Studies Sit-in Monitoring System</span>
+            <span class="logo-text">{{ get_navbar_title() }}</span>
         </div>
+
+        {% if session.get('user_id') and session.get('role') != 'admin' %}
+        <div class="notif-wrapper" id="notifWrapper">
+            <button class="notif-bell-btn" id="notifBellBtn" onclick="toggleNotifDropdown(event)" title="Notifications">
+                <i class="fas fa-bell"></i>
+                <span class="notif-badge" id="notifBadge" style="display:none;">0</span>
+            </button>
+            <div class="notif-dropdown" id="notifDropdown">
+                <div class="notif-header">
+                    <span><i class="fas fa-bell"></i> Notifications</span>
+                    <button class="notif-read-all-btn" onclick="markAllRead()">Mark all read</button>
+                </div>
+                <div class="notif-list" id="notifList">
+                    <div class="notif-empty">
+                        <i class="fas fa-bell-slash"></i>
+                        <p>No notifications yet</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
 
         <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">
             <span></span>
@@ -108,11 +129,22 @@
         </button>
 
         <div class="modern-nav-links" id="navbarLinks">
+            <button class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="Close menu">&times;</button>
             <a href="/" class="nav-item"><i class="fas fa-home"></i> Home</a>
             <a href="/community" class="nav-item"><i class="fas fa-users"></i> Community</a>
-            <a href="/about" class="nav-item" style="font-weight: bold; color: #1b4f8a;"><i class="fas fa-info-circle"></i> About</a>
             <a href="/leaderboard" class="nav-item"><i class="fas fa-trophy"></i> Leaderboard</a>
-            <a href="/?openLogin=true" class="nav-login-btn"><i class="fas fa-sign-in-alt"></i> Login</a>
+            <a href="/about" class="nav-item" style="font-weight: bold; color: #f1c40f;"><i class="fas fa-info-circle"></i> About</a>
+            
+            {% if session.get('user_id') %}
+                {% if session.get('role') == 'admin' %}
+                    <a href="/admin_dashboard" class="nav-item"><i class="fas fa-user-shield"></i> Dashboard</a>
+                {% else %}
+                    <a href="/student_dashboard" class="nav-item"><i class="fas fa-desktop"></i> Dashboard</a>
+                {% endif %}
+                <a href="/logout" class="nav-item"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            {% else %}
+                <a href="/?openLogin=true" class="nav-login-btn"><i class="fas fa-sign-in-alt"></i> Login</a>
+            {% endif %}
         </div>
     </nav>
     <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
@@ -190,24 +222,35 @@
         </div>
     </div>
 
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
     <script>
         const menuToggle = document.getElementById('menuToggle');
+        const sidebarCloseBtn = document.getElementById('sidebarCloseBtn');
         const navbarLinks = document.getElementById('navbarLinks');
         const sidebarBackdrop = document.getElementById('sidebarBackdrop');
 
         function closeSidebar() {
-            menuToggle.classList.remove('open');
-            navbarLinks.classList.remove('active');
-            sidebarBackdrop.classList.remove('active');
+            if (menuToggle) menuToggle.classList.remove('open');
+            if (navbarLinks) navbarLinks.classList.remove('active');
+            if (sidebarBackdrop) sidebarBackdrop.classList.remove('active');
         }
 
-        menuToggle.addEventListener('click', () => {
-            const isOpen = menuToggle.classList.toggle('open');
-            navbarLinks.classList.toggle('active', isOpen);
-            sidebarBackdrop.classList.toggle('active', isOpen);
-        });
+        if (menuToggle) {
+            menuToggle.addEventListener('click', () => {
+                const isOpen = menuToggle.classList.toggle('open');
+                if (navbarLinks) navbarLinks.classList.toggle('active', isOpen);
+                if (sidebarBackdrop) sidebarBackdrop.classList.toggle('active', isOpen);
+            });
+        }
 
-        sidebarBackdrop.addEventListener('click', closeSidebar);
+        if (sidebarCloseBtn) {
+            sidebarCloseBtn.addEventListener('click', closeSidebar);
+        }
+
+        if (sidebarBackdrop) {
+            sidebarBackdrop.addEventListener('click', closeSidebar);
+        }
+
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') closeSidebar();
         });

@@ -402,7 +402,7 @@
 <nav class="navbar">
     <div class="nav-left">
         <img src="{{ url_for('static', filename='images/uclogonav.png') }}" alt="UC Logo">
-        <span class="nav-brand">Student Dashboard</span>
+        <span class="nav-brand">{{ get_navbar_title() }}</span>
     </div>
     <div class="nav-right">
         <!-- Notification Bell -->

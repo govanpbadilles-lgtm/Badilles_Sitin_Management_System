@@ -207,9 +207,11 @@ def init_db():
             task_title TEXT NOT NULL,
             description TEXT,
             points INTEGER DEFAULT 0,
-            status TEXT DEFAULT 'Assigned',
+            status TEXT DEFAULT 'To Do',
             assigned_by TEXT NOT NULL,
-            date_assigned {TS} DEFAULT CURRENT_TIMESTAMP
+            date_assigned {TS} DEFAULT CURRENT_TIMESTAMP,
+            priority TEXT DEFAULT 'Medium',
+            due_date TEXT
         )""",
         f"""CREATE TABLE IF NOT EXISTS chat_messages (
             id {SERIAL} PRIMARY KEY {AUTO},
@@ -223,6 +225,16 @@ def init_db():
 
     for sql in tables:
         cur.execute(sql)
+
+    # Migrations for existing databases
+    try:
+        cur.execute("ALTER TABLE admin_tasks ADD COLUMN priority TEXT DEFAULT 'Medium'")
+    except Exception:
+        pass
+    try:
+        cur.execute("ALTER TABLE admin_tasks ADD COLUMN due_date TEXT")
+    except Exception:
+        pass
 
     if USE_PG:
         cur.execute("INSERT INTO app_settings (key, value) VALUES (%s, %s) ON CONFLICT (key) DO NOTHING", ('reservations_enabled', 'Enabled'))
@@ -308,6 +320,45 @@ init_db()
 create_default_admin()
 seed_students()
 seed_pcs()
+
+
+@app.context_processor
+def inject_navbar_title():
+    def get_navbar_title():
+        path = request.path
+        if path in ('/admin_dashboard', '/dashboard', '/'):
+            return "College of Computer Studies Sit-in Monitoring System"
+        elif path == '/leaderboard':
+            return "CCS Leaderboard"
+        elif path == '/admin_software':
+            return "CCS Software List"
+        elif path == '/community':
+            return "CCS Community"
+        elif path == '/admin_manage_tasks':
+            return "CCS Manage Tasks"
+        elif path == '/admin_award_points':
+            return "CCS Award Points"
+        elif path == '/student_list':
+            return "CCS Student List"
+        elif path == '/active_sitins':
+            return "CCS Active Sit-ins"
+        elif path == '/history':
+            return "CCS History Records"
+        elif path == '/admin_reservations':
+            return "CCS Reservations"
+        elif path == '/reports':
+            return "CCS Sit-in Reports"
+        elif path == '/admin_feedbacks':
+            return "CCS Feedback Reports"
+        elif path == '/about':
+            return "CCS About"
+        elif path == '/register':
+            return "CCS Register"
+        elif path == '/forgot_password':
+            return "CCS Forgot Password"
+        else:
+            return "College of Computer Studies Sit-in Monitoring System"
+    return dict(get_navbar_title=get_navbar_title)
 
 
 # =======================================================
@@ -1346,18 +1397,22 @@ def admin_award_points():
         id_number = request.form.get('id_number', '').strip()
         points    = int(request.form.get('points', 0))
         reason    = request.form.get('reason', '').strip()
+        category  = request.form.get('category', 'Other').strip()
+        formatted_reason = f"[{category}] {reason}"
         cur.execute(f"SELECT firstname, lastname FROM users WHERE id_number = {PH}", (id_number,))
         student = cur.fetchone()
         student_name = f"{student['firstname']} {student['lastname']}" if student else id_number
         cur.execute(f"""
             INSERT INTO admin_awards (id_number, student_name, points, reason, assigned_by)
             VALUES ({PH},{PH},{PH},{PH},{PH})
-        """, (id_number, student_name, points, reason, session.get('firstname', 'Admin')))
+        """, (id_number, student_name, points, formatted_reason, session.get('firstname', 'Admin')))
         conn.commit()
     cur.execute("SELECT * FROM admin_awards ORDER BY date_awarded DESC")
     awards = cur.fetchall()
+    cur.execute("SELECT id_number, firstname, lastname, course FROM users WHERE role='student' ORDER BY lastname ASC, firstname ASC")
+    students = cur.fetchall()
     conn.close()
-    return render_template('admin_award_points.html', awards=awards)
+    return render_template('admin_award_points.html', awards=awards, students=students)
 
 
 @app.route('/admin_manage_tasks', methods=['GET', 'POST'])
@@ -1371,18 +1426,22 @@ def admin_manage_tasks():
         task_title  = request.form.get('task_title', '').strip()
         description = request.form.get('description', '').strip()
         points      = int(request.form.get('points', 0))
+        priority    = request.form.get('priority', 'Medium').strip()
+        due_date    = request.form.get('due_date', '').strip()
         cur.execute(f"SELECT firstname, lastname FROM users WHERE id_number = {PH}", (id_number,))
         student = cur.fetchone()
         student_name = f"{student['firstname']} {student['lastname']}" if student else id_number
         cur.execute(f"""
-            INSERT INTO admin_tasks (id_number, student_name, task_title, description, points, assigned_by)
-            VALUES ({PH},{PH},{PH},{PH},{PH},{PH})
-        """, (id_number, student_name, task_title, description, points, session.get('firstname', 'Admin')))
+            INSERT INTO admin_tasks (id_number, student_name, task_title, description, points, assigned_by, priority, due_date, status)
+            VALUES ({PH},{PH},{PH},{PH},{PH},{PH},{PH},{PH},'To Do')
+        """, (id_number, student_name, task_title, description, points, session.get('firstname', 'Admin'), priority, due_date))
         conn.commit()
     cur.execute("SELECT * FROM admin_tasks ORDER BY date_assigned DESC")
     tasks = cur.fetchall()
+    cur.execute("SELECT id_number, firstname, lastname, course FROM users WHERE role='student' ORDER BY lastname ASC, firstname ASC")
+    students = cur.fetchall()
     conn.close()
-    return render_template('admin_manage_tasks.html', tasks=tasks)
+    return render_template('admin_manage_tasks.html', tasks=tasks, students=students)
 
 
 @app.route('/admin_manage_tasks/<int:task_id>/complete', methods=['POST'])
@@ -1393,6 +1452,27 @@ def admin_complete_task(task_id):
     conn.cursor().execute(f"UPDATE admin_tasks SET status='Completed' WHERE id={PH}", (task_id,))
     conn.commit(); conn.close()
     return redirect(url_for('admin_manage_tasks'))
+
+
+@app.route('/admin_manage_tasks/<int:task_id>/update_status', methods=['POST'])
+def admin_update_task_status(task_id):
+    if 'user_id' not in session or session.get('role') != 'admin':
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+    
+    if request.is_json:
+        data = request.get_json()
+        new_status = data.get('status')
+    else:
+        new_status = request.form.get('status')
+        
+    if new_status not in ('To Do', 'In Progress', 'Completed'):
+        return jsonify({'success': False, 'message': 'Invalid status'}), 400
+        
+    conn = get_db_connection()
+    conn.cursor().execute(f"UPDATE admin_tasks SET status={PH} WHERE id={PH}", (new_status, task_id))
+    conn.commit()
+    conn.close()
+    return jsonify({'success': True})
 
 
 @app.route('/admin_manage_tasks/<int:task_id>/delete', methods=['POST'])
