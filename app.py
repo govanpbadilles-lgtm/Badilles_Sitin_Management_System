@@ -325,39 +325,7 @@ seed_pcs()
 @app.context_processor
 def inject_navbar_title():
     def get_navbar_title():
-        path = request.path
-        if path in ('/admin_dashboard', '/dashboard', '/'):
-            return "College of Computer Studies Sit-in Monitoring System"
-        elif path == '/leaderboard':
-            return "CCS Leaderboard"
-        elif path == '/admin_software':
-            return "CCS Software List"
-        elif path == '/community':
-            return "CCS Community"
-        elif path == '/admin_manage_tasks':
-            return "CCS Manage Tasks"
-        elif path == '/admin_award_points':
-            return "CCS Award Points"
-        elif path == '/student_list':
-            return "CCS Student List"
-        elif path == '/active_sitins':
-            return "CCS Active Sit-ins"
-        elif path == '/history':
-            return "CCS History Records"
-        elif path == '/admin_reservations':
-            return "CCS Reservations"
-        elif path == '/reports':
-            return "CCS Sit-in Reports"
-        elif path == '/admin_feedbacks':
-            return "CCS Feedback Reports"
-        elif path == '/about':
-            return "CCS About"
-        elif path == '/register':
-            return "CCS Register"
-        elif path == '/forgot_password':
-            return "CCS Forgot Password"
-        else:
-            return "College of Computer Studies Sit-in Monitoring System"
+        return "College of Computer Studies Sit-in Monitoring System"
     return dict(get_navbar_title=get_navbar_title)
 
 

@@ -11,15 +11,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
-        /* SLIM NAVBAR */
-        body.leaderboard-page { padding-top: 0 !important; margin: 0; display: flex; flex-direction: column; position: relative; font-family: 'Segoe UI', sans-serif; min-height: 100vh; }
+        /* BACKGROUND FOR LEADERBOARD */
+        body.leaderboard-page { margin: 0; display: flex; flex-direction: column; position: relative; font-family: 'Segoe UI', sans-serif; min-height: 100vh; }
         body.leaderboard-page::before { content: ""; position: fixed; top: -20px; left: -20px; right: -20px; bottom: -20px; background-image: url('/static/images/ucbackground.jpg'); background-size: cover; background-position: center; filter: blur(8px) brightness(0.75); z-index: -1; }
-        body.leaderboard-page .navbar { position: sticky !important; top: 0 !important; }
-        .navbar { height: 54px; background: #1b4f8a; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
-        .nav-left { display: flex; align-items: center; gap: 10px; }
-        .nav-left img { height: 32px; width: auto; }
-        .nav-brand { color: white; font-size: 15px; font-weight: 600; letter-spacing: 0.2px; }
-        .nav-right { display: flex; align-items: center; gap: 10px; }
+        
         .leaderboard-container { flex: 1; display: flex; justify-content: center; align-items: flex-start; z-index: 1; margin-top: 40px; margin-bottom: 50px; padding: 0 20px; }
         .leaderboard-card { background: linear-gradient(135deg, rgba(255,255,255,0.85), rgba(255,255,255,0.6)); backdrop-filter: blur(20px); padding: 40px; width: 1100px; max-width: 98%; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.6); }
         .lb-header { text-align: center; margin-bottom: 35px; }
@@ -123,140 +118,41 @@
 
     <body class="{% if role == 'admin' %}admin-page{% else %}leaderboard-page{% endif %}">
 
-        {% if role == 'admin' %}
-        <!-- ══════════════════════════════════════════
-             SLIM NAVBAR
-        ══════════════════════════════════════════ -->
-        <nav class="navbar">
-            <div class="nav-left">
-                <img src="{{ url_for('static', filename='images/uclogonav.png') }}" alt="UC Logo">
-                <span class="nav-brand">{{ get_navbar_title() }}</span>
-            </div>
-            <div class="nav-right">
-                <div class="notif-wrapper" id="notifWrapper">
-                    <button class="notif-bell-btn" id="notifBellBtn" onclick="toggleNotifDropdown(event)" title="Notifications">
-                        <i class="fas fa-bell"></i>
-                        <span class="notif-badge" id="notifBadge" style="display:none;">0</span>
-                    </button>
-                    <div class="notif-dropdown" id="notifDropdown" style="display:none;">
-                        <div class="notif-header">
-                            <span><i class="fas fa-bell"></i> Notifications</span>
-                            <button class="notif-read-all-btn" onclick="markAllRead()">Mark all read</button>
-                        </div>
-                        <div class="notif-list" id="notifList">
-                            <div class="notif-empty">
-                                <i class="fas fa-bell-slash"></i>
-                                <p>No notifications yet</p>
-                            </div>
-                        </div>
+    <nav class="navbar">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='images/uclogonav.png') }}" alt="UC Logo">
+            <span class="logo-text">{{ get_navbar_title() }}</span>
+        </div>
+
+        {% if session.get('user_id') and session.get('role') != 'admin' %}
+        <div class="notif-wrapper" id="notifWrapper">
+            <button class="notif-bell-btn" id="notifBellBtn" onclick="toggleNotifDropdown(event)" title="Notifications">
+                <i class="fas fa-bell"></i>
+                <span class="notif-badge" id="notifBadge" style="display:none;">0</span>
+            </button>
+            <div class="notif-dropdown" id="notifDropdown">
+                <div class="notif-header">
+                    <span><i class="fas fa-bell"></i> Notifications</span>
+                    <button class="notif-read-all-btn" onclick="markAllRead()">Mark all read</button>
+                </div>
+                <div class="notif-list" id="notifList">
+                    <div class="notif-empty">
+                        <i class="fas fa-bell-slash"></i>
+                        <p>No notifications yet</p>
                     </div>
                 </div>
-                <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleSidebar()">
-                    <span></span><span></span><span></span>
-                </button>
             </div>
-        </nav>
+        </div>
+        {% endif %}
 
-        <!-- ══════════════════════════════════════════
-             SIDEBAR OVERLAY + SIDEBAR (RIGHT)
-        ══════════════════════════════════════════ -->
-        <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-
-        <aside class="sidebar" id="sidebar">
-            <!-- Admin Info -->
-            <div class="sidebar-user">
-                <div class="sidebar-avatar">
-                    <i class="fas fa-user-shield"></i>
-                </div>
-                <div class="sidebar-user-info">
-                    <div class="sidebar-name">Admin {{ session.get('firstname', 'User') }}</div>
-                    <div class="sidebar-sub">Administrator</div>
-                </div>
-            </div>
-
-            <!-- Nav Links -->
-            <nav class="sidebar-nav">
-                <a href="/admin_dashboard" class="sidebar-item {% if request.path == '/admin_dashboard' %}active{% endif %}">
-                    <i class="fas fa-home"></i> Home
-                </a>
-                <a href="#" class="sidebar-item" id="sb-search">
-                    <i class="fas fa-search"></i> Search Student
-                </a>
-
-                <div class="sidebar-divider"></div>
-                <div class="sidebar-section-label">Students & Sit-ins</div>
-
-                <a href="/student_list" class="sidebar-item {% if request.path == '/student_list' %}active{% endif %}">
-                    <i class="fas fa-user-graduate"></i> View Students
-                </a>
-                <a href="/active_sitins" class="sidebar-item {% if request.path == '/active_sitins' %}active{% endif %}">
-                    <i class="fas fa-desktop"></i> Active Sit-ins
-                </a>
-                <a href="/history" class="sidebar-item {% if request.path == '/history' %}active{% endif %}">
-                    <i class="fas fa-history"></i> History Records
-                </a>
-                <a href="/admin_reservations" class="sidebar-item {% if request.path == '/admin_reservations' %}active{% endif %}">
-                    <i class="fas fa-calendar-check"></i> Reservations
-                </a>
-                <a href="/admin_award_points" class="sidebar-item {% if request.path == '/admin_award_points' %}active{% endif %}">
-                    <i class="fas fa-award"></i> Award Points
-                </a>
-                <a href="/admin_manage_tasks" class="sidebar-item {% if request.path == '/admin_manage_tasks' %}active{% endif %}">
-                    <i class="fas fa-tasks"></i> Manage Tasks
-                </a>
-
-                <div class="sidebar-divider"></div>
-                <div class="sidebar-section-label">Reports</div>
-
-                <a href="/reports" class="sidebar-item {% if request.path == '/reports' %}active{% endif %}">
-                    <i class="fas fa-file-alt"></i> Sit-in Reports
-                </a>
-                <a href="/admin_feedbacks" class="sidebar-item {% if request.path == '/admin_feedbacks' %}active{% endif %}">
-                    <i class="fas fa-comments"></i> Feedback Reports
-                </a>
-
-                <div class="sidebar-divider"></div>
-                <div class="sidebar-section-label">General</div>
-
-                <a href="/leaderboard" class="sidebar-item {% if request.path == '/leaderboard' %}active{% endif %}">
-                    <i class="fas fa-trophy"></i> Leaderboard
-                </a>
-                <a href="/admin_software" class="sidebar-item {% if request.path == '/admin_software' %}active{% endif %}">
-                    <i class="fas fa-boxes"></i> Software List
-                </a>
-                <a href="/community" class="sidebar-item {% if request.path == '/community' %}active{% endif %}">
-                    <i class="fas fa-users"></i> Community Hub
-                </a>
-                <a href="#" class="sidebar-item" id="sb-pc-mgmt">
-                    <i class="fas fa-laptop-medical"></i> PC Maintenance
-                </a>
-                <a href="#" class="sidebar-item" id="sb-ai">
-                    <i class="fas fa-robot"></i> AI Assistant
-                </a>
-            </nav>
-
-            <!-- Logout -->
-            <div class="sidebar-footer">
-                <a href="/logout" class="sidebar-logout-btn">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </a>
-            </div>
-        </aside>
-        <div class="admin-container">
-        {% else %}
-        <nav class="navbar">
-            <div class="logo">
-                <img src="{{ url_for('static', filename='images/uclogonav.png') }}" alt="UC Logo">
-                <span class="logo-text">{{ get_navbar_title() }}</span>
-            </div>
-
-            {% if session.get('user_id') and session.get('role') != 'admin' %}
+        {% if session.get('role') == 'admin' %}
+        <div class="nav-right" style="display: flex; align-items: center; gap: 15px; margin-right: 15px;">
             <div class="notif-wrapper" id="notifWrapper">
                 <button class="notif-bell-btn" id="notifBellBtn" onclick="toggleNotifDropdown(event)" title="Notifications">
                     <i class="fas fa-bell"></i>
                     <span class="notif-badge" id="notifBadge" style="display:none;">0</span>
                 </button>
-                <div class="notif-dropdown" id="notifDropdown">
+                <div class="notif-dropdown" id="notifDropdown" style="display:none;">
                     <div class="notif-header">
                         <span><i class="fas fa-bell"></i> Notifications</span>
                         <button class="notif-read-all-btn" onclick="markAllRead()">Mark all read</button>
@@ -269,35 +165,130 @@
                     </div>
                 </div>
             </div>
-            {% endif %}
-
-            <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">
-                <span></span>
-                <span></span>
-                <span></span>
+            <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleSidebar()" style="background: none; border: none; color: white; cursor: pointer; display: flex; flex-direction: column; gap: 4px; padding: 5px;">
+                <span style="display: block; width: 25px; height: 3px; background: white; border-radius: 2px;"></span>
+                <span style="display: block; width: 25px; height: 3px; background: white; border-radius: 2px;"></span>
+                <span style="display: block; width: 25px; height: 3px; background: white; border-radius: 2px;"></span>
             </button>
-
-            <div class="modern-nav-links" id="navbarLinks">
-                <button class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="Close menu">&times;</button>
-                <a href="/" class="nav-item"><i class="fas fa-home"></i> Home</a>
-                <a href="/community" class="nav-item"><i class="fas fa-users"></i> Community</a>
-                <a href="/leaderboard" class="nav-item" style="font-weight: 700; color: #f1c40f;"><i class="fas fa-trophy"></i> Leaderboard</a>
-                <a href="/about" class="nav-item"><i class="fas fa-info-circle"></i> About</a>
-                
-                {% if session.get('user_id') %}
-                    {% if session.get('role') == 'admin' %}
-                        <a href="/admin_dashboard" class="nav-item"><i class="fas fa-user-shield"></i> Dashboard</a>
-                    {% else %}
-                        <a href="/student_dashboard" class="nav-item"><i class="fas fa-desktop"></i> Dashboard</a>
-                    {% endif %}
-                    <a href="/logout" class="nav-item"><i class="fas fa-sign-out-alt"></i> Logout</a>
-                {% else %}
-                    <a href="/?openLogin=true" class="nav-login-btn"><i class="fas fa-sign-in-alt"></i> Login</a>
-                {% endif %}
-            </div>
-        </nav>
-        <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+        </div>
         {% endif %}
+
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <div class="modern-nav-links" id="navbarLinks">
+            <button class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="Close menu">&times;</button>
+            <a href="/" class="nav-item"><i class="fas fa-home"></i> Home</a>
+            <a href="/community" class="nav-item"><i class="fas fa-users"></i> Community</a>
+            <a href="/leaderboard" class="nav-item"><i class="fas fa-trophy"></i> Leaderboard</a>
+            <a href="/about" class="nav-item"><i class="fas fa-info-circle"></i> About</a>
+            
+            {% if session.get('user_id') %}
+                {% if session.get('role') == 'admin' %}
+                    <a href="/admin_dashboard" class="nav-item"><i class="fas fa-user-shield"></i> Dashboard</a>
+                {% else %}
+                    <a href="/student_dashboard" class="nav-item"><i class="fas fa-desktop"></i> Dashboard</a>
+                {% endif %}
+                <a href="/logout" class="nav-item"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            {% else %}
+                <a href="#" id="openLogin" class="nav-login-btn"><i class="fas fa-sign-in-alt"></i> Login</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    {% if role == 'admin' %}
+    <!-- ══════════════════════════════════════════
+         SIDEBAR OVERLAY + SIDEBAR (RIGHT)
+    ══════════════════════════════════════════ -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <!-- Admin Info -->
+        <div class="sidebar-user">
+            <div class="sidebar-avatar">
+                <i class="fas fa-user-shield"></i>
+            </div>
+            <div class="sidebar-user-info">
+                <div class="sidebar-name">Admin {{ session.get('firstname', 'User') }}</div>
+                <div class="sidebar-sub">Administrator</div>
+            </div>
+        </div>
+
+        <!-- Nav Links -->
+        <nav class="sidebar-nav">
+            <a href="/admin_dashboard" class="sidebar-item {% if request.path == '/admin_dashboard' %}active{% endif %}">
+                <i class="fas fa-home"></i> Home
+            </a>
+            <a href="#" class="sidebar-item" id="sb-search">
+                <i class="fas fa-search"></i> Search Student
+            </a>
+
+            <div class="sidebar-divider"></div>
+            <div class="sidebar-section-label">Students & Sit-ins</div>
+
+            <a href="/student_list" class="sidebar-item {% if request.path == '/student_list' %}active{% endif %}">
+                <i class="fas fa-user-graduate"></i> View Students
+            </a>
+            <a href="/active_sitins" class="sidebar-item {% if request.path == '/active_sitins' %}active{% endif %}">
+                <i class="fas fa-desktop"></i> Active Sit-ins
+            </a>
+            <a href="/history" class="sidebar-item {% if request.path == '/history' %}active{% endif %}">
+                <i class="fas fa-history"></i> History Records
+            </a>
+            <a href="/admin_reservations" class="sidebar-item {% if request.path == '/admin_reservations' %}active{% endif %}">
+                <i class="fas fa-calendar-check"></i> Reservations
+            </a>
+            <a href="/admin_award_points" class="sidebar-item {% if request.path == '/admin_award_points' %}active{% endif %}">
+                <i class="fas fa-award"></i> Award Points
+            </a>
+            <a href="/admin_manage_tasks" class="sidebar-item {% if request.path == '/admin_manage_tasks' %}active{% endif %}">
+                <i class="fas fa-tasks"></i> Manage Tasks
+            </a>
+
+            <div class="sidebar-divider"></div>
+            <div class="sidebar-section-label">Reports</div>
+
+            <a href="/reports" class="sidebar-item {% if request.path == '/reports' %}active{% endif %}">
+                <i class="fas fa-file-alt"></i> Sit-in Reports
+            </a>
+            <a href="/admin_feedbacks" class="sidebar-item {% if request.path == '/admin_feedbacks' %}active{% endif %}">
+                <i class="fas fa-comments"></i> Feedback Reports
+            </a>
+
+            <div class="sidebar-divider"></div>
+            <div class="sidebar-section-label">General</div>
+
+            <a href="/leaderboard" class="sidebar-item {% if request.path == '/leaderboard' %}active{% endif %}">
+                <i class="fas fa-trophy"></i> Leaderboard
+            </a>
+            <a href="/admin_software" class="sidebar-item {% if request.path == '/admin_software' %}active{% endif %}">
+                <i class="fas fa-boxes"></i> Software List
+            </a>
+            <a href="/community" class="sidebar-item {% if request.path == '/community' %}active{% endif %}">
+                <i class="fas fa-users"></i> Community Hub
+            </a>
+            <a href="#" class="sidebar-item" id="sb-pc-mgmt">
+                <i class="fas fa-laptop-medical"></i> PC Maintenance
+            </a>
+            <a href="#" class="sidebar-item" id="sb-ai">
+                <i class="fas fa-robot"></i> AI Assistant
+            </a>
+        </nav>
+
+        <!-- Logout -->
+        <div class="sidebar-footer">
+            <a href="/logout" class="sidebar-logout-btn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </aside>
+    <div class="admin-container">
+    {% endif %}
 
     <div class="leaderboard-container">
         <div class="leaderboard-card">
@@ -618,6 +609,84 @@
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') closeSidebar();
         });
+    </script>
+
+    <!-- ── LOGIN MODAL ── -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content" style="width: 420px; max-width: 95vw; background: linear-gradient(145deg, #ffffff 0%, #f0f6ff 100%); border-radius: 24px; padding: 44px 40px 36px; box-shadow: 0 30px 80px rgba(10, 40, 100, 0.22), 0 0 0 1px rgba(255,255,255,0.9) inset; animation: slideUp .35s cubic-bezier(.22,.68,0,1.2); font-family: 'Outfit', sans-serif;">
+            <span class="close-btn" id="closeModal" style="position: absolute; top: 16px; right: 20px; font-size: 22px; color: #8a9bb5; cursor: pointer; line-height: 1; transition: color .2s, transform .2s;">&times;</span>
+
+            <div class="modal-header-wrap" style="text-align: center; margin-bottom: 30px;">
+                <div class="modal-icon-ring" style="width: 62px; height: 62px; border-radius: 50%; background: linear-gradient(135deg, #1b4f8a, #2e7de9); display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; box-shadow: 0 8px 24px rgba(27,79,138,.30);">
+                    <i class="fas fa-user-shield" style="color: #fff; font-size: 22px;"></i>
+                </div>
+                <h2 style="font-family: 'Outfit', sans-serif; font-size: 26px; font-weight: 700; color: #0d2b55; margin: 0 0 4px; letter-spacing: -.3px;">Welcome Back</h2>
+                <p class="modal-subtitle" style="font-size: 13px; color: #7a8fab; font-weight: 400; margin: 0;">Sign in to your CCS account</p>
+            </div>
+            
+            <form action="/login" method="POST" autocomplete="off">
+                <div class="input-group" style="margin-bottom: 18px;">
+                    <label style="display: block; font-size: 12px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: #4a6080; margin-bottom: 7px;">ID Number</label>
+                    <div class="input-with-icon" style="position: relative;">
+                        <input type="text" name="id_number" placeholder="e.g. 2021-12345 or ADMIN-001" required autocomplete="username" style="width: 100%; padding: 13px 44px 13px 16px; border: 1.5px solid #d4e1f4; border-radius: 12px; font-size: 14.5px; font-family: 'Outfit', sans-serif; background: #fff; color: #1a2e4a; outline: none; transition: border-color .2s, box-shadow .2s; box-sizing: border-box;">
+                        <i class="fas fa-id-badge" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: #a0b4cc; font-size: 15px; pointer-events: none;"></i>
+                    </div>
+                </div>
+
+                <div class="input-group" style="margin-bottom: 18px;">
+                    <label style="display: block; font-size: 12px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: #4a6080; margin-bottom: 7px;">Password</label>
+                    <div class="input-with-icon" style="position: relative;">
+                        <input type="password" name="password" id="loginPassword" placeholder="Enter your password" required autocomplete="current-password" style="width: 100%; padding: 13px 44px 13px 16px; border: 1.5px solid #d4e1f4; border-radius: 12px; font-size: 14.5px; font-family: 'Outfit', sans-serif; background: #fff; color: #1a2e4a; outline: none; transition: border-color .2s, box-shadow .2s; box-sizing: border-box;">
+                        <i class="fas fa-eye" id="toggleLoginPw" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: #a0b4cc; font-size: 15px; pointer-events:all; cursor:pointer;"></i>
+                    </div>
+                </div>
+
+                <div class="options" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; font-size: 13px; color: #5a7190;">
+                    <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;"><input type="checkbox" name="remember"> Remember me</label>
+                    <a href="/forgot_password" style="color: #2e7de9; text-decoration: none; font-weight: 500;">Forgot Password?</a>
+                </div>
+
+                <button type="submit" class="login-btn-submit" style="width: 100%; padding: 14px; background: linear-gradient(135deg, #1b4f8a 0%, #2e7de9 100%); color: #fff; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; font-family: 'Outfit', sans-serif; letter-spacing: .4px; cursor: pointer; transition: transform .18s, box-shadow .18s; box-shadow: 0 6px 20px rgba(27,79,138,.30);">
+                    <i class="fas fa-sign-in-alt" style="margin-right:8px;"></i>Login
+                </button>
+                
+                <p class="register-link" style="text-align: center; margin-top: 18px; font-size: 13.5px; color: #7a8fab;">Don't have an account? <a href="/register" style="color: #1b4f8a; font-weight: 700; text-decoration: none;">Register here</a></p>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // ── Open / Close Login Modal ──
+        const lModal = document.getElementById('loginModal');
+        const lOpenBtn = document.getElementById('openLogin');
+        const lCloseBtn = document.getElementById('closeModal');
+
+        function openLModal() { if(lModal) lModal.classList.add('active'); }
+        function closeLModal() { if(lModal) lModal.classList.remove('active'); }
+
+        if (lOpenBtn) {
+            lOpenBtn.addEventListener('click', e => { 
+                e.preventDefault(); 
+                if(typeof closeSidebar === 'function') closeSidebar(); 
+                openLModal(); 
+            });
+        }
+        if (lCloseBtn) lCloseBtn.addEventListener('click', closeLModal);
+        if (lModal) {
+            lModal.addEventListener('click', e => { if (e.target === lModal) closeLModal(); });
+        }
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLModal(); });
+
+        // ── Password toggle ──
+        const lPwInput = document.getElementById('loginPassword');
+        const lPwToggle = document.getElementById('toggleLoginPw');
+        if (lPwToggle && lPwInput) {
+            lPwToggle.addEventListener('click', () => {
+                const show = lPwInput.type === 'password';
+                lPwInput.type = show ? 'text' : 'password';
+                lPwToggle.className = show ? 'fas fa-eye-slash' : 'fas fa-eye';
+            });
+        }
     </script>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
