@@ -224,34 +224,40 @@ def init_db():
     ]
 
     for sql in tables:
-        cur.execute(sql)
+        try:
+            cur.execute(sql)
+        except Exception as e:
+            print(f"Table creation error: {e}")
+            if USE_PG: conn.rollback()
+            else: pass
 
-    # Commit initial table creations
-    conn.commit()
-
-    # Migrations for existing databases
+    # Insert default settings first
     try:
-        cur.execute("ALTER TABLE admin_tasks ADD COLUMN priority TEXT DEFAULT 'Medium'")
+        if USE_PG:
+            cur.execute("INSERT INTO app_settings (key, value) VALUES (%s, %s) ON CONFLICT (key) DO NOTHING", ('reservations_enabled', 'Enabled'))
+            cur.execute("INSERT INTO app_settings (key, value) VALUES (%s, %s) ON CONFLICT (key) DO NOTHING", ('feedback_enabled', 'Enabled'))
+        else:
+            cur.execute("INSERT OR IGNORE INTO app_settings (key, value) VALUES (?, ?)", ('reservations_enabled', 'Enabled'))
+            cur.execute("INSERT OR IGNORE INTO app_settings (key, value) VALUES (?, ?)", ('feedback_enabled', 'Enabled'))
         conn.commit()
-    except Exception:
+    except Exception as e:
+        print(f"Settings initialization error: {e}")
         if USE_PG: conn.rollback()
-        pass
 
-    try:
-        cur.execute("ALTER TABLE admin_tasks ADD COLUMN due_date TEXT")
-        conn.commit()
-    except Exception:
-        if USE_PG: conn.rollback()
-        pass
+    # Migrations for existing databases (after everything else is done)
+    migration_queries = [
+        "ALTER TABLE admin_tasks ADD COLUMN priority TEXT DEFAULT 'Medium'",
+        "ALTER TABLE admin_tasks ADD COLUMN due_date TEXT"
+    ]
+    
+    for m_sql in migration_queries:
+        try:
+            cur.execute(m_sql)
+            conn.commit()
+        except Exception:
+            if USE_PG: conn.rollback()
+            pass
 
-    if USE_PG:
-        cur.execute("INSERT INTO app_settings (key, value) VALUES (%s, %s) ON CONFLICT (key) DO NOTHING", ('reservations_enabled', 'Enabled'))
-        cur.execute("INSERT INTO app_settings (key, value) VALUES (%s, %s) ON CONFLICT (key) DO NOTHING", ('feedback_enabled', 'Enabled'))
-    else:
-        cur.execute("INSERT OR IGNORE INTO app_settings (key, value) VALUES (?, ?)", ('reservations_enabled', 'Enabled'))
-        cur.execute("INSERT OR IGNORE INTO app_settings (key, value) VALUES (?, ?)", ('feedback_enabled', 'Enabled'))
-
-    conn.commit()
     conn.close()
 
 
