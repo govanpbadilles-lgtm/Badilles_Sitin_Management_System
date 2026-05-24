@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Award Points | CCS</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body.admin-page { font-family: 'Plus Jakarta Sans', sans-serif; padding-top: 0 !important; min-height: 100vh; background: radial-gradient(circle at top left, rgba(56,189,248,0.18), transparent 25%), linear-gradient(180deg, #0e1e3c 0%, #102b55 100%); color: #e2e8f0; }
+        .admin-container { display: block !important; padding: 28px 40px 50px !important; width: 100% !important; max-width: 1600px !important; margin: 54px auto 0 !important; box-sizing: border-box !important; }
+        .page-header { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; padding: 24px 26px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.16); border-radius: 24px; backdrop-filter: blur(10px); }
+        .page-header-icon { width: 52px; height: 52px; background: linear-gradient(135deg, #38bdf8, #0f72c6); border-radius: 16px; display: flex; align-items: center; justify-content: center; color: white; font-size: 22px; flex-shrink: 0; }
+        .page-header h1 { font-size: 26px; font-weight: 800; color: white; line-height: 1.15; margin-bottom: 6px; }
+        .page-header p { font-size: 14px; color: rgba(226,232,240,0.85); margin: 0; }
+        .section-intro { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin-bottom: 28px; }
+        .section-intro p { max-width: 750px; color: rgba(226,232,240,0.9); font-size: 14px; line-height: 1.8; }
+        .rankings-tabs { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-bottom: 30px; }
+        .rankings-tab { display: inline-flex; align-items: center; justify-content: center; padding: 12px 22px; border-radius: 999px; background: rgba(255,255,255,0.16); color: #dbeafe; text-decoration: none; font-weight: 700; border: 1px solid transparent; transition: all 0.2s ease; }
+        .rankings-tab:hover { background: rgba(255,255,255,0.24); }
+        .rankings-tab.active { background: #38bdf8; color: #0f172a; border-color: rgba(56,189,248,0.4); box-shadow: 0 10px 24px rgba(56,189,248,0.18); }
+        .card { background: rgba(255,255,255,0.95); border-radius: 22px; box-shadow: 0 18px 40px rgba(15,23,42,0.08); overflow: hidden; }
+        .form-card { background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.16); border-radius: 22px; padding: 26px; margin-bottom: 24px; backdrop-filter: blur(12px); }
+        .form-grid { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit,minmax(240px,1fr)); }
+        .form-field { display: flex; flex-direction: column; gap: 10px; }
+        .form-field label { color: #e2e8f0; font-size: 13px; font-weight: 700; }
+        .form-field input, .form-field textarea { border-radius: 14px; border: 1px solid rgba(226,232,240,0.25); padding: 14px 16px; font-size: 14px; outline: none; background: rgba(255,255,255,0.92); color: #0f172a; }
+        .form-field input:focus, .form-field textarea:focus { border-color: #38bdf8; box-shadow: 0 0 0 4px rgba(56,189,248,0.12); }
+        .form-field textarea { min-height: 120px; resize: vertical; }
+        .btn-primary { border: none; border-radius: 14px; background: linear-gradient(135deg, #38bdf8, #0ea5e9); color: white; padding: 15px 24px; font-weight: 800; cursor: pointer; letter-spacing: 0.02em; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 18px 36px rgba(56,189,248,0.24); }
+        .modern-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; }
+        .modern-table thead th { padding: 16px 18px; background: #1a3f72; color: #ffffff; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; text-align: left; position: sticky; top: 0; }
+        .modern-table tbody tr { border-bottom: 1px solid rgba(15,23,42,0.08); transition: background 0.2s ease; }
+        .modern-table tbody tr:nth-child(odd) { background: rgba(255,255,255,0.92); }
+        .modern-table tbody tr:nth-child(even) { background: rgba(248,250,252,0.88); }
+        .modern-table tbody tr:hover { background: rgba(56,189,248,0.08); }
+        .modern-table tbody td { padding: 16px 18px; color: #334155; vertical-align: middle; }
+        .modern-table tbody td:first-child { border-top-left-radius: 14px; }
+        .modern-table tbody td:last-child { border-top-right-radius: 14px; }
+        .status-awarded { display: inline-flex; align-items: center; padding: 6px 12px; border-radius: 999px; background: #d1fae5; color: #0f5132; font-weight: 700; font-size: 11px; letter-spacing: 0.01em; }
+        .delete-btn { background: #fee2e2; color: #b91c1c; border: none; padding: 10px 14px; border-radius: 12px; cursor: pointer; font-weight: 700; transition: background 0.2s ease; }
+        .delete-btn:hover { background: #fecaca; }
+        .table-toolbar { padding: 22px 24px; background: rgba(255,255,255,0.9); border-bottom: 1px solid rgba(15,23,42,0.08); }
+        .table-toolbar div { color: #475569; font-size: 13px; }
+        .sidebar-item.active { background: rgba(255,255,255,0.15); color: white; border-left-color: rgba(255,255,255,0.85); font-weight: 600; }
+        @media (max-width: 900px) { .admin-container { padding: 24px 18px 40px !important; } .page-header { flex-direction: column; align-items: flex-start; } .form-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body class="admin-page">
+    <nav class="navbar">
+        <div class="nav-left">
+            <img src="{{ url_for('static', filename='images/uclogonav.png') }}" alt="UC Logo">
+            <span class="nav-brand">CCS Admin</span>
+        </div>
+        <div class="nav-right">
+            <div class="notif-wrapper" id="notifWrapper">
+                <button class="notif-bell-btn" id="notifBellBtn" onclick="toggleNotifDropdown(event)"><i class="fas fa-bell"></i><span class="notif-badge" id="notifBadge" style="display:none;">0</span></button>
+                <div class="notif-dropdown" id="notifDropdown" style="display:none;">
+                    <div class="notif-header"><span>Notifications</span><button onclick="markAllRead()">Mark all read</button></div>
+                    <div class="notif-list" id="notifList"></div>
+                </div>
+            </div>
+            <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleSidebar()"><span></span><span></span><span></span></button>
+        </div>
+    </nav>
+
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-user">
+            <div class="sidebar-avatar"><i class="fas fa-user-shield"></i></div>
+            <div class="sidebar-user-info">
+                <div class="sidebar-name">Admin {{ session.get('firstname', 'User') }}</div>
+                <div class="sidebar-sub">Administrator</div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/admin_dashboard" class="sidebar-item"><i class="fas fa-home"></i> Home</a>
+            <a href="#" class="sidebar-item" id="sb-search"><i class="fas fa-search"></i> Search Student</a>
+            <div class="sidebar-divider"></div>
+            <div class="sidebar-section-label">Students & Sit-ins</div>
+            <a href="/student_list" class="sidebar-item"><i class="fas fa-user-graduate"></i> View Students</a>
+            <a href="/active_sitins" class="sidebar-item"><i class="fas fa-desktop"></i> Active Sit-ins</a>
+            <a href="/history" class="sidebar-item"><i class="fas fa-history"></i> History Records</a>
+            <a href="/admin_reservations" class="sidebar-item"><i class="fas fa-calendar-check"></i> Reservations</a>
+            <div class="sidebar-divider"></div>
+            <div class="sidebar-section-label">Reports</div>
+            <a href="/reports" class="sidebar-item"><i class="fas fa-file-alt"></i> Sit-in Reports</a>
+            <a href="/admin_feedbacks" class="sidebar-item"><i class="fas fa-comments"></i> Feedback Reports</a>
+            <div class="sidebar-divider"></div>
+            <a href="/leaderboard" class="sidebar-item {% if request.path == '/leaderboard' %}active{% endif %}"><i class="fas fa-trophy"></i> Rankings</a>
+            <a href="/admin_software" class="sidebar-item"><i class="fas fa-boxes"></i> Software List</a>
+            <a href="#" class="sidebar-item" id="sb-pc-mgmt"><i class="fas fa-laptop-medical"></i> PC Maintenance</a>
+            <a href="#" class="sidebar-item" id="sb-ai"><i class="fas fa-robot"></i> AI Assistant</a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="/logout" class="sidebar-logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </aside>
+
+    <div class="admin-container">
+        <div class="page-header">
+            <div class="page-header-icon"><i class="fas fa-award"></i></div>
+            <div>
+                <h1>Award Points</h1>
+                <p>Give students bonus points and track awarded credits.</p>
+            </div>
+        </div>
+
+        <div class="rankings-tabs">
+            <a href="/admin_award_points" class="rankings-tab active">Award Points</a>
+            <a href="/admin_manage_tasks" class="rankings-tab">Manage Tasks</a>
+            <a href="/leaderboard" class="rankings-tab">View Rankings</a>
+        </div>
+
+        <div class="section-intro">
+            <div>
+                <p>Use this page to reward students for achievement, good behavior, and excellent participation. Award points that show up on the leaderboard and encourage positive habits.</p>
+            </div>
+        </div>
+
+        <div class="form-card">
+            <form method="POST">
+                <div class="form-grid">
+                    <div class="form-field">
+                        <label for="id_number">Student ID Number</label>
+                        <input type="text" id="id_number" name="id_number" placeholder="Enter student ID" required>
+                    </div>
+                    <div class="form-field">
+                        <label for="points">Points</label>
+                        <input type="number" id="points" name="points" placeholder="10" min="0" required>
+                    </div>
+                    <div class="form-field" style="grid-column: span 2;">
+                        <label for="reason">Reason</label>
+                        <textarea id="reason" name="reason" placeholder="e.g. Excellent participation, clean workstation"></textarea>
+                    </div>
+                </div>
+                <div style="margin-top: 18px; text-align: right;">
+                    <button type="submit" class="btn-primary">Award Points</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="card">
+            <div class="table-toolbar" style="padding: 20px;">
+                <div style="font-size:13px; color:#7a8ea8;">Recent point awards</div>
+            </div>
+            <div style="overflow-x:auto;">
+                <table class="modern-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>ID Number</th>
+                            <th>Student</th>
+                            <th>Points</th>
+                            <th>Reason</th>
+                            <th>Assigned By</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for award in awards %}
+                        <tr>
+                            <td>{{ award['date_awarded'] }}</td>
+                            <td>{{ award['id_number'] }}</td>
+                            <td>{{ award['student_name'] }}</td>
+                            <td style="font-weight:700; color:#1b4f8a;">+{{ award['points'] }}</td>
+                            <td>{{ award['reason'] or '—' }}</td>
+                            <td>{{ award['assigned_by'] }}</td>
+                            <td>
+                                <form action="/admin_award_points/{{ award['id'] }}/delete" method="POST" style="display:inline;">
+                                    <button type="submit" class="delete-btn">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" style="text-align:center; padding: 18px 0; color:#64748b;">No awards have been created yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='admin.js') }}"></script>
+</body>
+</html>

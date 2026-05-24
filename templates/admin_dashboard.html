@@ -18,424 +18,41 @@ body.admin-page {
 }
 
 /* ══════════════════════════════════════════
-   SLIM NAVBAR
+   ANALYTICS CHARTS STYLE
 ══════════════════════════════════════════ */
-.navbar {
-    height: 54px !important;
-    padding: 0 16px !important;
-    background: #1b4f8a !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    position: sticky !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    z-index: 1000 !important;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.2) !important;
-    box-sizing: border-box !important;
-}
-.nav-left {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-.nav-left img {
-    height: 32px;
-    width: auto;
-}
-.nav-brand {
-    color: white;
-    font-size: 14px;
-    font-weight: 600;
-    letter-spacing: 0.2px;
-    white-space: nowrap;
-}
-.nav-right {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-/* Hide old nav-links */
-.nav-links { display: none !important; }
-.logo      { display: none !important; }
-
-/* ══════════════════════════════════════════
-   HAMBURGER BUTTON
-══════════════════════════════════════════ */
-.hamburger-btn {
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
-    border: none;
-    background: rgba(255,255,255,0.12);
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-    transition: background 0.2s;
-    flex-shrink: 0;
-}
-.hamburger-btn:hover { background: rgba(255,255,255,0.22); }
-.hamburger-btn span {
-    display: block;
-    width: 16px;
-    height: 2px;
+.analytics-chart-card {
     background: white;
-    border-radius: 2px;
-    transition: all 0.28s cubic-bezier(0.4,0,0.2,1);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+    border: 1px solid rgba(0,0,0,0.05);
 }
-.hamburger-btn.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-.hamburger-btn.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
-.hamburger-btn.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-
-/* ══════════════════════════════════════════
-   SIDEBAR OVERLAY
-══════════════════════════════════════════ */
-.sidebar-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.42);
-    z-index: 1001;
-    backdrop-filter: blur(2px);
-    animation: overlayFadeIn 0.25s ease;
-}
-.sidebar-overlay.visible { display: block; }
-@keyframes overlayFadeIn {
-    from { opacity: 0; }
-    to   { opacity: 1; }
-}
-
-/* ══════════════════════════════════════════
-   SIDEBAR (RIGHT SIDE)
-══════════════════════════════════════════ */
-.sidebar {
-    position: fixed;
-    top: 0;
-    right: 0;
-    left: auto;
-    width: 255px;
-    height: 100vh;
-    background: #1b4f8a;
-    z-index: 1002;
-    display: flex;
-    flex-direction: column;
-    transform: translateX(100%);
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: -4px 0 24px rgba(0,0,0,0.25);
-}
-.sidebar.open { transform: translateX(0); }
-
-/* Admin info header */
-.sidebar-user {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 22px 16px 18px;
-    border-bottom: 1px solid rgba(255,255,255,0.12);
-}
-.sidebar-avatar {
-    width: 46px;
-    height: 46px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.2);
-    border: 2px solid rgba(255,255,255,0.35);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    color: white;
-    flex-shrink: 0;
-}
-.sidebar-user-info { min-width: 0; }
-.sidebar-name {
-    color: white;
-    font-size: 13px;
-    font-weight: 600;
-    margin-bottom: 3px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-.sidebar-sub {
-    color: rgba(255,255,255,0.52);
-    font-size: 11px;
-}
-
-/* Nav links */
-.sidebar-nav {
-    flex: 1;
-    padding: 10px 0;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-}
-.sidebar-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 11px 20px;
-    color: rgba(255,255,255,0.68);
-    font-size: 13px;
-    text-decoration: none;
-    border-right: 3px solid transparent;
-    transition: all 0.15s;
-    cursor: pointer;
-}
-.sidebar-item:hover {
-    background: rgba(255,255,255,0.1);
-    color: white;
-    text-decoration: none;
-}
-.sidebar-item.active {
-    background: rgba(255,255,255,0.15);
-    color: white;
-    border-right-color: rgba(255,255,255,0.85);
-    font-weight: 600;
-}
-.sidebar-item i {
-    width: 17px;
-    text-align: center;
-    font-size: 14px;
-    flex-shrink: 0;
-}
-
-/* Section label */
-.sidebar-section-label {
-    padding: 12px 20px 4px;
-    font-size: 10px;
-    font-weight: 700;
-    color: rgba(255,255,255,0.35);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.sidebar-divider {
-    height: 1px;
-    background: rgba(255,255,255,0.1);
-    margin: 6px 16px;
-}
-
-/* Logout */
-.sidebar-footer {
-    padding: 14px 16px;
-    border-top: 1px solid rgba(255,255,255,0.12);
-}
-.sidebar-logout-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    width: 100%;
-    padding: 10px;
-    border-radius: 8px;
-    background: rgba(255, 75, 75, 0.18);
-    color: rgba(255, 175, 175, 1);
-    font-size: 13px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: background 0.2s;
-}
-.sidebar-logout-btn:hover {
-    background: rgba(255, 75, 75, 0.32);
-    text-decoration: none;
-    color: rgba(255, 200, 200, 1);
-}
-
-/* ══════════════════════════════════════════
-   NOTIFICATION BELL
-══════════════════════════════════════════ */
-.notif-wrapper {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-}
-.notif-bell-btn {
-    background: rgba(255,255,255,0.12);
-    border: none;
-    color: white;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    cursor: pointer;
-    font-size: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    transition: background 0.2s, transform 0.2s;
-}
-.notif-bell-btn:hover { background: rgba(255,255,255,0.25); transform: scale(1.08); }
-.notif-bell-btn.shake { animation: bellShake 0.6s ease; }
-@keyframes bellShake {
-    0%,100% { transform: rotate(0); }
-    20%      { transform: rotate(-18deg); }
-    40%      { transform: rotate(18deg); }
-    60%      { transform: rotate(-10deg); }
-    80%      { transform: rotate(10deg); }
-}
-.notif-badge {
-    position: absolute;
-    top: -4px;
-    right: -4px;
-    background: #ff4c4c;
-    color: white;
-    font-size: 10px;
-    font-weight: bold;
-    min-width: 18px;
-    height: 18px;
-    border-radius: 9px;
-    display: flex !important;
-    align-items: center;
-    justify-content: center;
-    padding: 0 4px;
-    border: 2px solid #1b4f8a;
-    line-height: 1;
-    animation: badgePop 0.3s ease;
-}
-@keyframes badgePop {
-    0%   { transform: scale(0); }
-    70%  { transform: scale(1.3); }
-    100% { transform: scale(1); }
-}
-.notif-dropdown {
-    position: absolute;
-    top: calc(100% + 12px);
-    right: 50px;
-    width: 340px;
-    background: white;
-    border-radius: 14px;
-    box-shadow: 0 12px 40px rgba(0,0,0,0.18);
-    z-index: 99999;
-    overflow: hidden;
-    animation: notifSlideIn 0.22s ease;
-    border: 1px solid rgba(0,0,0,0.08);
-}
-@keyframes notifSlideIn {
-    from { opacity:0; transform: translateY(-10px) scale(0.97); }
-    to   { opacity:1; transform: translateY(0) scale(1); }
-}
-.notif-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 14px 16px 10px;
-    border-bottom: 1px solid #f0f0f0;
+.analytics-chart-title {
     font-size: 14px;
     font-weight: 700;
     color: #1b4f8a;
-}
-.notif-read-all-btn {
-    background: none;
-    border: none;
-    font-size: 12px;
-    color: #888;
-    cursor: pointer;
-    font-family: inherit;
-    transition: color 0.2s;
-}
-.notif-read-all-btn:hover { color: #1b4f8a; }
-.notif-list { max-height: 360px; overflow-y: auto; }
-.notif-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 13px 16px;
-    border-bottom: 1px solid #f7f7f7;
-    cursor: pointer;
-    transition: background 0.15s;
-}
-.notif-item:hover { background: #f8faff; }
-.notif-item.unread { background: #eef5ff; }
-.notif-item.unread:hover { background: #dfeeff; }
-.notif-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
+    margin-bottom: 15px;
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    flex-shrink: 0;
-    margin-top: 2px;
+    gap: 8px;
 }
-.notif-icon.reservation  { background: #fff3e0; color: #ff9800; }
-.notif-icon.approved     { background: #e8fff2; color: #15c35a; }
-.notif-icon.declined     { background: #fff0f0; color: #ff4c4c; }
-.notif-icon.announcement { background: #e8f4fd; color: #1b4f8a; }
-.notif-body { flex: 1; }
-.notif-msg  { font-size: 13px; color: #333; line-height: 1.4; margin: 0 0 4px 0; }
-.notif-time { font-size: 11px; color: #aaa; }
-.notif-unread-dot {
-    width: 8px; height: 8px;
-    background: #1b4f8a;
-    border-radius: 50%;
-    flex-shrink: 0;
-    margin-top: 6px;
+.analytics-legend {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
 }
-.notif-empty { padding: 40px 20px; text-align: center; color: #bbb; }
-.notif-empty i { font-size: 36px; display: block; margin-bottom: 10px; }
-.notif-empty p { margin: 0; font-size: 14px; }
-
-/* ══════════════════════════════════════════
-   MOBILE RESPONSIVE
-══════════════════════════════════════════ */
-@media (max-width: 768px) {
-    .navbar {
-        height: 50px !important;
-    }
-    .nav-brand {
-        font-size: 12px !important;
-    }
-    .admin-container {
-        padding: 15px 10px !important;
-    }
-    .admin-glass-card {
-        padding: 20px 14px !important;
-    }
-    .admin-glass-card h1 {
-        font-size: 22px !important;
-    }
-    .admin-glass-card > p {
-        font-size: 14px !important;
-    }
-    .dashboard-grid {
-        flex-direction: column !important;
-        gap: 20px !important;
-    }
-    .dashboard-left, .dashboard-right {
-        width: 100% !important;
-    }
-    .stat-card {
-        padding: 14px !important;
-    }
-    .stat-card i {
-        font-size: 24px !important;
-    }
-    .stat-info h3 {
-        font-size: 22px !important;
-    }
-    .notif-dropdown {
-        right: -60px !important;
-        width: 300px !important;
-    }
+.analytics-legend span {
+    font-size: 11px;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 5px;
 }
-
-@media (max-width: 480px) {
-    .admin-glass-card h1 {
-        font-size: 18px !important;
-    }
-    .stat-card {
-        padding: 10px !important;
-    }
-    .notif-dropdown {
-        right: -80px !important;
-        width: 270px !important;
-    }
+.aleg-box {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
 }
 </style>
 </head>
@@ -487,14 +104,14 @@ body.admin-page {
             <i class="fas fa-user-shield"></i>
         </div>
         <div class="sidebar-user-info">
-            <div class="sidebar-name">Admin {{ firstname }}</div>
+            <div class="sidebar-name">Admin {{ session.get('firstname', 'User') }}</div>
             <div class="sidebar-sub">Administrator</div>
         </div>
     </div>
 
     <!-- Nav Links -->
     <nav class="sidebar-nav">
-        <a href="/admin_dashboard" class="sidebar-item active">
+        <a href="/admin_dashboard" class="sidebar-item {% if request.path == '/admin_dashboard' %}active{% endif %}">
             <i class="fas fa-home"></i> Home
         </a>
         <a href="#" class="sidebar-item" id="sb-search">
@@ -529,12 +146,17 @@ body.admin-page {
 
         <div class="sidebar-divider"></div>
 
-
         <a href="/leaderboard" class="sidebar-item">
             <i class="fas fa-trophy"></i> Leaderboard
         </a>
         <a href="/admin_software" class="sidebar-item">
             <i class="fas fa-boxes"></i> Software List
+        </a>
+        <a href="#" class="sidebar-item" id="sb-pc-mgmt">
+            <i class="fas fa-laptop-medical"></i> PC Maintenance
+        </a>
+        <a href="#" class="sidebar-item" id="sb-ai">
+            <i class="fas fa-robot"></i> AI Assistant
         </a>
     </nav>
 
@@ -553,7 +175,7 @@ body.admin-page {
     <div class="admin-glass-card">
         
         <h1 style="color: #1b4f8a; margin-bottom: 5px; font-size: 32px;">
-            Welcome, Admin {{ firstname }}!
+            Welcome, Admin {{ session.get('firstname', 'User') }}!
         </h1>
         <p style="color: #333; font-size: 16px; margin-bottom: 20px;">
             You have full admin privileges to manage the laboratory sessions.
@@ -658,62 +280,134 @@ body.admin-page {
 </div>
 
 <!-- ══════════════════════════════════════════
-     SEARCH MODAL
+     COMMON MODALS
 ══════════════════════════════════════════ -->
-<div id="searchModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;">
-    <div class="admin-glass-card" style="width: 500px; padding: 30px; position: relative;">
-        <span id="closeSearchBtn" style="position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: #555;">&times;</span>
-        <h2 style="color: #1b4f8a; margin-bottom: 20px; text-align: left;"><i class="fas fa-search"></i> Search Student</h2>
-        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-            <input type="text" id="searchInputID" placeholder="Enter ID Number (e.g. 12345)" style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #ccc; outline: none;">
-            <button id="executeSearchBtn" class="btn-post" style="padding: 0 20px;"><i class="fas fa-search"></i> Search</button>
+
+<!-- SEARCH MODAL -->
+<div id="searchModal" class="modal">
+    <div class="modal-content glass-effect" style="max-width: 550px;">
+        <div class="modal-header">
+            <h2><i class="fas fa-search"></i> Search Student</h2>
+            <button class="close-btn" id="closeSearchBtn">&times;</button>
         </div>
-        <div id="searchResults" style="display: none; background: rgba(255,255,255,0.8); padding: 15px; border-radius: 8px; text-align: left;"></div>
+        <div class="modal-body">
+            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <input type="text" id="searchInputID" placeholder="Enter ID Number (e.g. 12345)" style="flex: 1; padding: 12px; border-radius: 8px; border: 1.5px solid #e2e8f0; outline: none; font-size: 14px;">
+                <button id="executeSearchBtn" class="btn-post" style="padding: 0 25px;"><i class="fas fa-search"></i> Search</button>
+            </div>
+            <div id="searchResults" style="display: none; background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0;"></div>
+        </div>
+    </div>
+</div>
+
+<!-- PC MANAGEMENT MODAL -->
+<div id="pcMgmtModal" class="modal">
+    <div class="modal-content glass-effect" style="max-width: 900px; max-height: 90vh; display: flex; flex-direction: column;">
+        <div class="modal-header">
+            <h2><i class="fas fa-laptop-medical"></i> PC Laboratory Maintenance</h2>
+            <button class="close-btn" id="closePcMgmtBtn">&times;</button>
+        </div>
+        <div class="modal-body" style="overflow-y: auto; max-height: calc(90vh - 130px);">
+            <div style="margin-bottom: 25px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <label for="labSelect" style="font-weight: 700; color: #475569; font-size: 14px;">Select Laboratory:</label>
+                    <select id="labSelect" onchange="loadPcStatuses()" style="padding: 10px 15px; border-radius: 8px; border: 1.5px solid #e2e8f0; outline: none; background: white; font-family: inherit; font-weight: 500;">
+                        <option value="Lab 524">Lab 524</option>
+                        <option value="Lab 526">Lab 526</option>
+                        <option value="Lab 528">Lab 528</option>
+                        <option value="Lab 530">Lab 530</option>
+                        <option value="Lab 542">Lab 542</option>
+                        <option value="Lab 544">Lab 544</option>
+                    </select>
+                </div>
+                <div style="font-size: 13px; color: #64748b; background: #f1f5f9; padding: 6px 14px; border-radius: 20px; border: 1px solid #e2e8f0;">
+                    <i class="fas fa-info-circle"></i> Click on a PC to toggle status.
+                </div>
+            </div>
+
+            <div id="pcGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 15px; padding: 15px; background: #f8fafc; border-radius: 16px; border: 1px solid #e2e8f0; min-height: 300px;">
+                <!-- PCs loaded via JS -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- PC EDIT MODAL -->
+<div id="editPcModal" class="modal">
+    <div class="modal-content glass-effect" style="max-width: 480px;">
+        <div class="modal-header">
+            <h2 id="editPcTitle"><i class="fas fa-edit"></i> Manage PC</h2>
+            <button class="close-btn" id="closeEditPcBtn">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="editPcForm">
+                <input type="hidden" id="editPcLab">
+                <input type="hidden" id="editPcNumber">
+                <div style="margin-bottom: 20px;">
+                    <label style="font-weight: 700; display: block; margin-bottom: 8px; color: #475569; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Condition / Status:</label>
+                    <select id="editPcStatus" style="width: 100%; padding: 12px; border-radius: 8px; border: 1.5px solid #e2e8f0; background: #fff; font-family: inherit;">
+                        <option value="Working">Working</option>
+                        <option value="Not Working">Not Working</option>
+                        <option value="Under Maintenance">Under Maintenance</option>
+                        <option value="No Internet Connection">No Internet Connection</option>
+                        <option value="Hardware Issue">Hardware Issue</option>
+                        <option value="Software Issue">Software Issue</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label style="font-weight: 700; display: block; margin-bottom: 8px; color: #475569; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Availability:</label>
+                    <div style="display: flex; gap: 25px; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        <label style="cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 600; color: #334155;"><input type="radio" name="availability" value="Enabled" id="availEnabled"> Enabled</label>
+                        <label style="cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 600; color: #334155;"><input type="radio" name="availability" value="Disabled" id="availDisabled"> Disabled</label>
+                    </div>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label style="font-weight: 700; display: block; margin-bottom: 8px; color: #475569; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Remarks / Notes:</label>
+                    <textarea id="editPcRemarks" style="width: 100%; height: 100px; padding: 12px; border-radius: 8px; border: 1.5px solid #e2e8f0; resize: none; font-family: inherit; font-size: 14px;" placeholder="Add details about the issue..."></textarea>
+                </div>
+                <p style="font-size: 12px; color: #94a3b8; margin-bottom: 25px; background: #f1f5f9; padding: 8px 12px; border-radius: 6px;">
+                    <i class="fas fa-clock"></i> Last Updated: <span id="editPcLastUpdated" style="font-weight: 600; color: #475569;">—</span>
+                </p>
+                <button type="submit" class="btn-post" style="width: 100%; height: 48px; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <i class="fas fa-save"></i> Update PC Status
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- AI ASSISTANT MODAL -->
+<div id="aiModal" class="modal">
+    <div class="modal-content glass-effect" style="max-width: 650px; max-height: 90vh; display: flex; flex-direction: column;">
+        <div class="modal-header">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 1px solid rgba(255,255,255,0.3);">
+                    <i class="fas fa-robot" style="font-size: 18px;"></i>
+                </div>
+                <div>
+                    <h2 style="font-size: 18px !important;">CCS AI Assistant (Admin)</h2>
+                    <p style="margin: 0; font-size: 11px; color: rgba(255,255,255,0.7); font-weight: 500;">Managing SITIN Analytics</p>
+                </div>
+            </div>
+            <button class="close-btn" id="closeAIBtn">&times;</button>
+        </div>
+        <div class="chat-container" style="flex: 1; border-radius: 0; border: none; height: auto; min-height: 400px;">
+            <div class="chat-messages" id="chatMessages" style="height: 400px; overflow-y: auto;"></div>
+            <form id="chatForm" class="chat-input-area">
+                <input type="text" id="chatInput" placeholder="Ask about lab status, student statistics..." autocomplete="off">
+                <button type="submit" class="chat-send-btn"><i class="fas fa-paper-plane"></i></button>
+            </form>
+        </div>
     </div>
 </div>
 
 <div id="toastBox"></div>
-<style>
-    #toastBox { left: 30px; right: auto; align-items: flex-start; z-index: 9999; }
-    .toast { transform: translateX(-100%); animation: slideInToastLeft 0.5s forwards; }
-    @keyframes slideInToastLeft { 100% { transform: translateX(0); } }
-
-    /* ── Analytics Chart Cards ── */
-    .analytics-chart-card {
-        background: white;
-        border-radius: 12px;
-        padding: 18px 20px;
-        border: 1px solid rgba(0,0,0,0.06);
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-    .analytics-chart-title {
-        font-size: 14px;
-        font-weight: 700;
-        color: #1b4f8a;
-        margin-bottom: 6px;
-        display: flex;
-        align-items: center;
-        gap: 7px;
-    }
-    .analytics-legend {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-bottom: 10px;
-        font-size: 12px;
-        color: #666;
-    }
-    .analytics-legend span { display: flex; align-items: center; gap: 5px; }
-    .aleg-box { width: 10px; height: 10px; border-radius: 2px; display: inline-block; flex-shrink: 0; }
-</style>
 
 <script src="{{ url_for('static', filename='script.js') }}"></script>
 <script src="{{ url_for('static', filename='admin.js') }}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 
-
 <script>
-
 /* ══════════════════════════════════════════
    ANALYTICS CHARTS
 ══════════════════════════════════════════ */
@@ -725,7 +419,6 @@ var purposeLabels = JSON.parse('{{ purpose_labels | tojson | safe }}' || '[]');
 var purposeData   = JSON.parse('{{ purpose_data   | tojson | safe }}' || '[]');
 var PIE_COLORS    = ['#1b4f8a','#15c35a','#ff9800','#e53935','#9c27b0','#00838f','#f06292'];
 
-/* Line Chart */
 new Chart(document.getElementById('lineChart'), {
     type: 'line',
     data: {
@@ -736,24 +429,13 @@ new Chart(document.getElementById('lineChart'), {
             borderColor: '#1b4f8a',
             backgroundColor: 'rgba(27,79,138,0.08)',
             borderWidth: 2,
-            pointBackgroundColor: '#1b4f8a',
-            pointRadius: 4,
             tension: 0.35,
-            fill: true,
-            pointStyle: 'circle'
+            fill: true
         }]
     },
-    options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-            x: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { font: { size: 11 }, autoSkip: false, maxRotation: 0 } },
-            y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { font: { size: 11 }, precision: 0 } }
-        }
-    }
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
 });
 
-/* Bar Chart */
 new Chart(document.getElementById('barChart'), {
     type: 'bar',
     data: {
@@ -763,21 +445,12 @@ new Chart(document.getElementById('barChart'), {
             data: labData,
             backgroundColor: 'rgba(27,79,138,0.75)',
             borderColor: '#1b4f8a',
-            borderWidth: 1,
-            borderRadius: 4
+            borderWidth: 1
         }]
     },
-    options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-            x: { grid: { display: false }, ticks: { font: { size: 10 }, maxRotation: 35, autoSkip: false } },
-            y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { font: { size: 11 }, precision: 0 } }
-        }
-    }
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
 });
 
-/* Pie Chart */
 new Chart(document.getElementById('pieChart'), {
     type: 'pie',
     data: {
@@ -789,191 +462,18 @@ new Chart(document.getElementById('pieChart'), {
             borderColor: '#fff'
         }]
     },
-    options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: false } }
-    }
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
 });
 
-/* Pie Legend */
-var total    = purposeData.reduce(function(a,b){ return a+b; }, 0);
+var total = purposeData.reduce((a,b) => a+b, 0);
 var legendEl = document.getElementById('pieLegend');
-purposeLabels.forEach(function(lbl, i) {
-    var pct  = total > 0 ? Math.round(purposeData[i] / total * 100) : 0;
+purposeLabels.forEach((lbl, i) => {
+    var pct = total > 0 ? Math.round(purposeData[i] / total * 100) : 0;
     var span = document.createElement('span');
-    span.innerHTML =
-        '<span class="aleg-box" style="background:' + PIE_COLORS[i % PIE_COLORS.length] + ';"></span>' +
-        lbl + ' ' + pct + '%';
+    span.innerHTML = `<span class="aleg-box" style="background:${PIE_COLORS[i % PIE_COLORS.length]};"></span> ${lbl} ${pct}%`;
     legendEl.appendChild(span);
 });
 </script>
-
-<script>
-/* ── SIDEBAR TOGGLE ── */
-function toggleSidebar() {
-    var sidebar   = document.getElementById('sidebar');
-    var overlay   = document.getElementById('sidebarOverlay');
-    var hamburger = document.getElementById('hamburgerBtn');
-    var isOpen    = sidebar.classList.contains('open');
-    if (isOpen) {
-        sidebar.classList.remove('open');
-        overlay.classList.remove('visible');
-        hamburger.classList.remove('open');
-    } else {
-        sidebar.classList.add('open');
-        overlay.classList.add('visible');
-        hamburger.classList.add('open');
-    }
-}
-
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        document.getElementById('sidebar').classList.remove('open');
-        document.getElementById('sidebarOverlay').classList.remove('visible');
-        document.getElementById('hamburgerBtn').classList.remove('open');
-    }
-});
-
-/* ── SIDEBAR SEARCH LINK ── */
-document.getElementById('sb-search').addEventListener('click', function(e) {
-    e.preventDefault();
-    toggleSidebar();
-    document.getElementById('searchModal').style.display = 'flex';
-});
-
-/* ── SEARCH MODAL CLOSE ── */
-document.getElementById('closeSearchBtn').addEventListener('click', function() {
-    document.getElementById('searchModal').style.display = 'none';
-});
-window.addEventListener('click', function(e) {
-    var modal = document.getElementById('searchModal');
-    if (e.target === modal) modal.style.display = 'none';
-});
-
-/* ── NOTIFICATIONS ── */
-(function() {
-    var POLL_INTERVAL = 30000;
-    var prevCount = 0;
-    var dropdownOpen = false;
-
-    var ICONS = {
-        reservation:  'fa-calendar-check',
-        approved:     'fa-check-circle',
-        declined:     'fa-times-circle',
-        announcement: 'fa-bullhorn'
-    };
-
-    window.toggleNotifDropdown = function(e) {
-        e.stopPropagation();
-        var dd = document.getElementById('notifDropdown');
-        if (!dd) return;
-        dropdownOpen = !dropdownOpen;
-        dd.style.display = dropdownOpen ? 'block' : 'none';
-        if (dropdownOpen) loadNotifications();
-    };
-
-    document.addEventListener('click', function(e) {
-        var wrapper = document.getElementById('notifWrapper');
-        if (wrapper && !wrapper.contains(e.target)) {
-            var dd = document.getElementById('notifDropdown');
-            if (dd) dd.style.display = 'none';
-            dropdownOpen = false;
-        }
-    });
-
-    function loadNotifications() {
-        fetch('/notifications/list')
-            .then(function(r){ return r.json(); })
-            .then(function(items) {
-                var list = document.getElementById('notifList');
-                if (!list) return;
-                if (!items || items.length === 0) {
-                    list.innerHTML = '<div class="notif-empty"><i class="fas fa-bell-slash"></i><p>No notifications yet</p></div>';
-                    return;
-                }
-                list.innerHTML = '';
-                items.forEach(function(item) {
-                    var icon   = ICONS[item.type] || 'fa-bell';
-                    var unread = item.is_read === 0;
-                    var time   = formatTime(item.created_at);
-                    var div    = document.createElement('div');
-                    div.className = 'notif-item' + (unread ? ' unread' : '');
-                    div.innerHTML =
-                        '<div class="notif-icon ' + item.type + '"><i class="fas ' + icon + '"></i></div>' +
-                        '<div class="notif-body"><p class="notif-msg">' + escHtml(item.message) + '</p><span class="notif-time">' + time + '</span></div>' +
-                        (unread ? '<div class="notif-unread-dot"></div>' : '');
-                    div.addEventListener('click', function() {
-                        fetch('/notifications/read/' + item.id, { method: 'POST' });
-                        div.classList.remove('unread');
-                        var dot = div.querySelector('.notif-unread-dot');
-                        if (dot) dot.remove();
-                        if (item.link) window.location.href = item.link;
-                        fetchCount();
-                    });
-                    list.appendChild(div);
-                });
-            })
-            .catch(function(){});
-    }
-
-    window.markAllRead = function() {
-        fetch('/notifications/read_all', { method: 'POST' })
-            .then(function() {
-                document.querySelectorAll('.notif-item.unread').forEach(function(el) {
-                    el.classList.remove('unread');
-                    var dot = el.querySelector('.notif-unread-dot');
-                    if (dot) dot.remove();
-                });
-                updateBadge(0);
-            });
-    };
-
-    function fetchCount() {
-        fetch('/notifications/count')
-            .then(function(r){ return r.json(); })
-            .then(function(data) {
-                var count = data.count || 0;
-                updateBadge(count);
-                if (count > prevCount && prevCount !== null) {
-                    var btn = document.getElementById('notifBellBtn');
-                    if (btn) {
-                        btn.classList.remove('shake');
-                        void btn.offsetWidth;
-                        btn.classList.add('shake');
-                        setTimeout(function(){ btn.classList.remove('shake'); }, 700);
-                    }
-                }
-                prevCount = count;
-            })
-            .catch(function(){});
-    }
-
-    function updateBadge(count) {
-        var badge = document.getElementById('notifBadge');
-        if (!badge) return;
-        if (count > 0) { badge.style.display = 'flex'; badge.textContent = count > 99 ? '99+' : count; }
-        else           { badge.style.display = 'none'; }
-    }
-
-    function formatTime(datetimeStr) {
-        if (!datetimeStr) return '';
-        var d    = new Date(datetimeStr.replace(' ', 'T'));
-        var diff = Math.floor((new Date() - d) / 1000);
-        if (diff < 60)    return 'Just now';
-        if (diff < 3600)  return Math.floor(diff/60) + 'm ago';
-        if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
-        return Math.floor(diff/86400) + 'd ago';
-    }
-
-    function escHtml(str) {
-        return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    }
-
-    fetchCount();
-    setInterval(fetchCount, POLL_INTERVAL);
-})();
-</script>
- <script src="{{ url_for('static', filename='bible_verse.js') }}"></script>
- <div id="toastBox"></div>
+<script src="{{ url_for('static', filename='bible_verse.js') }}"></script>
 </body>
 </html>

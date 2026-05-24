@@ -11,7 +11,73 @@
     /* ══════════════════════════════════════════
        BODY & NAVBAR
     ══════════════════════════════════════════ */
-    body.admin-page { padding-top: 0 !important; }
+    body.admin-page {
+        padding-top: 0 !important;
+        background: linear-gradient(180deg, #eef6ff 0%, #f8fbfd 100%);
+        color: #1e293b;
+    }
+    .admin-glass-card {
+        background: rgba(255,255,255,0.88);
+        border: 1px solid rgba(255,255,255,0.9);
+        box-shadow: 0 30px 60px rgba(17, 24, 39, 0.08);
+        border-radius: 28px;
+        margin: 24px auto;
+        padding: 30px;
+        width: 95%;
+        max-width: 1080px;
+        backdrop-filter: blur(16px);
+    }
+    .page-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 28px;
+    }
+    .page-header-left {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+    .page-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+        display: grid;
+        place-items: center;
+        background: linear-gradient(135deg, #e3f2ff 0%, #d1e9ff 100%);
+        color: #1b4f8a;
+        font-size: 20px;
+    }
+    .page-title { font-size: 24px; font-weight: 800; margin: 0; color: #12263b; }
+    .page-subtitle { margin: 4px 0 0; color: #5e7388; font-size: 14px; }
+    .settings-panel { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); background: rgba(255,255,255,0.18); border: 1px solid rgba(226,232,240,0.8); border-radius: 22px; padding: 20px; margin-bottom: 22px; }
+    .settings-card { background: rgba(255,255,255,0.96); border-radius: 22px; padding: 24px; border: 1px solid #e2e8f0; box-shadow: 0 18px 40px rgba(15,23,42,0.06); }
+    .settings-card h3 { margin: 0 0 12px; font-size: 15px; letter-spacing: 0.08em; text-transform: uppercase; color: #0f172a; }
+    .settings-card p { margin: 0 0 14px; color: #475569; font-size: 13px; line-height: 1.6; }
+    .settings-card .setting-control { display: grid; gap: 14px; }
+    .toggle-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .toggle-option { display: flex; align-items: center; gap: 12px; padding: 16px 18px; border-radius: 16px; border: 1px solid rgba(148,163,184,0.28); background: #f8fafc; color: #0f172a; cursor: pointer; transition: all 0.2s ease; }
+    .toggle-option:hover { border-color: #93c5fd; background: #eff6ff; }
+    .toggle-option input { display: none; }
+    .toggle-option.active,
+    .toggle-option:has(input:checked) { border-color: #2563eb; background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); box-shadow: 0 14px 28px rgba(59,130,246,0.14); color: #1d4ed8; }
+    .toggle-option .option-dot { width: 12px; height: 12px; border-radius: 999px; background: #c7d2fe; flex-shrink: 0; }
+    .toggle-option.active .option-dot,
+    .toggle-option:has(input:checked) .option-dot { background: #1d4ed8; box-shadow: 0 0 0 4px rgba(59,130,246,0.14); }
+    .settings-save { padding: 12px 18px; border-radius: 14px; border: none; background: #1b4f8a; color: #fff; font-weight: 700; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    .settings-save:hover { transform: translateY(-1px); box-shadow: 0 16px 28px rgba(27,79,138,0.18); }
+    .page-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 18px;
+        border-radius: 999px;
+        background: rgba(27,79,138,0.1);
+        color: #1b4f8a;
+        font-weight: 700;
+        font-size: 13px;
+    }
     body.admin-page .navbar { position: sticky !important; top: 0 !important; }
     .navbar { height: 54px; background: #1b4f8a; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
     .nav-left { display: flex; align-items: center; gap: 10px; }
@@ -93,24 +159,26 @@
 
     .feedback-card {
         background: #ffffff;
-        border-radius: 14px;
-        border: 1px solid rgba(0,0,0,0.06);
+        border-radius: 20px;
+        border: 1px solid rgba(27,79,138,0.1);
         overflow: hidden;
         transition: transform 0.2s ease, box-shadow 0.2s ease;
         display: flex;
+        align-items: stretch;
     }
-    .feedback-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+    .feedback-card:hover { transform: translateY(-2px); box-shadow: 0 14px 32px rgba(17,24,39,0.1); }
 
-    .feedback-card-accent { width: 5px; flex-shrink: 0; }
-    .feedback-card-body { flex: 1; padding: 18px 20px; }
+    .feedback-card-accent { width: 6px; flex-shrink: 0; }
+    .feedback-card-body { flex: 1; padding: 20px 22px; }
 
     .fb-card-header {
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
-        margin-bottom: 12px;
-        padding-bottom: 12px;
-        border-bottom: 1px solid #f0f0f0;
+        gap: 18px;
+        margin-bottom: 14px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid #eef3fb;
     }
     .fb-user-row { display: flex; align-items: center; gap: 12px; }
     .fb-avatar {
@@ -129,11 +197,31 @@
     .fb-date { font-size: 11px; color: #aaa; display: flex; align-items: center; gap: 5px; }
 
     .fb-message {
-        margin: 0; font-size: 14px; color: #555;
-        line-height: 1.65; font-style: italic;
+        margin: 0;
+        font-size: 15px;
+        color: #3c5066;
+        line-height: 1.8;
+        letter-spacing: 0.02em;
+        position: relative;
+        padding-left: 12px;
     }
-    .fb-message::before { content: "\201C"; color: #ccc; font-size: 18px; margin-right: 3px; font-family: serif; }
-    .fb-message::after  { content: "\201D"; color: #ccc; font-size: 18px; margin-left: 3px;  font-family: serif; }
+    .fb-message::before {
+        content: "\201C";
+        color: #d1d9e7;
+        font-size: 28px;
+        position: absolute;
+        left: 0;
+        top: -4px;
+        font-family: serif;
+    }
+    .fb-message::after {
+        content: "\201D";
+        display: block;
+        color: #d1d9e7;
+        font-size: 28px;
+        margin-top: 8px;
+        font-family: serif;
+    }
 
     /* Rating color schemes */
     .rating-excellent .feedback-card-accent { background: #15c35a; }
@@ -165,29 +253,63 @@
     ══════════════════════════════════════════ */
     .fb-stats-grid {
         display: grid;
-        grid-template-columns: repeat(5, 1fr);
-        gap: 10px;
-        margin-bottom: 18px;
+        grid-template-columns: repeat(5, minmax(110px, 1fr));
+        gap: 14px;
+        margin-bottom: 22px;
     }
     .fb-stat-chip {
-        border-radius: 10px; padding: 12px;
-        border: 1px solid #e8e8e8; background: #fff;
+        border-radius: 18px;
+        padding: 16px 14px;
+        border: 1px solid rgba(27,79,138,0.12);
+        background: #ffffff;
         text-align: center;
+        box-shadow: 0 8px 18px rgba(17,24,39,0.04);
     }
-    .fb-stat-chip .chip-count { font-size: 22px; font-weight: 700; margin-bottom: 2px; }
-    .fb-stat-chip .chip-label { font-size: 11px; color: #888; }
-    .chip-exc .chip-count { color: #0F6E56; }
-    .chip-vg  .chip-count { color: #185FA5; }
-    .chip-gd  .chip-count { color: #0C447C; }
-    .chip-av  .chip-count { color: #854F0B; }
-    .chip-pr  .chip-count { color: #A32D2D; }
+    .fb-stat-chip .chip-count { font-size: 24px; font-weight: 800; margin-bottom: 4px; color: #1b4f8a; }
+    .fb-stat-chip .chip-label { font-size: 12px; color: #5e7388; text-transform: uppercase; letter-spacing: 0.6px; }
+    .chip-exc .chip-count { color: #0f6e56; }
+    .chip-vg  .chip-count { color: #185fa5; }
+    .chip-gd  .chip-count { color: #0c447c; }
+    .chip-av  .chip-count { color: #854f0b; }
+    .chip-pr  .chip-count { color: #a32d2d; }
 
-    .fb-bars { margin-bottom: 24px; }
-    .fb-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-    .fb-bar-row .bar-label { font-size: 12px; color: #888; width: 62px; flex-shrink: 0; }
-    .fb-bar-track { flex: 1; height: 8px; background: #f0f0f0; border-radius: 99px; overflow: hidden; }
-    .fb-bar-fill { height: 100%; border-radius: 99px; }
-    .fb-bar-row .bar-count { font-size: 12px; font-weight: 600; width: 16px; text-align: right; flex-shrink: 0; }
+    .section-heading {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 18px;
+        flex-wrap: wrap;
+    }
+    .section-heading h2 {
+        margin: 0;
+        font-size: 17px;
+        color: #1b4f8a;
+        font-weight: 700;
+    }
+    .section-heading p {
+        margin: 2px 0 0;
+        font-size: 13px;
+        color: #5e7388;
+        max-width: 680px;
+        line-height: 1.5;
+    }
+
+    .fb-bars {
+        margin-bottom: 24px;
+        padding: 20px 0 0;
+        border-top: 1px solid rgba(27,79,138,0.1);
+    }
+    .fb-bar-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+    .fb-bar-row .bar-label { font-size: 12px; color: #6b7a8a; width: 80px; flex-shrink: 0; }
+    .fb-bar-track { flex: 1; height: 10px; background: #edf3fb; border-radius: 999px; overflow: hidden; }
+    .fb-bar-fill { height: 100%; border-radius: 999px; transition: width 0.4s ease; }
+    .fb-bar-row .bar-count { font-size: 12px; font-weight: 700; width: 28px; text-align: right; flex-shrink: 0; color: #374151; }
 
     /* ══════════════════════════════════════════
        MOBILE RESPONSIVE
@@ -271,8 +393,8 @@
         <div class="sidebar-divider"></div>
         <div class="sidebar-section-label">Reports</div>
         <a href="/reports" class="sidebar-item"><i class="fas fa-file-alt"></i> Sit-in Reports</a>
-        <a href="/admin_feedbacks" class="sidebar-item active"><i class="fas fa-comments"></i> Feedback Reports</a>
-        <a href="/leaderboard" class="sidebar-item"><i class="fas fa-trophy"></i> Leaderboard</a>
+        <a href="/admin_feedbacks" class="sidebar-item {% if request.path == '/admin_feedbacks' %}active{% endif %}"><i class="fas fa-comments"></i> Feedback Reports</a>
+        <a href="/leaderboard" class="sidebar-item"><i class="fas fa-trophy"></i> Rankings</a>
     </nav>
     <div class="sidebar-footer">
         <a href="/logout" class="sidebar-logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
@@ -283,22 +405,47 @@
      MAIN CONTENT
 ══════════════════════════════════════════ -->
 <div class="admin-container">
-    <div class="admin-glass-card" style="width: 95%; max-width: 1000px;">
+    <div class="admin-glass-card">
 
         <!-- Page Header -->
-        <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:2px solid rgba(27,79,138,0.2); padding-bottom:15px; margin-bottom:20px;">
-            <div style="display:flex; align-items:center; gap:10px;">
-                <div style="width:40px;height:40px;background:#E6F1FB;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#185FA5;font-size:18px;">
-                    <i class="fas fa-comments"></i>
-                </div>
+        <div class="page-header">
+            <div class="page-header-left">
+                <div class="page-icon"><i class="fas fa-comments"></i></div>
                 <div>
-                    <h2 style="color:#1b4f8a; margin:0; font-size:18px;">Student Feedback Reports</h2>
-                    <p style="font-size:12px; color:#888; margin:2px 0 0;">College of Computer Studies · Sit-in System</p>
+                    <h1 class="page-title">Student Feedback Reports</h1>
+                    <p class="page-subtitle">Quick insights from student experience and lab reservation feedback.</p>
                 </div>
             </div>
-            <span style="background:#e8f4fd; color:#1b4f8a; padding:5px 15px; border-radius:20px; font-size:13px; font-weight:bold;">
-                Total: {{ feedbacks|length }}
-            </span>
+            <div class="page-badge">
+                <i class="fas fa-list"></i>
+                Total feedback: {{ feedbacks|length }}
+            </div>
+        </div>
+
+        <div class="settings-panel">
+            <div class="settings-card">
+                <h3>Feedback Access</h3>
+                <form action="/admin_update_system_settings" method="POST" style="display:grid; gap:12px;">
+                    <input type="hidden" name="next_page" value="{{ request.path }}">
+                    <input type="hidden" name="reservations_enabled" value="{{ reservations_enabled }}">
+                    <div class="setting-control">
+                        <div class="toggle-options">
+                            <label class="toggle-option {% if feedback_enabled == 'Enabled' %}active{% endif %}">
+                                <input type="radio" name="feedback_enabled" value="Enabled" {% if feedback_enabled == 'Enabled' %}checked{% endif %}>
+                                <span class="option-dot"></span>
+                                <span>Enabled</span>
+                            </label>
+                            <label class="toggle-option {% if feedback_enabled == 'Disabled' %}active{% endif %}">
+                                <input type="radio" name="feedback_enabled" value="Disabled" {% if feedback_enabled == 'Disabled' %}checked{% endif %}>
+                                <span class="option-dot"></span>
+                                <span>Disabled</span>
+                            </label>
+                        </div>
+                        <p>Enable or disable student feedback submissions from the student dashboard.</p>
+                    </div>
+                    <button type="submit" class="settings-save">Save Feedback Setting</button>
+                </form>
+            </div>
         </div>
 
         <!-- Rating Counts -->
@@ -308,6 +455,11 @@
         {% set av_count  = feedbacks | selectattr('rating', 'equalto', 'Average')   | list | length %}
         {% set pr_count  = feedbacks | selectattr('rating', 'equalto', 'Poor')      | list | length %}
         {% set max_count = [exc_count, vg_count, gd_count, av_count, pr_count] | max %}
+
+        <div class="section-heading">
+            <h2>Feedback summary</h2>
+            <p>Track the most common student responses and see how frequently each rating appears.</p>
+        </div>
 
         <!-- Stat Chips -->
         <div class="fb-stats-grid">
@@ -574,6 +726,25 @@ document.addEventListener('keydown', function(e) {
 
     fetchCount();
     setInterval(fetchCount, POLL_INTERVAL);
+})();
+
+(function() {
+    function initToggleOptions() {
+        document.querySelectorAll('.toggle-option').forEach(function(option) {
+            option.addEventListener('click', function() {
+                var input = option.querySelector('input[type="radio"]');
+                if (!input) return;
+                input.checked = true;
+                var group = option.closest('.toggle-options');
+                if (!group) return;
+                group.querySelectorAll('.toggle-option').forEach(function(opt) {
+                    opt.classList.remove('active');
+                });
+                option.classList.add('active');
+            });
+        });
+    }
+    initToggleOptions();
 })();
 </script>
 

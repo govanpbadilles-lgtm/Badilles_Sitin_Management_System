@@ -33,21 +33,89 @@
             text-align: center;
             border: 1px solid rgba(27, 79, 138, 0.2);
         }
+        .feature-section {
+            margin-top: 32px;
+        }
+        .feature-section h3 {
+            color: #1b4f8a;
+            margin-bottom: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 18px;
+            margin-top: 22px;
+        }
+        .feature-card {
+            background: rgba(255,255,255,0.92);
+            border: 1px solid rgba(27,79,138,0.12);
+            border-radius: 18px;
+            padding: 22px;
+            min-height: 170px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            box-shadow: 0 18px 40px rgba(17,24,39,0.06);
+        }
+        .feature-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(27,79,138,0.08);
+            color: #1b4f8a;
+            font-size: 18px;
+        }
+        .feature-card h4 {
+            margin: 0;
+            font-size: 18px;
+            color: #1b4f8a;
+        }
+        .feature-card p {
+            margin: 0;
+            font-size: 14px;
+            color: #475569;
+            line-height: 1.7;
+        }
+        @media (max-width: 920px) {
+            .feature-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+        @media (max-width: 640px) {
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
-<body class="home-page"> <nav class="navbar">
+<body class="home-page">
+    <nav class="navbar">
         <div class="logo">
             <img src="{{ url_for('static', filename='images/uclogonav.png') }}" alt="UC Logo">
             <span>College of Computer Studies Sit-in Monitoring System</span>
         </div>
-        
-        <div class="modern-nav-links">
+
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <div class="modern-nav-links" id="navbarLinks">
             <a href="/" class="nav-item"><i class="fas fa-home"></i> Home</a>
-            <a href="#" class="nav-item"><i class="fas fa-users"></i> Community</a>
+            <a href="/community" class="nav-item"><i class="fas fa-users"></i> Community</a>
             <a href="/about" class="nav-item" style="font-weight: bold; color: #1b4f8a;"><i class="fas fa-info-circle"></i> About</a>
+            <a href="/leaderboard" class="nav-item"><i class="fas fa-trophy"></i> Leaderboard</a>
             <a href="/?openLogin=true" class="nav-login-btn"><i class="fas fa-sign-in-alt"></i> Login</a>
         </div>
     </nav>
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
     <div class="reg-container" style="padding-top: 100px;">
         <div class="reg-glass-card" style="width: 800px; text-align: center;">
@@ -60,6 +128,12 @@
                 <h3><i class="fas fa-bullseye"></i> Our Purpose</h3>
                 <p>The <strong>CCS Sit-in Monitoring System</strong> is a dedicated platform designed to streamline and modernize the laboratory access process for students. It replaces manual logbooks with a secure, real-time digital tracking system, ensuring that laboratory resources are utilized efficiently and fairly.</p>
 
+                <h3><i class="fas fa-flag"></i> Our Mission</h3>
+                <p>To provide the College of Computer Studies with a reliable, transparent, and user-friendly digital platform that modernizes laboratory management and enriches the academic experience of every student and faculty member.</p>
+
+                <h3><i class="fas fa-eye"></i> Our Vision</h3>
+                <p>A paperless, data-driven CCS laboratory environment where students are empowered through accountability, transparency, and fair access — fostering a culture of excellence within the University of Cebu community.</p>
+
                 <h3><i class="fas fa-gem"></i> Key Features</h3>
                 <ul style="margin-left: 20px; margin-top: 10px;">
                     <li><strong>Real-Time Monitoring:</strong> Admins can view active laboratory users instantly.</li>
@@ -67,6 +141,42 @@
                     <li><strong>Secure Authentication:</strong> Ensures that only registered and authorized CCS students can access the facilities.</li>
                     <li><strong>Comprehensive Records:</strong> Maintains a detailed history of laboratory usage for reporting and analytics.</li>
                 </ul>
+
+                <div class="feature-section">
+                    <h3><i class="fas fa-th-large"></i> What We Offer</h3>
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon"><i class="fas fa-calendar-check"></i></div>
+                            <h4>Session Tracking</h4>
+                            <p>Real-time sit-in logging with entry/exit timestamps and automatic session credit deduction.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon"><i class="fas fa-trophy"></i></div>
+                            <h4>Leaderboard</h4>
+                            <p>Gamified ranking system that highlights the most diligent and responsible laboratory users.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon"><i class="fas fa-calendar-alt"></i></div>
+                            <h4>Lab Reservations</h4>
+                            <p>Students can pre-book laboratory slots, reducing crowding and ensuring equitable access.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+                            <h4>Admin Reports</h4>
+                            <p>Comprehensive usage analytics and downloadable reports for laboratory administrators.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon"><i class="fas fa-comments"></i></div>
+                            <h4>Feedback System</h4>
+                            <p>Students can leave feedback and interact with announcements, keeping the community in the loop.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon"><i class="fas fa-lock"></i></div>
+                            <h4>Secure Access</h4>
+                            <p>Role-based authentication ensures data privacy and appropriate access levels for all users.</p>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="developer-section">
                     <h2 style="color: #1b4f8a; margin-bottom: 5px;"><i class="fas fa-code"></i> Lead Developer</h2>
@@ -80,5 +190,27 @@
         </div>
     </div>
 
+    <script>
+        const menuToggle = document.getElementById('menuToggle');
+        const navbarLinks = document.getElementById('navbarLinks');
+        const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+
+        function closeSidebar() {
+            menuToggle.classList.remove('open');
+            navbarLinks.classList.remove('active');
+            sidebarBackdrop.classList.remove('active');
+        }
+
+        menuToggle.addEventListener('click', () => {
+            const isOpen = menuToggle.classList.toggle('open');
+            navbarLinks.classList.toggle('active', isOpen);
+            sidebarBackdrop.classList.toggle('active', isOpen);
+        });
+
+        sidebarBackdrop.addEventListener('click', closeSidebar);
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeSidebar();
+        });
+    </script>
 </body>
 </html>

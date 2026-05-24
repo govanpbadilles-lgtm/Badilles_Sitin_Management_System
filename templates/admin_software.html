@@ -345,9 +345,8 @@
         <a href="/reports" class="sidebar-item"><i class="fas fa-file-alt"></i> Sit-in Reports</a>
         <a href="/admin_feedbacks" class="sidebar-item"><i class="fas fa-comments"></i> Feedback Reports</a>
         <div class="sidebar-divider"></div>
-        <a href="/leaderboard" class="sidebar-item"><i class="fas fa-trophy"></i> Leaderboard</a>
-        <a href="/analytics" class="sidebar-item"><i class="fas fa-chart-bar"></i> Analytics</a>
-        <a href="/admin_software" class="sidebar-item active"><i class="fas fa-boxes"></i> Software List</a>
+        <a href="/leaderboard" class="sidebar-item"><i class="fas fa-trophy"></i> Rankings</a>
+        <a href="/admin_software" class="sidebar-item {% if request.path == '/admin_software' %}active{% endif %}"><i class="fas fa-boxes"></i> Software List</a>
     </nav>
     <div class="sidebar-footer">
         <a href="/logout" class="sidebar-logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
@@ -402,11 +401,7 @@
         <div class="sw-lab-card">
             <div class="sw-lab-header">
                 <div class="sw-lab-name">
-                    {% if lab == 'Mac Lab' %}
-                        <i class="fab fa-apple"></i>
-                    {% else %}
-                        <i class="fas fa-desktop"></i>
-                    {% endif %}
+                    <i class="fas fa-desktop"></i>
                     {{ lab }}
                 </div>
                 <span class="sw-lab-count">{{ sw_list|length }} app{{ 's' if sw_list|length != 1 }}</span>

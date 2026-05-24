@@ -40,14 +40,6 @@
     .nav-left img { height: 32px; width: auto; }
     .nav-brand { color: white; font-size: 15px; font-weight: 600; letter-spacing: 0.2px; }
     .nav-right { display: flex; align-items: center; gap: 10px; }
-    .nav-avatar {
-        width: 34px; height: 34px; border-radius: 50%;
-        background: rgba(255,255,255,0.22); color: white;
-        font-size: 12px; font-weight: 600;
-        display: flex; align-items: center; justify-content: center;
-        border: 2px solid rgba(255,255,255,0.38);
-        cursor: pointer; user-select: none;
-    }
 
     /* ══════════════════════════════════════════
        HAMBURGER
@@ -127,7 +119,36 @@
         background: rgba(255,255,255,0.15); color: white;
         border-left-color: rgba(255,255,255,0.85); font-weight: 600;
     }
+    .sidebar-item.disabled {
+        opacity: 0.65; cursor: not-allowed;
+    }
     .sidebar-item i { width: 17px; text-align: center; font-size: 14px; flex-shrink: 0; }
+    .status-banner {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin: 18px 0 24px;
+    }
+    .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 16px;
+        border-radius: 999px;
+        font-size: 14px;
+        font-weight: 600;
+        border: 1px solid transparent;
+    }
+    .status-pill.status-enabled {
+        background: #e6f4ea;
+        color: #14532d;
+        border-color: #16a34a;
+    }
+    .status-pill.status-disabled {
+        background: #ffefef;
+        color: #991b1b;
+        border-color: #ef4444;
+    }
     .sidebar-divider { height: 1px; background: rgba(255,255,255,0.1); margin: 6px 16px; }
     .sidebar-footer { padding: 14px 16px; border-top: 1px solid rgba(255,255,255,0.12); }
     .sidebar-logout-btn {
@@ -235,210 +256,6 @@
     .dashboard-grid-3 {
         overflow-y: unset !important;
     }
-
-    /* ══════════════════════════════════════════
-       RESERVATION MODAL
-    ══════════════════════════════════════════ */
-    @keyframes modalSlideIn {
-        from { opacity:0; transform: translateY(-20px) scale(0.97); }
-        to   { opacity:1; transform: translateY(0) scale(1); }
-    }
-    .res-modal-wrapper {
-        background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(240,248,255,0.92));
-        backdrop-filter: blur(20px); border-radius: 20px; padding: 35px;
-        width: 740px; max-width: 95vw; max-height: 90vh; overflow-y: auto;
-        position: relative; box-shadow: 0 25px 60px rgba(0,0,0,0.3);
-        border: 1px solid rgba(255,255,255,0.7); animation: modalSlideIn 0.3s ease;
-    }
-    .res-close-btn {
-        position: absolute; top: 15px; right: 20px; font-size: 26px;
-        cursor: pointer; color: #555; line-height: 1; z-index: 10; transition: color 0.2s;
-    }
-    .res-close-btn:hover { color: #ff4c4c; }
-    .res-tab-bar { display: flex; gap: 10px; margin-bottom: 25px; }
-    .res-tab {
-        flex: 1; padding: 11px; border: 2px solid #e0e0e0; background: white;
-        border-radius: 10px; font-weight: bold; font-size: 14px; cursor: pointer;
-        color: #555; transition: all 0.25s;
-        display: flex; align-items: center; justify-content: center; gap: 7px;
-        font-family: inherit;
-    }
-    .res-tab.active { background: #1b4f8a; color: white; border-color: #1b4f8a; }
-    .res-steps { display: flex; align-items: center; margin-bottom: 25px; }
-    .res-step {
-        display: flex; align-items: center; gap: 6px;
-        font-size: 13px; font-weight: 600; color: #bbb; transition: color 0.3s;
-    }
-    .res-step span {
-        width: 26px; height: 26px; background: #ddd; border-radius: 50%;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 12px; font-weight: bold; color: #888; transition: all 0.3s;
-    }
-    .res-step.active { color: #1b4f8a; }
-    .res-step.active span { background: #1b4f8a; color: white; }
-    .res-step.done { color: #15c35a; }
-    .res-step.done span { background: #15c35a; color: white; }
-    .res-step-line { flex: 1; height: 2px; background: #e0e0e0; margin: 0 8px; }
-    .res-step-title { font-size: 15px; font-weight: 700; color: #333; margin: 0 0 15px 0; }
-    .lab-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 20px; }
-    .lab-card {
-        border: 2px solid #e0e0e0; border-radius: 12px; padding: 14px 8px;
-        text-align: center; cursor: pointer; background: white;
-        transition: all 0.25s; display: flex; flex-direction: column; align-items: center; gap: 5px;
-    }
-    .lab-card i { font-size: 22px; color: #1b4f8a; }
-    .lab-card span { font-size: 13px; font-weight: bold; color: #333; }
-    .lab-card small { font-size: 11px; color: #888; }
-    .lab-card:hover { border-color: #1b4f8a; background: #f0f7ff; transform: translateY(-2px); }
-    .lab-card.selected { border-color: #1b4f8a; background: #1b4f8a; }
-    .lab-card.selected i, .lab-card.selected span, .lab-card.selected small { color: white; }
-    .pc-legend { display: flex; gap: 15px; margin-bottom: 12px; flex-wrap: wrap; }
-    .legend-pill {
-        display: flex; align-items: center; gap: 6px;
-        font-size: 12px; font-weight: 600; padding: 4px 12px;
-        border-radius: 20px; background: #f5f5f5;
-    }
-    .legend-pill.green { color: #15c35a; }
-    .legend-pill.red   { color: #ff4c4c; }
-    .legend-pill.blue  { color: #1b4f8a; }
-    .pc-grid {
-        display: grid; grid-template-columns: repeat(8,1fr); gap: 7px;
-        margin-bottom: 20px; padding: 15px; background: #f8faff;
-        border-radius: 12px; border: 1px solid #e0e0e0;
-    }
-    .pc-item {
-        aspect-ratio: 1; border-radius: 8px; border: 2px solid;
-        display: flex; flex-direction: column; align-items: center; justify-content: center;
-        font-size: 9px; font-weight: bold; cursor: pointer; transition: all 0.2s; position: relative;
-    }
-    .pc-item.available { border-color: #15c35a; background: #eafff2; color: #15c35a; }
-    .pc-item.available:hover { background: #15c35a; color: white; transform: scale(1.12); box-shadow: 0 4px 10px rgba(21,195,90,0.4); z-index: 2; }
-    .pc-item.occupied { border-color: #ffb3b3; background: #fff5f5; color: #ff8888; cursor: not-allowed; }
-    .pc-item.selected-pc { border-color: #1b4f8a; background: #1b4f8a; color: white; transform: scale(1.15); box-shadow: 0 4px 14px rgba(27,79,138,0.5); z-index: 2; }
-    .pc-item i { font-size: 13px; margin-bottom: 2px; }
-    .res-summary-box {
-        background: linear-gradient(135deg,#e8f4fd,#dbeeff); border: 1px solid #b3d4f5;
-        border-radius: 10px; padding: 12px 16px; font-size: 14px; color: #1b4f8a;
-        margin-bottom: 18px; display: flex; align-items: center; gap: 10px;
-    }
-    .res-field { margin-bottom: 15px; }
-    .res-field label {
-        display: block; font-size: 12px; font-weight: 700; color: #555;
-        margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;
-    }
-    .res-field input, .res-field select {
-        width: 100%; padding: 11px 14px; border-radius: 8px; border: 1.5px solid #ddd;
-        font-size: 14px; font-family: inherit; outline: none;
-        transition: border 0.2s; background: white; box-sizing: border-box;
-    }
-    .res-field input:focus, .res-field select:focus { border-color: #1b4f8a; }
-    .res-btn-next {
-        width: 100%; padding: 12px;
-        background: linear-gradient(135deg,#1b4f8a,#2463b0); color: white; border: none;
-        border-radius: 10px; font-weight: bold; font-size: 15px; cursor: pointer;
-        transition: all 0.3s; display: flex; align-items: center; justify-content: center;
-        gap: 8px; margin-top: 5px; font-family: inherit;
-    }
-    .res-btn-next:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(27,79,138,0.35); }
-    .res-btn-next:disabled { background: #ccc; cursor: not-allowed; }
-    .res-btn-submit {
-        flex: 1; padding: 12px;
-        background: linear-gradient(135deg,#15c35a,#12a64c); color: white; border: none;
-        border-radius: 10px; font-weight: bold; font-size: 15px; cursor: pointer;
-        transition: all 0.3s; display: flex; align-items: center; justify-content: center;
-        gap: 8px; font-family: inherit;
-    }
-    .res-btn-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(21,195,90,0.35); }
-    .res-btn-back {
-        padding: 12px 20px; background: #f0f0f0; color: #555; border: none;
-        border-radius: 10px; font-weight: bold; font-size: 14px; cursor: pointer;
-        transition: all 0.2s; display: flex; align-items: center; gap: 6px; font-family: inherit;
-    }
-    .res-btn-back:hover { background: #e0e0e0; }
-    .res-btn-row { display: flex; gap: 10px; margin-top: 5px; }
-
-    /* ══════════════════════════════════════════
-       FEEDBACK MODAL
-    ══════════════════════════════════════════ */
-    .feedback-modal-wrapper {
-        background: white; border-radius: 16px; padding: 0;
-        width: 520px; max-width: 95vw; max-height: 90vh; overflow-y: auto;
-        position: relative; box-shadow: 0 25px 60px rgba(0,0,0,0.3);
-        animation: modalSlideIn 0.3s ease;
-    }
-    .feedback-modal-header {
-        background: #1b4f8a; padding: 22px 28px 18px;
-        border-radius: 16px 16px 0 0; position: relative;
-    }
-    .feedback-modal-header h2 {
-        color: white; margin: 0 0 6px 0; font-size: 20px; font-weight: 700;
-        display: flex; align-items: center; gap: 10px;
-    }
-    .feedback-modal-header p {
-        color: rgba(255,255,255,0.75); font-size: 13px;
-        margin: 0; font-style: italic; line-height: 1.5;
-    }
-    .feedback-close-btn {
-        position: absolute; top: 14px; right: 18px; font-size: 22px;
-        cursor: pointer; color: rgba(255,255,255,0.7); line-height: 1;
-        transition: color 0.2s; background: none; border: none; padding: 0;
-    }
-    .feedback-close-btn:hover { color: white; }
-    .feedback-modal-body { padding: 24px 28px 28px; }
-    .fb-name-row { display: flex; gap: 12px; margin-bottom: 18px; }
-    .fb-field { flex: 1; display: flex; flex-direction: column; gap: 5px; }
-    .fb-label {
-        font-size: 12px; font-weight: 700; color: #555;
-        text-transform: uppercase; letter-spacing: 0.5px;
-        display: flex; align-items: center; gap: 5px;
-    }
-    .fb-input {
-        padding: 10px 13px; border-radius: 8px; border: 1.5px solid #c8dff5;
-        font-size: 14px; font-family: inherit; outline: none;
-        transition: border-color 0.2s, box-shadow 0.2s;
-        color: #333; background: white; width: 100%; box-sizing: border-box;
-    }
-    .fb-input:focus { border-color: #1b4f8a; box-shadow: 0 0 0 3px rgba(27,79,138,0.1); }
-    .fb-sub { font-size: 11px; color: #aaa; }
-    .fb-section { margin-bottom: 18px; }
-    .fb-rating-grid { display: flex; gap: 8px; flex-wrap: wrap; }
-    .fb-rating-label {
-        flex: 1; min-width: 72px; border: 1.5px solid #c8dff5;
-        border-radius: 10px; padding: 10px 6px 8px; text-align: center;
-        cursor: pointer; font-size: 12px; font-weight: 600; color: #666;
-        transition: all 0.2s; user-select: none; background: white;
-    }
-    .fb-rating-label i { display: block; font-size: 18px; margin-bottom: 5px; color: #1b4f8a; }
-    .fb-rating-label:hover { border-color: #1b4f8a; background: #f0f7ff; color: #1b4f8a; }
-    .fb-rating-label.selected { border-color: #1b4f8a; background: #1b4f8a; color: white; }
-    .fb-rating-label.selected i { color: white; }
-    .fb-rating-label input[type="radio"] { display: none; }
-    .fb-textarea {
-        width: 100%; padding: 11px 13px; border-radius: 8px; border: 1.5px solid #c8dff5;
-        font-size: 14px; font-family: inherit; resize: vertical; outline: none;
-        transition: border-color 0.2s, box-shadow 0.2s;
-        color: #333; background: white; box-sizing: border-box; min-height: 100px;
-    }
-    .fb-textarea:focus { border-color: #1b4f8a; box-shadow: 0 0 0 3px rgba(27,79,138,0.1); }
-    .fb-submit-btn {
-        width: 100%; padding: 13px; background: #1b4f8a; color: white; border: none;
-        border-radius: 10px; font-weight: 700; font-size: 15px; cursor: pointer;
-        display: flex; align-items: center; justify-content: center; gap: 8px;
-        font-family: inherit; transition: background 0.2s, transform 0.15s; margin-top: 6px;
-    }
-    .fb-submit-btn:hover { background: #15407a; transform: translateY(-1px); }
-    .fb-submit-btn:active { transform: translateY(0); }
-
-    /* ══════════════════════════════════════════
-       AI ADVISOR MODAL
-    ══════════════════════════════════════════ */
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .stat-mini {
-        flex: 1; min-width: 100px; background: white; border-radius: 10px;
-        padding: 12px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    }
-    .stat-mini .num { font-size: 22px; font-weight: bold; color: #1b4f8a; }
-    .stat-mini .lbl { font-size: 11px; color: #888; margin-top: 2px; }
 
     /* ══════════════════════════════════════════
        SIT-IN SUMMARY SECTION
@@ -553,76 +370,16 @@
        MOBILE RESPONSIVE OVERRIDES
     ══════════════════════════════════════════ */
     @media (max-width: 768px) {
-        /* Notification dropdown */
         .notif-dropdown {
             right: -60px !important;
             width: 300px !important;
         }
-
-        /* Reservation modal */
-        .res-modal-wrapper {
-            width: 100% !important;
-            max-width: 95vw !important;
-            padding: 20px 16px !important;
-            border-radius: 14px !important;
-        }
-        .lab-grid {
-            grid-template-columns: repeat(2, 1fr) !important;
-            gap: 8px !important;
-        }
-        .pc-grid {
-            grid-template-columns: repeat(5, 1fr) !important;
-            gap: 5px !important;
-            padding: 10px !important;
-        }
-        .pc-item {
-            font-size: 8px !important;
-        }
-        .pc-item i {
-            font-size: 11px !important;
-        }
-        .res-tab {
-            font-size: 12px !important;
-            padding: 9px !important;
-        }
-        .res-step-title {
-            font-size: 14px !important;
-        }
-
-        /* Feedback modal */
-        .feedback-modal-wrapper {
-            width: 100% !important;
-            max-width: 95vw !important;
-        }
-        .feedback-modal-body {
-            padding: 16px !important;
-        }
-        .fb-name-row {
-            flex-direction: column !important;
-        }
-        .fb-rating-grid {
-            gap: 6px !important;
-        }
-        .fb-rating-label {
-            min-width: 60px !important;
-            padding: 8px 4px 6px !important;
-            font-size: 11px !important;
-        }
-        .fb-rating-label i {
-            font-size: 15px !important;
-        }
-
-        /* AI Modal */
-        .student-glass-card[style*="width:560px"] {
-            width: 95vw !important;
-            max-width: 95vw !important;
-            padding: 20px !important;
-        }
-
-        /* Sessions table wrapper */
         .sessions-table-wrapper {
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
+        }
+        .summary-stats-row {
+            grid-template-columns: repeat(2, 1fr);
         }
     }
 
@@ -631,29 +388,13 @@
             right: -80px !important;
             width: 280px !important;
         }
-        .lab-grid {
-            grid-template-columns: repeat(2, 1fr) !important;
-        }
-        .pc-grid {
-            grid-template-columns: repeat(4, 1fr) !important;
-        }
-        .res-btn-row {
-            flex-direction: column !important;
-        }
-        .res-btn-back, .res-btn-submit {
-            width: 100% !important;
-        }
-        .stat-mini {
-            min-width: 80px !important;
-            padding: 8px !important;
-        }
-        .stat-mini .num {
-            font-size: 16px !important;
+        .summary-stats-row {
+            grid-template-columns: 1fr;
         }
     }
     </style>
 </head>
-<body class="student-page">
+<body class="student-page" data-reservations-enabled="{{ reservations_enabled }}" data-feedback-enabled="{{ feedback_enabled }}">
 
 <!-- ══════════════════════════════════════════
      NAVBAR
@@ -709,8 +450,8 @@
         <a href="#" class="sidebar-item active"><i class="fas fa-home"></i> Home</a>
         <a href="#" class="sidebar-item" id="sb-editProfile"><i class="fas fa-user-edit"></i> Edit Profile</a>
         <div class="sidebar-divider"></div>
-        <a href="#" class="sidebar-item" id="sb-reservation"><i class="fas fa-calendar-check"></i> Reservation</a>
-        <a href="#" class="sidebar-item" id="sb-feedback"><i class="fas fa-comment-dots"></i> Send Feedback</a>
+        <a href="#" class="sidebar-item {% if reservations_enabled == 'Disabled' %}disabled{% endif %}" id="sb-reservation"><i class="fas fa-calendar-check"></i> Reservation</a>
+        <a href="#" class="sidebar-item {% if feedback_enabled == 'Disabled' %}disabled{% endif %}" id="sb-feedback"><i class="fas fa-comment-dots"></i> Send Feedback</a>
         <div class="sidebar-divider"></div>
         <a href="/leaderboard" class="sidebar-item"><i class="fas fa-trophy"></i> Leaderboard</a>
         <a href="#" class="sidebar-item" id="sb-ai"><i class="fas fa-robot"></i> AI Advisor</a>
@@ -731,6 +472,17 @@
             Welcome, {{ student['firstname'] }}!
         </h1>
         <p style="color:#555; margin-bottom:0;">Here is your student portal overview.</p>
+
+        <div class="status-banner">
+            <div class="status-pill {% if reservations_enabled == 'Enabled' %}status-enabled{% else %}status-disabled{% endif %}">
+                <i class="fas fa-calendar-check"></i>
+                Reservations {{ reservations_enabled }}
+            </div>
+            <div class="status-pill {% if feedback_enabled == 'Enabled' %}status-enabled{% else %}status-disabled{% endif %}">
+                <i class="fas fa-comment-dots"></i>
+                Feedback {{ feedback_enabled }}
+            </div>
+        </div>
 
         <div class="dashboard-grid-3">
 
@@ -778,31 +530,22 @@
             <div class="col-card">
                 <h2><i class="fas fa-gavel"></i> Rules & Regs</h2>
                 <ul style="padding-left:20px; font-size:14px; color:#333; line-height:1.6;">
-                    <li style="margin-bottom:12px;">Maintain silence, proper decorum, and discipline inside the laboratory.
-                                                    Mobile phones and personal devices must be switched off.</li>
-                    <li style="margin-bottom:12px;">Games are not allowed inside the lab. This includes computer-related 
-                                                    games and card games that may disturb operations.</li>
-                    <li style="margin-bottom:12px;">Surfing the Internet is allowed only with the permission of the instructor.
-                                                    Downloading and installing software are strictly prohibited.</li>
+                    <li style="margin-bottom:12px;">Maintain silence, proper decorum, and discipline inside the laboratory. Mobile phones and personal devices must be switched off.</li>
+                    <li style="margin-bottom:12px;">Games are not allowed inside the lab. This includes computer-related games and card games that may disturb operations.</li>
+                    <li style="margin-bottom:12px;">Surfing the Internet is allowed only with the permission of the instructor. Downloading and installing software are strictly prohibited.</li>
                     <li style="margin-bottom:12px;">Getting access to websites not related to the course is strictly prohibited.</li>
                     <li style="margin-bottom:12px;">Deleting computer files and changing the set-up of the computer is a major offense.</li>
                     <li style="margin-bottom:12px;">Observe computer time. All times consumed beyond the allowable number of hours are charged accordingly.</li>
                     <li style="margin-bottom:12px;">No food and drinks are allowed inside the laboratory.</li>
                     <li style="margin-bottom:12px;">Students are not allowed to go outside during laboratory hours without permission.</li>
-                    
                 </ul>
-
-
             </div>
-
         </div>
 
         <!-- ══════════════════════════════════════════
              USER SIT-IN SUMMARY + SESSIONS TABLE
         ══════════════════════════════════════════ -->
         <div class="sitin-summary-section">
-
-            <!-- Summary Stats -->
             <div class="summary-stats-row">
                 <div class="summary-stat-card">
                     <div class="summary-stat-icon" style="background:linear-gradient(135deg,#1b4f8a,#3b82f6);">
@@ -842,7 +585,6 @@
                 </div>
             </div>
 
-            <!-- Sessions Table -->
             <div class="sessions-table-wrapper">
                 <div class="sessions-table-header">
                     <h3><i class="fas fa-table"></i> My Sessions History</h3>
@@ -897,667 +639,540 @@
                     </table>
                 </div>
             </div>
-
-        </div><!-- end sitin-summary-section -->
-
-    </div>
-</div>
-
-<!-- Toast -->
-<div id="toastBox"></div>
-
-<!-- ══════════════════════════════════════════
-     EDIT PROFILE MODAL
-══════════════════════════════════════════ -->
-<div id="editProfileModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; justify-content:center; align-items:center;">
-    <div class="student-glass-card" style="width:500px; padding:30px; position:relative;">
-        <span id="closeEditProfileBtn" style="position:absolute; top:15px; right:20px; font-size:24px; cursor:pointer; color:#555;">&times;</span>
-        <h2 style="color:#1b4f8a; margin-bottom:20px;"><i class="fas fa-user-edit"></i> Edit Profile</h2>
-        <form action="/update_profile" method="POST" enctype="multipart/form-data" style="display:flex; flex-direction:column; gap:15px;">
-            <div class="profile-pic-wrapper">
-                <div class="profile-pic-container">
-                    <img src="{{ url_for('static', filename='uploads/' + student['profile_pic']) if student['profile_pic'] and student['profile_pic'] != 'default_profile.png' else url_for('static', filename='images/default_profile.png') }}"
-                         alt="Profile Preview" id="profilePreview"
-                         onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'">
-                    <label for="profileUpload" class="camera-btn" title="Change Profile Picture"><i class="fas fa-camera"></i></label>
-                    <input type="file" id="profileUpload" name="profile_pic" accept=".png,.jpg,.jpeg" onchange="previewImage(event)">
-                </div>
-            </div>
-            <div style="display:flex; gap:10px;">
-                <div style="flex:1;"><label>First Name:</label><input type="text" name="firstname" value="{{ student['firstname'] }}" required style="width:100%; padding:8px; border-radius:5px; border:1px solid #ccc;"></div>
-                <div style="flex:1;"><label>Last Name:</label><input type="text" name="lastname" value="{{ student['lastname'] }}" required style="width:100%; padding:8px; border-radius:5px; border:1px solid #ccc;"></div>
-            </div>
-            <div><label>Course:</label><input type="text" name="course" value="{{ student['course'] }}" required style="width:100%; padding:8px; border-radius:5px; border:1px solid #ccc;"></div>
-            <div><label>Address:</label><input type="text" name="address" value="{{ student['address'] }}" required style="width:100%; padding:8px; border-radius:5px; border:1px solid #ccc;"></div>
-            <button type="submit" style="padding:10px; background:#15c35a; color:white; border:none; border-radius:5px; font-weight:bold; cursor:pointer;">
-                <i class="fas fa-save"></i> Save Changes
-            </button>
-        </form>
-    </div>
-</div>
-
-<!-- ══════════════════════════════════════════
-     RESERVATION MODAL
-══════════════════════════════════════════ -->
-<div id="reservationModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center;">
-    <div class="res-modal-wrapper">
-        <span id="closeReservationBtn" class="res-close-btn">&times;</span>
-        <div class="res-tab-bar">
-            <button id="tabBookBtn" class="res-tab active" onclick="switchTab('book')">
-                <i class="fas fa-plus-circle"></i> Book a Slot
-            </button>
-            <button id="tabStatusBtn" class="res-tab" onclick="switchTab('status')">
-                <i class="fas fa-list-alt"></i> My Reservations
-            </button>
-        </div>
-
-        <!-- Book Tab -->
-        <div id="tabBook">
-            <div class="res-steps">
-                <div class="res-step active" id="step1Indicator"><span>1</span> Lab</div>
-                <div class="res-step-line"></div>
-                <div class="res-step" id="step2Indicator"><span>2</span> PC</div>
-                <div class="res-step-line"></div>
-                <div class="res-step" id="step3Indicator"><span>3</span> Details</div>
-            </div>
-            <form action="/submit_reservation" method="POST" id="reservationForm">
-                <input type="hidden" name="id_number" value="{{ student['id_number'] }}">
-                <input type="hidden" name="selected_pc" id="selectedPcInput" value="">
-
-                <!-- Step 1: Lab -->
-                <div id="resStep1">
-                    <p class="res-step-title"><i class="fas fa-door-open"></i> Select a Laboratory</p>
-                    <div class="lab-grid">
-                        <div class="lab-card" onclick="selectLab(this,'Lab 524')"><i class="fas fa-desktop"></i><span>Lab 524</span><small>40 PCs</small></div>
-                        <div class="lab-card" onclick="selectLab(this,'Lab 526')"><i class="fas fa-desktop"></i><span>Lab 526</span><small>40 PCs</small></div>
-                        <div class="lab-card" onclick="selectLab(this,'Lab 528')"><i class="fas fa-desktop"></i><span>Lab 528</span><small>40 PCs</small></div>
-                        <div class="lab-card" onclick="selectLab(this,'Lab 530')"><i class="fas fa-desktop"></i><span>Lab 530</span><small>40 PCs</small></div>
-                        <div class="lab-card" onclick="selectLab(this,'Lab 542')"><i class="fas fa-desktop"></i><span>Lab 542</span><small>40 PCs</small></div>
-                        <div class="lab-card" onclick="selectLab(this,'Lab 544')"><i class="fas fa-desktop"></i><span>Lab 544</span><small>40 PCs</small></div>
-                        <div class="lab-card" onclick="selectLab(this,'Mac Lab')"><i class="fab fa-apple"></i><span>Mac Lab</span><small>40 PCs</small></div>
-                    </div>
-                    <input type="hidden" name="res_lab" id="selectedLabInput" required>
-
-                    <!-- Software Panel (shown after selecting a lab) -->
-                    <div id="resSoftwarePanel" style="display:none; margin-bottom:18px; background:linear-gradient(135deg,#f0f7ff,#e8f4fd); border:1px solid #b3d4f5; border-radius:12px; padding:14px 16px;">
-                        <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
-                            <i class="fas fa-laptop-code" style="color:#1b4f8a; font-size:14px;"></i>
-                            <span style="font-size:13px; font-weight:700; color:#1b4f8a;">Available Software in <span id="resSoftwareLab"></span></span>
-                        </div>
-                        <div id="resSoftwareList" style="display:flex; flex-wrap:wrap; gap:6px; min-height:26px;">
-                            <span style="font-size:12px; color:#999; font-style:italic;"><i class="fas fa-spinner fa-spin"></i> Loading...</span>
-                        </div>
-                    </div>
-
-                    <button type="button" class="res-btn-next" id="btnStep1Next" onclick="goToStep(2)" disabled>
-                        Next: Choose PC <i class="fas fa-arrow-right"></i>
-                    </button>
-                </div>
-
-                <!-- Step 2: PC -->
-                <div id="resStep2" style="display:none;">
-                    <p class="res-step-title"><i class="fas fa-desktop"></i> Select a PC — <span id="labNameDisplay" style="color:#1b4f8a; font-weight:bold;"></span></p>
-                    <div class="pc-legend">
-                        <div class="legend-pill green"><i class="fas fa-circle"></i> Available</div>
-                        <div class="legend-pill red"><i class="fas fa-circle"></i> Occupied</div>
-                        <div class="legend-pill blue"><i class="fas fa-circle"></i> Your Pick</div>
-                    </div>
-                    <div class="pc-grid" id="pcGrid"></div>
-                    <div class="res-btn-row">
-                        <button type="button" class="res-btn-back" onclick="goToStep(1)"><i class="fas fa-arrow-left"></i> Back</button>
-                        <button type="button" class="res-btn-next" id="btnStep2Next" onclick="goToStep(3)" disabled>Next: Set Details <i class="fas fa-arrow-right"></i></button>
-                    </div>
-                </div>
-
-                <!-- Step 3: Details -->
-                <div id="resStep3" style="display:none;">
-                    <p class="res-step-title"><i class="fas fa-calendar-alt"></i> Reservation Details</p>
-                    <div class="res-summary-box">
-                        <i class="fas fa-info-circle"></i>
-                        <span>Lab: <strong id="summaryLab"></strong> &nbsp;|&nbsp; PC: <strong id="summaryPc"></strong></span>
-                    </div>
-                    <div class="res-field">
-                        <label><i class="fas fa-calendar"></i> Date</label>
-                        <input type="date" name="res_date" id="resDate" required>
-                    </div>
-                    <div class="res-field">
-                        <label><i class="fas fa-clock"></i> Preferred Time Slot</label>
-                        <select name="res_time" required>
-                            <option value="" disabled selected>-- Select Time Slot --</option>
-                            <option>7:30 AM - 9:00 AM</option>
-                            <option>9:00 AM - 10:30 AM</option>
-                            <option>10:30 AM - 12:00 PM</option>
-                            <option>12:00 PM - 1:30 PM</option>
-                            <option>1:30 PM - 3:00 PM</option>
-                            <option>3:00 PM - 4:30 PM</option>
-                            <option>4:30 PM - 6:00 PM</option>
-                        </select>
-                    </div>
-                    <div class="res-field">
-                        <label><i class="fas fa-laptop-code"></i> Purpose</label>
-                        <select name="res_purpose" required>
-                            <option value="" disabled selected>-- Choose Purpose --</option>
-                            <option>C Programming</option>
-                            <option>Java Programming</option>
-                            <option>Python Programming</option>
-                            <option>Web Development</option>
-                            <option>Database</option>
-                            <option>Others</option>
-                        </select>
-                    </div>
-                    <div class="res-btn-row">
-                        <button type="button" class="res-btn-back" onclick="goToStep(2)"><i class="fas fa-arrow-left"></i> Back</button>
-                        <button type="submit" class="res-btn-submit"><i class="fas fa-check-circle"></i> Confirm Reservation</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-
-        <!-- Status Tab -->
-        <div id="tabStatus" style="display:none;">
-            {% if reservations %}
-                {% for res in reservations %}
-                    {% if res['status'] == 'Approved' %}{% set status_color = '#15c35a' %}
-                    {% elif res['status'] == 'Declined' %}{% set status_color = '#ff4c4c' %}
-                    {% else %}{% set status_color = '#ff9800' %}{% endif %}
-                    <div style="background:white; border-radius:10px; padding:15px; margin-bottom:12px; border-left:5px solid {{ status_color }};">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                            <strong style="color:#1b4f8a; font-size:15px;">{{ res['res_lab'] }}</strong>
-                            <span style="background:{{ status_color }}; color:white; padding:4px 12px; border-radius:15px; font-size:12px; font-weight:bold;">
-                                {% if res['status'] == 'Approved' %}<i class="fas fa-check"></i> Approved
-                                {% elif res['status'] == 'Declined' %}<i class="fas fa-times"></i> Declined
-                                {% else %}<i class="fas fa-clock"></i> Pending{% endif %}
-                            </span>
-                        </div>
-                        <p style="margin:0; font-size:13px; color:#555;">
-                            <i class="fas fa-calendar"></i> {{ res['res_date'] }} &nbsp;|&nbsp;
-                            <i class="fas fa-laptop-code"></i> {{ res['res_purpose'] }}
-                            {% if res['selected_pc'] %}&nbsp;|&nbsp; <i class="fas fa-desktop"></i> {{ res['selected_pc'] }}{% endif %}
-                        </p>
-                    </div>
-                {% endfor %}
-            {% else %}
-                <div style="text-align:center; padding:40px; color:#888;">
-                    <i class="fas fa-calendar-times" style="font-size:40px; margin-bottom:10px; display:block;"></i>
-                    No reservations yet.
-                </div>
-            {% endif %}
         </div>
     </div>
 </div>
 
 <!-- ══════════════════════════════════════════
-     FEEDBACK MODAL
+     MODALS
 ══════════════════════════════════════════ -->
-<div id="feedbackModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.55); z-index:9999; justify-content:center; align-items:center;">
-    <div class="feedback-modal-wrapper">
-        <div class="feedback-modal-header">
-            <h2><i class="fas fa-comment-dots"></i> Feedback Form</h2>
-            <p>Here at CCS, it is our duty to serve you, the student, and we take your feedback very seriously. Whether negative or positive, please let us know about your experience.</p>
-            <button class="feedback-close-btn" id="closeFeedbackBtn">&times;</button>
+
+<!-- EDIT PROFILE MODAL -->
+<div id="editProfileModal" class="modal">
+    <div class="modal-content glass-effect" style="max-width: 520px;">
+        <div class="modal-header">
+            <h2><i class="fas fa-user-edit"></i> Edit Profile</h2>
+            <button class="close-btn" id="closeEditProfileBtn">&times;</button>
         </div>
-        <div class="feedback-modal-body">
-            <form action="/submit_student_feedback" method="POST" id="feedbackForm">
-                <input type="hidden" name="id_number" value="{{ student['id_number'] }}">
-                <input type="hidden" name="student_name" value="{{ student['firstname'] }} {{ student['lastname'] }}">
-                <input type="hidden" name="rating" id="ratingInput" value="">
-
-                <!-- Name -->
-                <div class="fb-name-row">
-                    <div class="fb-field">
-                        <label class="fb-label"><i class="fas fa-user" style="font-size:11px;"></i> First Name</label>
-                        <input type="text" class="fb-input" name="firstname" value="{{ student['firstname'] }}" placeholder="First Name">
-                        <span class="fb-sub">First Name</span>
-                    </div>
-                    <div class="fb-field">
-                        <label class="fb-label"><i class="fas fa-user" style="font-size:11px;"></i> Last Name</label>
-                        <input type="text" class="fb-input" name="lastname" value="{{ student['lastname'] }}" placeholder="Last Name">
-                        <span class="fb-sub">Last Name</span>
+        <div class="modal-body">
+            <form action="/update_profile" method="POST" enctype="multipart/form-data" style="display:flex; flex-direction:column; gap:20px;">
+                <div class="profile-pic-wrapper">
+                    <div class="profile-pic-container">
+                        <img src="{{ url_for('static', filename='uploads/' + student['profile_pic']) if student['profile_pic'] and student['profile_pic'] != 'default_profile.png' else url_for('static', filename='images/default_profile.png') }}"
+                             alt="Profile Preview" id="profilePreview"
+                             onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'">
+                        <label for="profileUpload" class="camera-btn" title="Change Profile Picture"><i class="fas fa-camera"></i></label>
+                        <input type="file" id="profileUpload" name="profile_pic" accept=".png,.jpg,.jpeg" onchange="previewImage(event)">
                     </div>
                 </div>
-
-                <!-- Rating -->
-                <div class="fb-section">
-                    <label class="fb-label" style="margin-bottom:10px; display:flex;">
-                        <i class="fas fa-star" style="font-size:11px;"></i>&nbsp; Please rate the quality of our service
-                    </label>
-                    <div class="fb-rating-grid">
-                        <label class="fb-rating-label" onclick="selectRating(this,'Excellent')">
-                            <input type="radio" name="_rating" value="Excellent">
-                            <i class="fas fa-star"></i> Excellent
-                        </label>
-                        <label class="fb-rating-label" onclick="selectRating(this,'Very Good')">
-                            <input type="radio" name="_rating" value="Very Good">
-                            <i class="fas fa-smile-beam"></i> Very Good
-                        </label>
-                        <label class="fb-rating-label" onclick="selectRating(this,'Good')">
-                            <input type="radio" name="_rating" value="Good">
-                            <i class="fas fa-smile"></i> Good
-                        </label>
-                        <label class="fb-rating-label" onclick="selectRating(this,'Average')">
-                            <input type="radio" name="_rating" value="Average">
-                            <i class="fas fa-meh"></i> Average
-                        </label>
-                        <label class="fb-rating-label" onclick="selectRating(this,'Poor')">
-                            <input type="radio" name="_rating" value="Poor">
-                            <i class="fas fa-frown"></i> Poor
-                        </label>
+                <div style="display:flex; gap:15px;">
+                    <div style="flex:1;">
+                        <label style="display:block; font-size:12px; font-weight:700; color:#555; margin-bottom:5px; text-transform:uppercase;">First Name</label>
+                        <input type="text" name="firstname" value="{{ student['firstname'] }}" required style="width:100%; padding:12px; border-radius:8px; border:1.5px solid #e2e8f0; font-family:inherit;">
+                    </div>
+                    <div style="flex:1;">
+                        <label style="display:block; font-size:12px; font-weight:700; color:#555; margin-bottom:5px; text-transform:uppercase;">Last Name</label>
+                        <input type="text" name="lastname" value="{{ student['lastname'] }}" required style="width:100%; padding:12px; border-radius:8px; border:1.5px solid #e2e8f0; font-family:inherit;">
                     </div>
                 </div>
-
-                <!-- Suggestions -->
-                <div class="fb-section">
-                    <label class="fb-label" style="margin-bottom:8px; display:flex;">
-                        <i class="fas fa-lightbulb" style="font-size:11px;"></i>&nbsp; Do you have suggestions for a better service?
-                    </label>
-                    <textarea class="fb-textarea" name="message" rows="4" placeholder="Type here..." required></textarea>
+                <div>
+                    <label style="display:block; font-size:12px; font-weight:700; color:#555; margin-bottom:5px; text-transform:uppercase;">Course</label>
+                    <input type="text" name="course" value="{{ student['course'] }}" required style="width:100%; padding:12px; border-radius:8px; border:1.5px solid #e2e8f0; font-family:inherit;">
                 </div>
-
-                <button type="submit" class="fb-submit-btn">
-                    <i class="fas fa-paper-plane"></i> Send to Admin
+                <div>
+                    <label style="display:block; font-size:12px; font-weight:700; color:#555; margin-bottom:5px; text-transform:uppercase;">Address</label>
+                    <input type="text" name="address" value="{{ student['address'] }}" required style="width:100%; padding:12px; border-radius:8px; border:1.5px solid #e2e8f0; font-family:inherit;">
+                </div>
+                <button type="submit" style="padding:14px; background:#15c35a; color:white; border:none; border-radius:10px; font-weight:bold; cursor:pointer; font-size:15px; margin-top:10px; display:flex; align-items:center; justify-content:center; gap:10px;">
+                    <i class="fas fa-save"></i> Save Changes
                 </button>
             </form>
         </div>
     </div>
 </div>
 
-<!-- ══════════════════════════════════════════
-     AI ADVISOR MODAL
-══════════════════════════════════════════ -->
-<div id="aiModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center;">
-    <div class="student-glass-card" style="width:560px; padding:35px; position:relative; max-height:85vh; overflow-y:auto;">
-        <span id="closeAIBtn" style="position:absolute; top:15px; right:20px; font-size:24px; cursor:pointer; color:#555;">&times;</span>
-        <div style="text-align:center; margin-bottom:25px;">
-            <div style="width:70px; height:70px; background:linear-gradient(135deg,#1b4f8a,#3b82f6); border-radius:50%; display:flex; justify-content:center; align-items:center; margin:0 auto 12px auto; box-shadow:0 8px 20px rgba(27,79,138,0.3);">
-                <i class="fas fa-robot" style="font-size:30px; color:white;"></i>
+<!-- RESERVATION MODAL -->
+<div id="reservationModal" class="modal">
+    <div class="modal-content glass-effect" style="max-width: 800px; max-height: 90vh;">
+        <div class="modal-header">
+            <h2><i class="fas fa-calendar-check"></i> Lab Reservation</h2>
+            <button class="close-btn" id="closeReservationBtn">&times;</button>
+        </div>
+        <div class="modal-body" style="overflow-y: auto;">
+            <div class="res-tab-bar">
+                <button id="tabBookBtn" class="res-tab active" onclick="switchTab('book')">
+                    <i class="fas fa-plus-circle"></i> Book a Slot
+                </button>
+                <button id="tabStatusBtn" class="res-tab" onclick="switchTab('status')">
+                    <i class="fas fa-list-alt"></i> My Reservations
+                </button>
             </div>
-            <h2 style="color:#1b4f8a; margin:0 0 5px 0;">AI Study Advisor</h2>
-            <p style="color:#666; font-size:14px; margin:0;">Personalized recommendations based on your sit-in history.</p>
-        </div>
-        <div id="aiLoading" style="text-align:center; padding:30px; display:none;">
-            <div style="width:50px; height:50px; border:4px solid #e0e7ff; border-top:4px solid #1b4f8a; border-radius:50%; animation:spin 1s linear infinite; margin:0 auto 15px auto;"></div>
-            <p style="color:#666; font-size:15px;">Analyzing your session data...</p>
-        </div>
-        <div id="aiResult" style="display:none;">
-            <div id="aiStats" style="display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap;"></div>
-            <div style="background:linear-gradient(135deg,#f0f7ff,#e8f4fd); border-radius:12px; padding:20px; border-left:4px solid #1b4f8a;">
-                <p style="font-size:13px; color:#1b4f8a; font-weight:bold; margin:0 0 10px 0;"><i class="fas fa-lightbulb"></i> AI Recommendations</p>
-                <div id="aiText" style="font-size:14px; color:#333; line-height:1.8; white-space:pre-wrap;"></div>
+
+            <div id="tabBook">
+                <div class="res-steps">
+                    <div class="res-step active" id="step1Indicator"><span>1</span> Lab</div>
+                    <div class="res-step-line"></div>
+                    <div class="res-step" id="step2Indicator"><span>2</span> PC</div>
+                    <div class="res-step-line"></div>
+                    <div class="res-step" id="step3Indicator"><span>3</span> Details</div>
+                </div>
+                <form action="/submit_reservation" method="POST" id="reservationForm">
+                    <input type="hidden" name="id_number" value="{{ student['id_number'] }}">
+                    <input type="hidden" name="selected_pc" id="selectedPcInput" value="">
+
+                    <div id="resStep1">
+                        <p class="res-step-title"><i class="fas fa-door-open"></i> Select a Laboratory</p>
+                        <div class="lab-grid">
+                            <div class="lab-card" onclick="selectLab(this,'Lab 524')"><i class="fas fa-desktop"></i><span>Lab 524</span><small>50 PCs</small></div>
+                            <div class="lab-card" onclick="selectLab(this,'Lab 526')"><i class="fas fa-desktop"></i><span>Lab 526</span><small>50 PCs</small></div>
+                            <div class="lab-card" onclick="selectLab(this,'Lab 528')"><i class="fas fa-desktop"></i><span>Lab 528</span><small>50 PCs</small></div>
+                            <div class="lab-card" onclick="selectLab(this,'Lab 530')"><i class="fas fa-desktop"></i><span>Lab 530</span><small>50 PCs</small></div>
+                            <div class="lab-card" onclick="selectLab(this,'Lab 542')"><i class="fas fa-desktop"></i><span>Lab 542</span><small>50 PCs</small></div>
+                            <div class="lab-card" onclick="selectLab(this,'Lab 544')"><i class="fas fa-desktop"></i><span>Lab 544</span><small>50 PCs</small></div>
+                        </div>
+                        <input type="hidden" name="res_lab" id="selectedLabInput" required>
+
+                        <div id="resSoftwarePanel" style="display:none; margin-bottom:18px; background:linear-gradient(135deg,#f0f7ff,#e8f4fd); border:1px solid #b3d4f5; border-radius:12px; padding:14px 16px;">
+                            <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+                                <i class="fas fa-laptop-code" style="color:#1b4f8a; font-size:14px;"></i>
+                                <span style="font-size:13px; font-weight:700; color:#1b4f8a;">Available Software in <span id="resSoftwareLab"></span></span>
+                            </div>
+                            <div id="resSoftwareList" style="display:flex; flex-wrap:wrap; gap:6px; min-height:26px;"></div>
+                        </div>
+
+                        <button type="button" class="res-btn-next" id="btnStep1Next" onclick="goToStep(2)" disabled>
+                            Next: Choose PC <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+
+                    <div id="resStep2" style="display:none;">
+                        <p class="res-step-title"><i class="fas fa-desktop"></i> Select a PC — <span id="labNameDisplay" style="color:#1b4f8a; font-weight:bold;"></span></p>
+                        <div class="pc-legend">
+                            <div class="legend-pill green"><i class="fas fa-circle"></i> Available</div>
+                            <div class="legend-pill red"><i class="fas fa-circle"></i> Occupied</div>
+                            <div class="legend-pill maintenance"><i class="fas fa-tools" style="color:#ff4c4c;"></i> Maintenance</div>
+                            <div class="legend-pill blue"><i class="fas fa-circle"></i> Your Pick</div>
+                        </div>
+                        <div class="pc-grid" id="pcGrid"></div>
+                        <div class="res-btn-row">
+                            <button type="button" class="res-btn-back" onclick="goToStep(1)"><i class="fas fa-arrow-left"></i> Back</button>
+                            <button type="button" class="res-btn-next" id="btnStep2Next" onclick="goToStep(3)" disabled>Next: Set Details <i class="fas fa-arrow-right"></i></button>
+                        </div>
+                    </div>
+
+                    <div id="resStep3" style="display:none;">
+                        <p class="res-step-title"><i class="fas fa-calendar-alt"></i> Reservation Details</p>
+                        <div class="res-summary-box">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Lab: <strong id="summaryLab"></strong> &nbsp;|&nbsp; PC: <strong id="summaryPc"></strong></span>
+                        </div>
+                        <div class="res-field">
+                            <label><i class="fas fa-calendar"></i> Date</label>
+                            <input type="date" name="res_date" id="resDate" required>
+                        </div>
+                        <div class="res-field">
+                            <label><i class="fas fa-clock"></i> Preferred Time Slot</label>
+                            <select name="res_time" required>
+                                <option value="" disabled selected>-- Select Time Slot --</option>
+                                <option>7:30 AM - 9:00 AM</option>
+                                <option>9:00 AM - 10:30 AM</option>
+                                <option>10:30 AM - 12:00 PM</option>
+                                <option>12:00 PM - 1:30 PM</option>
+                                <option>1:30 PM - 3:00 PM</option>
+                                <option>3:00 PM - 4:30 PM</option>
+                                <option>4:30 PM - 6:00 PM</option>
+                            </select>
+                        </div>
+                        <div class="res-field">
+                            <label><i class="fas fa-laptop-code"></i> Purpose</label>
+                            <select name="res_purpose" required>
+                                <option value="" disabled selected>-- Choose Purpose --</option>
+                                <option>C Programming</option>
+                                <option>Java Programming</option>
+                                <option>Python Programming</option>
+                                <option>Web Development</option>
+                                <option>Database</option>
+                                <option>Others</option>
+                            </select>
+                        </div>
+                        <div class="res-btn-row">
+                            <button type="button" class="res-btn-back" onclick="goToStep(2)"><i class="fas fa-arrow-left"></i> Back</button>
+                            <button type="submit" class="res-btn-submit"><i class="fas fa-check-circle"></i> Confirm Reservation</button>
+                        </div>
+                    </div>
+                </form>
             </div>
-            <button id="refreshAIBtn" style="width:100%; margin-top:15px; padding:12px; background:linear-gradient(135deg,#1b4f8a,#3b82f6); color:white; border:none; border-radius:10px; font-weight:bold; font-size:14px; cursor:pointer;">
-                <i class="fas fa-sync-alt"></i> Refresh Recommendations
-            </button>
-        </div>
-        <div id="aiError" style="display:none; text-align:center; padding:20px; color:#ef4444;">
-            <i class="fas fa-exclamation-triangle" style="font-size:30px; margin-bottom:10px; display:block;"></i>
-            <p>Could not load recommendations. Please try again.</p>
+
+            <div id="tabStatus" style="display:none;">
+                {% if reservations %}
+                    {% for res in reservations %}
+                        {% if res['status'] == 'Approved' %}{% set status_color = '#15c35a' %}
+                        {% elif res['status'] == 'Declined' %}{% set status_color = '#ff4c4c' %}
+                        {% else %}{% set status_color = '#ff9800' %}{% endif %}
+                        <div style="background:#f8fafc; border-radius:12px; padding:15px; margin-bottom:12px; border:1px solid #e2e8f0; border-left:6px solid {{ status_color }};">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                                <strong style="color:#1b4f8a; font-size:15px;">{{ res['res_lab'] }}</strong>
+                                <span style="background:{{ status_color }}; color:white; padding:4px 12px; border-radius:15px; font-size:11px; font-weight:bold; text-transform:uppercase; letter-spacing:0.5px;">
+                                    {% if res['status'] == 'Approved' %}<i class="fas fa-check"></i> Approved
+                                    {% elif res['status'] == 'Declined' %}<i class="fas fa-times"></i> Declined
+                                    {% else %}<i class="fas fa-clock"></i> Pending{% endif %}
+                                </span>
+                            </div>
+                            <p style="margin:0; font-size:13px; color:#555;">
+                                <i class="fas fa-calendar" style="color:#1b4f8a;"></i> {{ res['res_date'] }} &nbsp;|&nbsp;
+                                <i class="fas fa-laptop-code" style="color:#1b4f8a;"></i> {{ res['res_purpose'] }}
+                                {% if res['selected_pc'] %}&nbsp;|&nbsp; <i class="fas fa-desktop" style="color:#1b4f8a;"></i> {{ res['selected_pc'] }}{% endif %}
+                            </p>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div style="text-align:center; padding:60px 20px; color:#94a3b8;">
+                        <i class="fas fa-calendar-times" style="font-size:50px; margin-bottom:15px; display:block; opacity:0.5;"></i>
+                        <p style="font-weight:600;">No reservations yet.</p>
+                        <p style="font-size:13px; margin-top:5px;">Book your first slot in the "Book a Slot" tab.</p>
+                    </div>
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>
 
-<!-- ══════════════════════════════════════════
-     SCRIPTS
-══════════════════════════════════════════ -->
+<!-- FEEDBACK MODAL -->
+<div id="feedbackModal" class="modal">
+    <div class="modal-content glass-effect" style="max-width: 550px;">
+        <div class="modal-header">
+            <h2><i class="fas fa-comment-dots"></i> Feedback Form</h2>
+            <button class="close-btn" id="closeFeedbackBtn">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p style="color: #64748b; font-size: 13px; line-height: 1.6; margin-bottom: 25px; padding: 12px; background: #f1f5f9; border-radius: 8px; border-left: 4px solid #1b4f8a;">
+                Here at CCS, it is our duty to serve you, and we take your feedback seriously. Whether negative or positive, please let us know about your experience.
+            </p>
+            <form action="/submit_student_feedback" method="POST" id="feedbackForm">
+                <input type="hidden" name="id_number" value="{{ student['id_number'] }}">
+                <input type="hidden" name="student_name" value="{{ student['firstname'] }} {{ student['lastname'] }}">
+
+                <div class="fb-name-row">
+                    <div class="fb-field">
+                        <label class="fb-label">First Name</label>
+                        <input type="text" class="fb-input" name="firstname" value="{{ student['firstname'] }}" placeholder="First Name">
+                    </div>
+                    <div class="fb-field">
+                        <label class="fb-label">Last Name</label>
+                        <input type="text" class="fb-input" name="lastname" value="{{ student['lastname'] }}" placeholder="Last Name">
+                    </div>
+                </div>
+
+                <div class="fb-section">
+                    <label class="fb-label" style="margin-bottom:12px;">Rate our service</label>
+                    <div class="fb-rating-grid">
+                        <label class="fb-rating-label">
+                            <input type="radio" name="rating" value="Excellent"><i class="fas fa-star"></i> <span>Excellent</span>
+                        </label>
+                        <label class="fb-rating-label">
+                            <input type="radio" name="rating" value="Very Good"><i class="fas fa-smile-beam"></i> <span>Very Good</span>
+                        </label>
+                        <label class="fb-rating-label">
+                            <input type="radio" name="rating" value="Good"><i class="fas fa-smile"></i> <span>Good</span>
+                        </label>
+                        <label class="fb-rating-label">
+                            <input type="radio" name="rating" value="Average"><i class="fas fa-meh"></i> <span>Average</span>
+                        </label>
+                        <label class="fb-rating-label">
+                            <input type="radio" name="rating" value="Poor"><i class="fas fa-frown"></i> <span>Poor</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="fb-section">
+                    <label class="fb-label" style="margin-bottom:8px;">Your Suggestions</label>
+                    <textarea class="fb-textarea" name="message" rows="4" placeholder="How can we improve our service?" required></textarea>
+                </div>
+
+                <button type="submit" class="fb-submit-btn" style="height:50px;">
+                    <i class="fas fa-paper-plane"></i> Send Feedback
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- AI ASSISTANT MODAL -->
+<div id="aiModal" class="modal">
+    <div class="modal-content glass-effect" style="max-width: 650px; max-height: 90vh; display: flex; flex-direction: column;">
+        <div class="modal-header">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 1px solid rgba(255,255,255,0.3);">
+                    <i class="fas fa-robot" style="font-size: 18px;"></i>
+                </div>
+                <div>
+                    <h2 style="font-size: 18px !important;">CCS AI Assistant</h2>
+                    <p style="margin: 0; font-size: 11px; color: rgba(255,255,255,0.7); font-weight: 500;">Online | Ask me anything about SITIN</p>
+                </div>
+            </div>
+            <button class="close-btn" id="closeAIBtn">&times;</button>
+        </div>
+        <div class="chat-container" style="flex: 1; border-radius: 0; border: none; height: auto; min-height: 400px;">
+            <div class="chat-messages" id="chatMessages" style="height: 400px; overflow-y: auto;"></div>
+            <form id="chatForm" class="chat-input-area">
+                <input type="text" id="chatInput" placeholder="Type your question here..." autocomplete="off">
+                <button type="submit" class="chat-send-btn"><i class="fas fa-paper-plane"></i></button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- RESERVATION SUCCESS MODAL -->
+<div id="resSuccessModal" class="modal">
+    <div class="modal-content glass-effect" style="max-width: 420px; text-align: center;">
+        <div class="modal-body" style="padding: 40px 30px;">
+            <div style="width: 80px; height: 80px; background: #dcfce7; color: #15803d; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px; font-size: 36px; box-shadow: 0 10px 20px rgba(21, 128, 61, 0.15);">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2 style="color: #1b4f8a; margin-bottom: 12px; font-size: 24px; font-weight: 800;">Success!</h2>
+            <p style="color: #64748b; margin-bottom: 30px; font-size: 14px; line-height: 1.6;">Your reservation has been created and is now pending admin approval.</p>
+            
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; text-align: left; margin-bottom: 30px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 13px;">
+                    <span style="color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Lab:</span>
+                    <strong id="successLab" style="color: #1e293b;"></strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 13px;">
+                    <span style="color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">PC Number:</span>
+                    <strong id="successPc" style="color: #1e293b;"></strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 13px;">
+                    <span style="color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Date:</span>
+                    <strong id="successDate" style="color: #1e293b;"></strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 13px;">
+                    <span style="color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Time Slot:</span>
+                    <strong id="successTime" style="color: #1e293b;"></strong>
+                </div>
+            </div>
+            
+            <button onclick="closeSuccessModal()" style="width: 100%; height: 50px; background: #1b4f8a; color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; transition: all 0.3s; font-size: 16px; box-shadow: 0 4px 12px rgba(27, 79, 138, 0.25);">
+                Done
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- SCRIPTS -->
 <script src="{{ url_for('static', filename='script.js') }}"></script>
 <script src="{{ url_for('static', filename='student.js') }}"></script>
+<script src="{{ url_for('static', filename='bible_verse.js') }}"></script>
 
 <script>
-/* ══════════════════════════════════════════
-   LAB SOFTWARE LOADER
-══════════════════════════════════════════ */
-function loadLabSoftware(labName) {
-    var list = document.getElementById('labSoftwareList');
-    if (!labName) {
-        list.innerHTML = '<span class="lab-sw-empty">Select a lab to see software</span>';
-        return;
-    }
-    list.innerHTML = '<span class="lab-sw-empty"><i class="fas fa-spinner fa-spin"></i> Loading...</span>';
-    fetch('/get_lab_software?lab=' + encodeURIComponent(labName))
-        .then(function(r) { return r.json(); })
-        .then(function(data) {
-            if (!data || data.length === 0) {
-                list.innerHTML = '<span class="lab-sw-empty">No software listed for this lab</span>';
-                return;
-            }
-            list.innerHTML = '';
-            data.forEach(function(sw) {
-                var tag = document.createElement('span');
-                tag.className = 'lab-sw-tag';
-                tag.innerHTML = '<i class="fas fa-check-circle"></i> ' + sw;
-                list.appendChild(tag);
-            });
-        })
-        .catch(function() {
-            list.innerHTML = '<span class="lab-sw-empty">Failed to load software</span>';
-        });
-}
-</script>
-
-<script>
-/* ══════════════════════════════════════════
-   SIDEBAR
-══════════════════════════════════════════ */
+// Sidebar Toggle
 function toggleSidebar() {
-    var sidebar   = document.getElementById('sidebar');
-    var overlay   = document.getElementById('sidebarOverlay');
-    var hamburger = document.getElementById('hamburgerBtn');
-    var isOpen    = sidebar.classList.contains('open');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    const hamburger = document.getElementById('hamburgerBtn');
+    const isOpen = sidebar.classList.contains('open');
     sidebar.classList.toggle('open', !isOpen);
     overlay.classList.toggle('visible', !isOpen);
     hamburger.classList.toggle('open', !isOpen);
 }
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        document.getElementById('sidebar').classList.remove('open');
-        document.getElementById('sidebarOverlay').classList.remove('visible');
-        document.getElementById('hamburgerBtn').classList.remove('open');
-    }
-});
 
-/* ══════════════════════════════════════════
-   SIDEBAR LINK WIRING
-══════════════════════════════════════════ */
-document.getElementById('sb-editProfile').addEventListener('click', function(e) {
-    e.preventDefault(); toggleSidebar();
-    document.getElementById('editProfileModal').style.display = 'flex';
-});
-document.getElementById('sb-reservation').addEventListener('click', function(e) {
-    e.preventDefault(); toggleSidebar();
+// Modal Wiring
+const reservationsEnabled = document.body.dataset.reservationsEnabled === 'Enabled';
+const feedbackEnabled = document.body.dataset.feedbackEnabled === 'Enabled';
+
+document.getElementById('sb-editProfile').addEventListener('click', (e) => { e.preventDefault(); toggleSidebar(); document.getElementById('editProfileModal').style.display = 'flex'; });
+document.getElementById('sb-reservation').addEventListener('click', (e) => {
+    e.preventDefault();
+    toggleSidebar();
+    if (!reservationsEnabled) {
+        return alert('Reservations are currently disabled by the administrator.');
+    }
     document.getElementById('reservationModal').style.display = 'flex';
-    goToStep(1); switchTab('book');
+    goToStep(1);
+    switchTab('book');
 });
-document.getElementById('sb-feedback').addEventListener('click', function(e) {
-    e.preventDefault(); toggleSidebar();
+document.getElementById('sb-feedback').addEventListener('click', (e) => {
+    e.preventDefault();
+    toggleSidebar();
+    if (!feedbackEnabled) {
+        return alert('Student feedback is currently disabled by the administrator.');
+    }
     document.getElementById('feedbackModal').style.display = 'flex';
 });
-document.getElementById('sb-ai').addEventListener('click', function(e) {
-    e.preventDefault(); toggleSidebar();
-    document.getElementById('aiModal').style.display = 'flex';
-    loadRecommendations();
-});
+document.getElementById('sb-ai').addEventListener('click', (e) => { e.preventDefault(); toggleSidebar(); document.getElementById('aiModal').style.display = 'flex'; loadChatHistory(); });
 
-/* ══════════════════════════════════════════
-   MODAL CLOSE BUTTONS
-══════════════════════════════════════════ */
-document.getElementById('closeEditProfileBtn').addEventListener('click', function() {
-    document.getElementById('editProfileModal').style.display = 'none';
-});
-document.getElementById('closeFeedbackBtn').addEventListener('click', function() {
-    document.getElementById('feedbackModal').style.display = 'none';
-});
-window.addEventListener('click', function(e) {
-    var modals = ['editProfileModal','reservationModal','feedbackModal','aiModal'];
-    modals.forEach(function(id) {
-        var m = document.getElementById(id);
+document.getElementById('closeEditProfileBtn').onclick = () => document.getElementById('editProfileModal').style.display = 'none';
+document.getElementById('closeReservationBtn').onclick = () => document.getElementById('reservationModal').style.display = 'none';
+document.getElementById('closeFeedbackBtn').onclick = () => document.getElementById('feedbackModal').style.display = 'none';
+document.getElementById('closeAIBtn').onclick = () => document.getElementById('aiModal').style.display = 'none';
+
+window.onclick = (e) => {
+    const modals = ['editProfileModal', 'reservationModal', 'feedbackModal', 'aiModal'];
+    modals.forEach(id => {
+        const m = document.getElementById(id);
         if (e.target === m) m.style.display = 'none';
     });
-});
+};
 
-/* ══════════════════════════════════════════
-   RESERVATION
-══════════════════════════════════════════ */
-(function() {
-    window.switchTab = function(tab) {
-        document.getElementById('tabBook').style.display   = tab === 'book'   ? 'block' : 'none';
-        document.getElementById('tabStatus').style.display = tab === 'status' ? 'block' : 'none';
-        document.getElementById('tabBookBtn').classList.toggle('active',   tab === 'book');
-        document.getElementById('tabStatusBtn').classList.toggle('active', tab === 'status');
-    };
-
-    window.goToStep = function(step) {
-        [1,2,3].forEach(function(s) {
-            document.getElementById('resStep' + s).style.display = s === step ? 'block' : 'none';
-            var ind = document.getElementById('step' + s + 'Indicator');
-            ind.classList.remove('active','done');
-            if (s < step)        ind.classList.add('done');
-            else if (s === step) ind.classList.add('active');
-        });
-        if (step === 2) buildPcGrid();
-    };
-
-    var selectedLab = '';
-    window.selectLab = function(el, labName) {
-        document.querySelectorAll('.lab-card').forEach(function(c){ c.classList.remove('selected'); });
-        el.classList.add('selected');
-        selectedLab = labName;
-        document.getElementById('selectedLabInput').value     = labName;
-        document.getElementById('labNameDisplay').textContent = labName;
-        document.getElementById('summaryLab').textContent     = labName;
-        document.getElementById('btnStep1Next').disabled      = false;
-
-        // Show software panel and fetch software for selected lab
-        var panel    = document.getElementById('resSoftwarePanel');
-        var labLabel = document.getElementById('resSoftwareLab');
-        var swList   = document.getElementById('resSoftwareList');
-        labLabel.textContent = labName;
-        swList.innerHTML = '<span style="font-size:12px;color:#999;font-style:italic;"><i class="fas fa-spinner fa-spin"></i> Loading...</span>';
-        panel.style.display = 'block';
-
-        fetch('/get_lab_software?lab=' + encodeURIComponent(labName))
-            .then(function(r) { return r.json(); })
-            .then(function(data) {
-                if (!data || data.length === 0) {
-                    swList.innerHTML = '<span style="font-size:12px;color:#999;font-style:italic;">No software listed for this lab.</span>';
-                    return;
-                }
-                swList.innerHTML = '';
-                data.forEach(function(sw) {
-                    var tag = document.createElement('span');
-                    tag.className = 'lab-sw-tag';
-                    tag.innerHTML = '<i class="fas fa-check-circle"></i> ' + sw;
-                    swList.appendChild(tag);
-                });
-            })
-            .catch(function() {
-                swList.innerHTML = '<span style="font-size:12px;color:#cc0000;font-style:italic;">Could not load software list.</span>';
-            });
-    };
-
-    var occupiedPcs = {
-        'Lab 524': [3,8,12,20,25,33],
-        'Lab 526': [1,5,14,18,22,30,37],
-        'Lab 528': [6,11,19,28,35,40],
-        'Lab 530': [2,9,16,23,31,38],
-        'Lab 542': [4,10,17,24,32,39],
-        'Lab 544': [7,13,21,29,36],
-        'Mac Lab': [5,12,20,27,34]
-    };
-
-    function buildPcGrid() {
-        var grid     = document.getElementById('pcGrid');
-        grid.innerHTML = '';
-        var occupied = occupiedPcs[selectedLab] || [];
-        for (var i = 1; i <= 40; i++) {
-            var isOccupied = occupied.indexOf(i) !== -1;
-            var div = document.createElement('div');
-            div.className = 'pc-item ' + (isOccupied ? 'occupied' : 'available');
-            div.innerHTML = '<i class="fas fa-desktop"></i><span>PC' + i + '</span>';
-            div.title     = 'PC' + i + (isOccupied ? ' — Occupied' : ' — Available');
-            if (!isOccupied) {
-                (function(pcNum, el) {
-                    el.addEventListener('click', function() {
-                        document.querySelectorAll('.pc-item.selected-pc').forEach(function(p) {
-                            p.classList.remove('selected-pc'); p.classList.add('available');
-                        });
-                        el.classList.remove('available'); el.classList.add('selected-pc');
-                        document.getElementById('selectedPcInput').value = 'PC' + pcNum;
-                        document.getElementById('summaryPc').textContent  = 'PC' + pcNum;
-                        document.getElementById('btnStep2Next').disabled  = false;
-                    });
-                })(i, div);
-            }
-            grid.appendChild(div);
-        }
-    }
-
-    var resDateInput = document.getElementById('resDate');
-    if (resDateInput) resDateInput.min = new Date().toISOString().split('T')[0];
-
-    var closeReservationBtn = document.getElementById('closeReservationBtn');
-    if (closeReservationBtn) closeReservationBtn.addEventListener('click', function() {
-        document.getElementById('reservationModal').style.display = 'none';
-    });
-})();
-
-/* ══════════════════════════════════════════
-   FEEDBACK RATING
-══════════════════════════════════════════ */
-function selectRating(labelEl, value) {
-    document.querySelectorAll('.fb-rating-label').forEach(function(l) { l.classList.remove('selected'); });
-    labelEl.classList.add('selected');
-    document.getElementById('ratingInput').value = value;
+// Reservation Success Logic
+function closeSuccessModal() {
+    document.getElementById('resSuccessModal').style.display = 'none';
+    window.location.reload();
 }
 
-/* ══════════════════════════════════════════
-   AI ADVISOR
-══════════════════════════════════════════ */
-var loadRecommendations;
-(function() {
-    var closeAIBtn   = document.getElementById('closeAIBtn');
-    var refreshAIBtn = document.getElementById('refreshAIBtn');
+// Reservation Tab & Step Switching
+function switchTab(tab) {
+    document.getElementById('tabBook').style.display = tab === 'book' ? 'block' : 'none';
+    document.getElementById('tabStatus').style.display = tab === 'status' ? 'block' : 'none';
+    document.getElementById('tabBookBtn').classList.toggle('active', tab === 'book');
+    document.getElementById('tabStatusBtn').classList.toggle('active', tab === 'status');
+}
 
-    function showState(state) {
-        document.getElementById('aiLoading').style.display = state === 'loading' ? 'block' : 'none';
-        document.getElementById('aiResult').style.display  = state === 'result'  ? 'block' : 'none';
-        document.getElementById('aiError').style.display   = state === 'error'   ? 'block' : 'none';
-    }
-
-    loadRecommendations = async function() {
-        showState('loading');
-        try {
-            var res  = await fetch('/ai_recommendation');
-            if (!res.ok) throw new Error('Network error');
-            var data = await res.json();
-            document.getElementById('aiStats').innerHTML =
-                '<div class="stat-mini"><div class="num">' + data.total_sitins + '</div><div class="lbl">Total Sit-ins</div></div>' +
-                '<div class="stat-mini"><div class="num">' + data.remaining_sessions + '</div><div class="lbl">Sessions Left</div></div>' +
-                '<div class="stat-mini"><div class="num">' + data.course + '</div><div class="lbl">Course</div></div>';
-            document.getElementById('aiText').textContent = data.recommendation;
-            showState('result');
-        } catch(err) {
-            showState('error');
-        }
-    };
-
-    if (closeAIBtn)   closeAIBtn.addEventListener('click', function() { document.getElementById('aiModal').style.display = 'none'; });
-    if (refreshAIBtn) refreshAIBtn.addEventListener('click', loadRecommendations);
-})();
-
-/* ══════════════════════════════════════════
-   NOTIFICATIONS
-══════════════════════════════════════════ */
-(function() {
-    var POLL_INTERVAL = 30000;
-    var prevCount     = 0;
-    var dropdownOpen  = false;
-    var ICONS = {
-        reservation: 'fa-calendar-check', approved: 'fa-check-circle',
-        declined: 'fa-times-circle', announcement: 'fa-bullhorn'
-    };
-
-    window.toggleNotifDropdown = function(e) {
-        e.stopPropagation();
-        var dd = document.getElementById('notifDropdown');
-        if (!dd) return;
-        dropdownOpen = !dropdownOpen;
-        dd.style.display = dropdownOpen ? 'block' : 'none';
-        if (dropdownOpen) loadNotifications();
-    };
-
-    document.addEventListener('click', function(e) {
-        var wrapper = document.getElementById('notifWrapper');
-        if (wrapper && !wrapper.contains(e.target)) {
-            var dd = document.getElementById('notifDropdown');
-            if (dd) dd.style.display = 'none';
-            dropdownOpen = false;
-        }
+function goToStep(step) {
+    [1, 2, 3].forEach(s => {
+        document.getElementById('resStep' + s).style.display = s === step ? 'block' : 'none';
+        const ind = document.getElementById('step' + s + 'Indicator');
+        ind.classList.remove('active', 'done');
+        if (s < step) ind.classList.add('done');
+        else if (s === step) ind.classList.add('active');
     });
+    if (step === 2) buildPcGrid();
+}
 
-    function loadNotifications() {
-        fetch('/notifications/list')
-            .then(function(r){ return r.json(); })
-            .then(function(items) {
-                var list = document.getElementById('notifList');
-                if (!list) return;
-                if (!items || items.length === 0) {
-                    list.innerHTML = '<div class="notif-empty"><i class="fas fa-bell-slash"></i><p>No notifications yet</p></div>';
-                    return;
-                }
-                list.innerHTML = '';
-                items.forEach(function(item) {
-                    var icon   = ICONS[item.type] || 'fa-bell';
-                    var unread = item.is_read === 0;
-                    var div    = document.createElement('div');
-                    div.className = 'notif-item' + (unread ? ' unread' : '');
-                    div.innerHTML =
-                        '<div class="notif-icon ' + item.type + '"><i class="fas ' + icon + '"></i></div>' +
-                        '<div class="notif-body"><p class="notif-msg">' + escHtml(item.message) + '</p>' +
-                        '<span class="notif-time">' + formatTime(item.created_at) + '</span></div>' +
-                        (unread ? '<div class="notif-unread-dot"></div>' : '');
-                    div.addEventListener('click', function() {
-                        fetch('/notifications/read/' + item.id, { method: 'POST' });
-                        div.classList.remove('unread');
-                        var dot = div.querySelector('.notif-unread-dot');
-                        if (dot) dot.remove();
-                        if (item.link) window.location.href = item.link;
-                        fetchCount();
-                    });
-                    list.appendChild(div);
-                });
-            }).catch(function(){});
-    }
+let selectedLabName = '';
+function selectLab(el, labName) {
+    document.querySelectorAll('.lab-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedLabName = labName;
+    document.getElementById('selectedLabInput').value = labName;
+    document.getElementById('labNameDisplay').textContent = labName;
+    document.getElementById('summaryLab').textContent = labName;
+    document.getElementById('btnStep1Next').disabled = false;
 
-    window.markAllRead = function() {
-        fetch('/notifications/read_all', { method: 'POST' }).then(function() {
-            document.querySelectorAll('.notif-item.unread').forEach(function(el) {
-                el.classList.remove('unread');
-                var dot = el.querySelector('.notif-unread-dot');
-                if (dot) dot.remove();
+    // Software List
+    const panel = document.getElementById('resSoftwarePanel');
+    const labLabel = document.getElementById('resSoftwareLab');
+    const swList = document.getElementById('resSoftwareList');
+    labLabel.textContent = labName;
+    swList.innerHTML = '<span style="font-size:12px;color:#999;font-style:italic;"><i class="fas fa-spinner fa-spin"></i> Loading...</span>';
+    panel.style.display = 'block';
+
+    fetch('/get_lab_software?lab=' + encodeURIComponent(labName))
+        .then(r => r.json())
+        .then(data => {
+            swList.innerHTML = data.length ? '' : '<span style="font-size:12px;color:#999;font-style:italic;">No software listed.</span>';
+            data.forEach(sw => {
+                const tag = document.createElement('span');
+                tag.className = 'lab-sw-tag';
+                tag.innerHTML = '<i class="fas fa-check-circle"></i> ' + sw;
+                swList.appendChild(tag);
             });
-            updateBadge(0);
+        });
+}
+
+function buildPcGrid() {
+    const grid = document.getElementById('pcGrid');
+    grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #888;"><i class="fas fa-circle-notch fa-spin"></i> Loading PCs...</div>';
+    fetch('/api/get_lab_pcs?lab=' + encodeURIComponent(selectedLabName))
+        .then(r => r.json())
+        .then(pcs => {
+            grid.innerHTML = '';
+            pcs.forEach(pc => {
+                const div = document.createElement('div');
+                const status = pc.status.toLowerCase();
+                let statusClass = 'available', iconClass = 'fa-desktop', isSelectable = true;
+                if (status === 'disabled' || pc.availability === 'Disabled') { statusClass = 'maintenance'; iconClass = 'fa-ban'; isSelectable = false; }
+                else if (status === 'maintenance' || pc.condition === 'Under Maintenance') { statusClass = 'maintenance'; iconClass = 'fa-tools'; isSelectable = false; }
+                else if (status === 'occupied') { statusClass = 'occupied'; isSelectable = false; }
+                div.className = 'pc-item ' + statusClass;
+                div.innerHTML = `<i class="fas ${iconClass}"></i><span>PC${pc.pc_number}</span>`;
+                if (isSelectable) {
+                    div.onclick = () => {
+                        document.querySelectorAll('.pc-item.selected-pc').forEach(p => { p.classList.remove('selected-pc'); p.classList.add('available'); });
+                        div.classList.remove('available'); div.classList.add('selected-pc');
+                        document.getElementById('selectedPcInput').value = 'PC' + pc.pc_number;
+                        document.getElementById('summaryPc').textContent = 'PC' + pc.pc_number;
+                        document.getElementById('btnStep2Next').disabled = false;
+                    };
+                }
+                grid.appendChild(div);
+            });
+        });
+}
+
+// AI Chat Logic
+function appendMessage(type, text, time) {
+    const chatMessages = document.getElementById('chatMessages');
+    const div = document.createElement('div');
+    div.className = `chat-bubble ${type}`;
+    div.innerHTML = `${text}<span class="chat-time">Recent</span>`;
+    chatMessages.appendChild(div);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function loadChatHistory() {
+    const chatMessages = document.getElementById('chatMessages');
+    chatMessages.innerHTML = '';
+    fetch('/api/chat/history').then(r => r.json()).then(history => {
+        if (!history.length) appendMessage('ai', 'Hello! How can I help you today?');
+        else history.forEach(msg => appendMessage(msg.type, msg.text, msg.time));
+    });
+}
+
+document.getElementById('chatForm').onsubmit = function(e) {
+    e.preventDefault();
+    const input = document.getElementById('chatInput');
+    const msg = input.value.trim();
+    if (!msg) return;
+    appendMessage('user', msg);
+    input.value = '';
+    fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: msg })
+    }).then(r => r.json()).then(data => appendMessage('ai', data.response || 'Error.'));
+};
+
+// Notification Logic
+(function() {
+    const fetchCount = () => {
+        fetch('/notifications/count').then(r => r.json()).then(data => {
+            const badge = document.getElementById('notifBadge');
+            badge.style.display = data.count > 0 ? 'flex' : 'none';
+            badge.textContent = data.count;
         });
     };
-
-    function fetchCount() {
-        fetch('/notifications/count')
-            .then(function(r){ return r.json(); })
-            .then(function(data) {
-                var count = data.count || 0;
-                updateBadge(count);
-                if (count > prevCount) {
-                    var btn = document.getElementById('notifBellBtn');
-                    if (btn) { btn.classList.remove('shake'); void btn.offsetWidth; btn.classList.add('shake'); setTimeout(function(){ btn.classList.remove('shake'); }, 700); }
-                }
-                prevCount = count;
-            }).catch(function(){});
-    }
-
-    function updateBadge(count) {
-        var badge = document.getElementById('notifBadge');
-        if (!badge) return;
-        badge.style.display = count > 0 ? 'flex' : 'none';
-        badge.textContent   = count > 99 ? '99+' : count;
-    }
-
-    function formatTime(datetimeStr) {
-        if (!datetimeStr) return '';
-        var d    = new Date(datetimeStr.replace(' ','T'));
-        var diff = Math.floor((new Date() - d) / 1000);
-        if (diff < 60)    return 'Just now';
-        if (diff < 3600)  return Math.floor(diff/60) + 'm ago';
-        if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
-        return Math.floor(diff/86400) + 'd ago';
-    }
-
-    function escHtml(str) {
-        return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    }
-
     fetchCount();
-    setInterval(fetchCount, POLL_INTERVAL);
+    setInterval(fetchCount, 30000);
 })();
+
+function toggleNotifDropdown(e) {
+    e.stopPropagation();
+    const dd = document.getElementById('notifDropdown');
+    const isOpen = dd.style.display === 'block';
+    dd.style.display = isOpen ? 'none' : 'block';
+    if (!isOpen) loadNotifications();
+}
+
+function loadNotifications() {
+    fetch('/notifications/list').then(r => r.json()).then(items => {
+        const list = document.getElementById('notifList');
+        if (!items.length) { list.innerHTML = '<div class="notif-empty"><p>No notifications</p></div>'; return; }
+        list.innerHTML = '';
+        items.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'notif-item' + (item.is_read ? '' : ' unread');
+            div.innerHTML = `<div class="notif-body"><p class="notif-msg">${item.message}</p></div>`;
+            div.onclick = () => { fetch('/notifications/read/' + item.id, { method: 'POST' }); if (item.link) window.location.href = item.link; };
+            list.appendChild(div);
+        });
+    });
+}
+
+function markAllRead() {
+    fetch('/notifications/read_all', { method: 'POST' }).then(() => loadNotifications());
+}
 </script>
- <script src="{{ url_for('static', filename='bible_verse.js') }}"></script>
- <div id="toastBox"></div>
+
+<div id="toastBox"></div>
 </body>
 </html>

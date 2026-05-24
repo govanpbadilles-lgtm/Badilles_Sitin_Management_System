@@ -4,170 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Reservations | CCS</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=16">
-    <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}?v=16">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body.admin-page {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background: #eef2f7;
-            padding-top: 0 !important;
-            min-height: 100vh;
-        }
-
-        .navbar { height: 56px; background: #1a3f72; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: sticky; top: 0; z-index: 1000; box-shadow: 0 1px 0 rgba(255,255,255,0.06), 0 4px 16px rgba(0,0,0,0.18); }
-        .nav-left { display: flex; align-items: center; gap: 10px; }
-        .nav-left img { height: 30px; }
-        .nav-brand { color: #fff; font-size: 14px; font-weight: 600; letter-spacing: 0.3px; }
-        .nav-right { display: flex; align-items: center; gap: 8px; }
-
-        .notif-wrapper { position: relative; display: inline-flex; align-items: center; }
-        .notif-bell-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.12); color: white; width: 36px; height: 36px; border-radius: 10px; cursor: pointer; font-size: 15px; display: flex; align-items: center; justify-content: center; position: relative; transition: background 0.2s, transform 0.15s; }
-        .notif-bell-btn:hover { background: rgba(255,255,255,0.2); transform: scale(1.06); }
-        .notif-bell-btn.shake { animation: bellShake 0.6s ease; }
-        @keyframes bellShake { 0%,100% { transform: rotate(0); } 20% { transform: rotate(-18deg); } 40% { transform: rotate(18deg); } 60% { transform: rotate(-10deg); } 80% { transform: rotate(10deg); } }
-        .notif-badge { position: absolute; top: -5px; right: -5px; background: #f44; color: white; font-size: 9px; font-weight: 700; min-width: 17px; height: 17px; border-radius: 9px; display: flex !important; align-items: center; justify-content: center; padding: 0 4px; border: 2px solid #1a3f72; }
-        .notif-dropdown { position: absolute; top: calc(100% + 10px); right: 0; width: 330px; background: white; border-radius: 14px; box-shadow: 0 16px 48px rgba(0,0,0,0.16); z-index: 99999; overflow: hidden; animation: notifSlideIn 0.2s ease; border: 1px solid rgba(0,0,0,0.07); }
-        @keyframes notifSlideIn { from { opacity:0; transform: translateY(-8px) scale(0.97); } to { opacity:1; transform: translateY(0) scale(1); } }
-        .notif-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 10px; border-bottom: 1px solid #f0f0f0; font-size: 13px; font-weight: 700; color: #1a3f72; }
-        .notif-read-all-btn { background: none; border: none; font-size: 11px; color: #999; cursor: pointer; font-family: inherit; transition: color 0.2s; }
-        .notif-read-all-btn:hover { color: #1a3f72; }
-        .notif-list { max-height: 340px; overflow-y: auto; }
-        .notif-item { display: flex; align-items: flex-start; gap: 11px; padding: 12px 16px; border-bottom: 1px solid #f5f5f5; cursor: pointer; transition: background 0.12s; }
-        .notif-item:hover { background: #f8faff; }
-        .notif-item.unread { background: #eef5ff; }
-        .notif-icon { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; margin-top: 2px; }
-        .notif-icon.reservation { background: #fff3e0; color: #f90; }
-        .notif-icon.approved { background: #e8fff2; color: #15c35a; }
-        .notif-icon.declined { background: #fff0f0; color: #f44; }
-        .notif-icon.announcement { background: #e8f4fd; color: #1a3f72; }
-        .notif-body { flex: 1; }
-        .notif-msg { font-size: 12px; color: #333; line-height: 1.4; margin: 0 0 3px 0; }
-        .notif-time { font-size: 10px; color: #bbb; }
-        .notif-unread-dot { width: 7px; height: 7px; background: #1a3f72; border-radius: 50%; flex-shrink: 0; margin-top: 6px; }
-        .notif-empty { padding: 36px 20px; text-align: center; color: #ccc; }
-        .notif-empty i { font-size: 32px; display: block; margin-bottom: 8px; }
-        .notif-empty p { margin: 0; font-size: 13px; }
-
-        .hamburger-btn { width: 36px; height: 36px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.1); cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; transition: background 0.2s; flex-shrink: 0; }
-        .hamburger-btn:hover { background: rgba(255,255,255,0.2); }
-        .hamburger-btn span { display: block; width: 15px; height: 1.5px; background: white; border-radius: 2px; transition: all 0.28s cubic-bezier(0.4,0,0.2,1); }
-        .hamburger-btn.open span:nth-child(1) { transform: translateY(5.5px) rotate(45deg); }
-        .hamburger-btn.open span:nth-child(2) { opacity: 0; }
-        .hamburger-btn.open span:nth-child(3) { transform: translateY(-5.5px) rotate(-45deg); }
-
-        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.38); z-index: 1001; animation: overlayFadeIn 0.22s ease; }
-        .sidebar-overlay.visible { display: block; }
-        @keyframes overlayFadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .sidebar { position: fixed; top: 0; right: 0; width: 240px; height: 100vh; background: #1a3f72; z-index: 1002; display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.28s cubic-bezier(0.4,0,0.2,1); box-shadow: -4px 0 24px rgba(0,0,0,0.22); }
-        .sidebar.open { transform: translateX(0); }
-        .sidebar-user { display: flex; align-items: center; gap: 11px; padding: 20px 16px 16px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .sidebar-admin-icon { width: 42px; height: 42px; border-radius: 50%; background: rgba(255,255,255,0.14); color: white; font-size: 17px; display: flex; align-items: center; justify-content: center; border: 1.5px solid rgba(255,255,255,0.28); flex-shrink: 0; }
-        .sidebar-name { color: white; font-size: 12px; font-weight: 600; margin-bottom: 2px; }
-        .sidebar-sub { color: rgba(255,255,255,0.46); font-size: 10px; }
-        .sidebar-nav { flex: 1; padding: 8px 0; overflow-y: auto; display: flex; flex-direction: column; }
-        .sidebar-item { display: flex; align-items: center; gap: 10px; padding: 10px 18px; color: rgba(255,255,255,0.64); font-size: 12px; text-decoration: none; border-left: 2.5px solid transparent; transition: all 0.14s; }
-        .sidebar-item:hover { background: rgba(255,255,255,0.09); color: white; text-decoration: none; }
-        .sidebar-item.active { background: rgba(255,255,255,0.13); color: white; border-left-color: rgba(255,255,255,0.8); font-weight: 600; }
-        .sidebar-item i { width: 15px; text-align: center; font-size: 13px; }
-        .sidebar-divider { height: 1px; background: rgba(255,255,255,0.08); margin: 5px 14px; }
-        .sidebar-section-label { padding: 9px 18px 3px; font-size: 9px; font-weight: 700; letter-spacing: 0.9px; text-transform: uppercase; color: rgba(255,255,255,0.32); }
-        .sidebar-footer { padding: 12px 14px; border-top: 1px solid rgba(255,255,255,0.1); }
-        .sidebar-logout-btn { display: flex; align-items: center; justify-content: center; gap: 7px; width: 100%; padding: 9px; border-radius: 8px; background: rgba(255,80,80,0.15); color: rgba(255,170,170,1); font-size: 12px; font-weight: 600; text-decoration: none; transition: background 0.18s; }
-        .sidebar-logout-btn:hover { background: rgba(255,80,80,0.28); text-decoration: none; color: rgba(255,200,200,1); }
-
-        .admin-container { display: block !important; padding: 28px 40px 50px !important; width: 100% !important; max-width: 1600px !important; margin: 0 auto !important; box-sizing: border-box !important; }
-
+        body.admin-page { font-family: 'Plus Jakarta Sans', sans-serif; padding-top: 0 !important; min-height: 100vh; }
+        .admin-container { display: block !important; padding: 28px 40px 50px !important; width: 100% !important; max-width: 1600px !important; margin: 54px auto 0 !important; box-sizing: border-box !important; }
         .page-header { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; }
         .page-header-icon { width: 46px; height: 46px; background: #1a3f72; border-radius: 13px; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; flex-shrink: 0; }
-        .page-header h1 { font-size: 22px; font-weight: 700; color: #1a3f72; line-height: 1.2; }
-        .page-header p { font-size: 13px; color: #7a8ea8; margin-top: 2px; }
-
+        .page-header h1 { font-size: 22px; font-weight: 700; color: white; line-height: 1.2; }
+        .page-header p { font-size: 13px; color: rgba(255,255,255,0.85); margin-top: 2px; }
+        .settings-panel { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.28); border-radius: 22px; padding: 20px; margin-bottom: 22px; }
+        .settings-card { background: rgba(255,255,255,0.92); border-radius: 22px; padding: 24px; border: 1px solid rgba(226,232,240,0.9); color: #0f172a; box-shadow: 0 18px 40px rgba(15,23,42,0.06); }
+        .settings-card h3 { margin: 0 0 12px; font-size: 15px; letter-spacing: 0.08em; text-transform: uppercase; color: #1e293b; }
+        .settings-card p { margin: 0 0 14px; color: #475569; font-size: 13px; line-height: 1.6; }
+        .settings-card .setting-control { display: grid; gap: 14px; }
+        .toggle-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+        .toggle-option { display: flex; align-items: center; gap: 12px; padding: 16px 18px; border-radius: 16px; border: 1px solid rgba(148,163,184,0.28); background: #f8fafc; color: #0f172a; cursor: pointer; transition: all 0.2s ease; }
+        .toggle-option:hover { border-color: #93c5fd; background: #eff6ff; }
+        .toggle-option input { display: none; }
+        .toggle-option.active,
+        .toggle-option:has(input:checked) { border-color: #2563eb; background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); box-shadow: 0 14px 28px rgba(59,130,246,0.14); color: #1d4ed8; }
+        .toggle-option .option-dot { width: 12px; height: 12px; border-radius: 999px; background: #c7d2fe; flex-shrink: 0; }
+        .toggle-option.active .option-dot,
+        .toggle-option:has(input:checked) .option-dot { background: #1d4ed8; box-shadow: 0 0 0 4px rgba(59,130,246,0.14); }
+        .settings-save { padding: 12px 18px; border-radius: 14px; border: none; background: #2563eb; color: white; font-weight: 700; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .settings-save:hover { transform: translateY(-1px); box-shadow: 0 16px 28px rgba(37,99,235,0.18); }
         .card { background: #fff; border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.06); overflow: hidden; }
-
         .table-toolbar { display: flex; justify-content: space-between; align-items: center; padding: 18px 20px; border-bottom: 1px solid #f0f3f8; gap: 12px; }
-
-        .search-box { position: relative; flex-shrink: 0; }
-        .search-box i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #a0aec0; font-size: 13px; pointer-events: none; }
-        .search-box input { width: 240px; height: 38px; padding: 0 14px 0 36px; border: 1.5px solid #e2e8f0; border-radius: 9px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; color: #333; outline: none; transition: border-color 0.2s, box-shadow 0.2s; background: #f8fafc; }
-        .search-box input:focus { border-color: #1a3f72; box-shadow: 0 0 0 3px rgba(26,63,114,0.1); background: #fff; }
-        .search-box input::placeholder { color: #b0bec5; }
-
         .modern-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-
-        /* ── TABLE ALIGNMENT FIX ── */
-        /* All headers: left-aligned, consistent padding */
-        .modern-table thead th {
-            padding: 13px 16px;
-            background: #f8fafc;
-            color: #7a8ea8;
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.7px;
-            border-bottom: 1px solid #eef2f7;
-            white-space: nowrap;
-            text-align: left;
-        }
-        /* Date header — match the extra left padding of its data cell */
-        .modern-table thead th:first-child { padding-left: 20px; }
-        /* Action header — centered to match action buttons cell */
-        .modern-table thead th:last-child { text-align: center; padding-right: 20px; }
-
-        .modern-table tbody tr { border-bottom: 1px solid #f5f7fb; transition: background 0.1s; }
-        .modern-table tbody tr:last-child { border-bottom: none; }
-        .modern-table tbody tr:hover { background: #f8faff; }
-
-        /* All data cells: left-aligned, consistent padding to match headers */
-        .modern-table tbody td {
-            padding: 13px 16px;
-            color: #374151;
-            vertical-align: middle;
-            text-align: left;
-        }
-        /* Date cell — extra left padding */
-        .modern-table tbody td:first-child { padding-left: 20px; font-weight: 600; color: #1a3f72; }
-        /* Action cell — centered to match its header */
-        .modern-table tbody td:last-child { text-align: center; padding-right: 20px; }
-        /* ── END ALIGNMENT FIX ── */
-
-        .student-name { font-weight: 500; color: #1f2937; }
-        .lab-badge { display: inline-flex; align-items: center; padding: 4px 10px; background: #eef2f7; color: #4a6fa5; font-size: 11px; font-weight: 700; border-radius: 6px; letter-spacing: 0.3px; }
-
-        .status-badge { display: inline-flex; align-items: center; padding: 4px 10px; font-size: 11px; font-weight: 700; border-radius: 20px; }
-        .status-pending  { background: #fff7ed; color: #c2410c; }
-        .status-approved { background: #dcfce7; color: #15803d; }
-        .status-declined { background: #fee2e2; color: #b91c1c; }
-
-        .action-btn { display: inline-flex; align-items: center; gap: 5px; padding: 0 12px; height: 32px; border: none; border-radius: 7px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; transition: transform 0.12s, box-shadow 0.12s; white-space: nowrap; margin: 0 2px; }
-        .action-btn:hover { transform: translateY(-1px); }
-        .action-approve { background: #dcfce7; color: #15803d; }
-        .action-approve:hover { background: #bbf7d0; box-shadow: 0 3px 8px rgba(21,195,90,0.2); }
-        .action-decline { background: #fee2e2; color: #b91c1c; }
-        .action-decline:hover { background: #fecaca; box-shadow: 0 3px 8px rgba(239,68,68,0.2); }
-
-        .actions-cell { display: flex; align-items: center; justify-content: center; gap: 4px; }
-        .empty-row td { padding: 48px 20px; text-align: center; color: #b0bec5; font-style: italic; font-size: 14px; }
-
-        @media (max-width: 768px) {
-            .admin-container { padding: 16px 10px 30px !important; }
-            .page-header h1 { font-size: 18px; }
-            .page-header-icon { width: 38px; height: 38px; font-size: 16px; }
-            .table-toolbar { flex-direction: column; align-items: flex-start; gap: 10px; padding: 14px 12px; }
-            .search-box input { width: 100%; }
-            .card { overflow-x: auto; }
-            .modern-table { min-width: 700px; }
-            .modern-table th, .modern-table td { padding: 10px 10px; font-size: 12px; }
-            .notif-dropdown { right: -60px !important; width: 300px !important; }
-        }
-        @media (max-width: 480px) {
-            .admin-container { padding: 10px 6px 20px !important; }
-            .modern-table { min-width: 580px; font-size: 11px; }
-            .notif-dropdown { right: -80px !important; width: 270px !important; }
-        }
+        .modern-table thead th { padding: 13px 16px; background: #1a3f72; color: #ffffff; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; text-align: left; }
+        .modern-table tbody tr { border-bottom: 1px solid #f5f7fb; }
+        .modern-table tbody td { padding: 13px 16px; color: #374151; }
+        .status-pending { background: #fef3c7; color: #92400e; padding: 4px 10px; border-radius: 20px; font-weight: 700; font-size: 11px; }
+        .status-approved { background: #dcfce7; color: #15803d; padding: 4px 10px; border-radius: 20px; font-weight: 700; font-size: 11px; }
+        .status-declined { background: #fee2e2; color: #b91c1c; padding: 4px 10px; border-radius: 20px; font-weight: 700; font-size: 11px; }
+        .btn-action { padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 12px; transition: all 0.15s; }
+        .btn-approve { background: #dcfce7; color: #15803d; }
+        .btn-approve:hover { background: #bbf7d0; }
+        .btn-decline { background: #fee2e2; color: #b91c1c; }
+        .btn-decline:hover { background: #fecaca; }
     </style>
 </head>
 
@@ -180,23 +58,13 @@
         </div>
         <div class="nav-right">
             <div class="notif-wrapper" id="notifWrapper">
-                <button class="notif-bell-btn" id="notifBellBtn" onclick="toggleNotifDropdown(event)" title="Notifications">
-                    <i class="fas fa-bell"></i>
-                    <span class="notif-badge" id="notifBadge" style="display:none;">0</span>
-                </button>
+                <button class="notif-bell-btn" id="notifBellBtn" onclick="toggleNotifDropdown(event)"><i class="fas fa-bell"></i><span class="notif-badge" id="notifBadge" style="display:none;">0</span></button>
                 <div class="notif-dropdown" id="notifDropdown" style="display:none;">
-                    <div class="notif-header">
-                        <span><i class="fas fa-bell"></i> Notifications</span>
-                        <button class="notif-read-all-btn" onclick="markAllRead()">Mark all read</button>
-                    </div>
-                    <div class="notif-list" id="notifList">
-                        <div class="notif-empty"><i class="fas fa-bell-slash"></i><p>No notifications yet</p></div>
-                    </div>
+                    <div class="notif-header"><span>Notifications</span><button onclick="markAllRead()">Mark all read</button></div>
+                    <div class="notif-list" id="notifList"></div>
                 </div>
             </div>
-            <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleSidebar()">
-                <span></span><span></span><span></span>
-            </button>
+            <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleSidebar()"><span></span><span></span><span></span></button>
         </div>
     </nav>
 
@@ -204,26 +72,30 @@
 
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-user">
-            <div class="sidebar-admin-icon"><i class="fas fa-user-shield"></i></div>
-            <div>
-                <div class="sidebar-name">Administrator</div>
-                <div class="sidebar-sub">College of Computer Studies</div>
+            <div class="sidebar-avatar"><i class="fas fa-user-shield"></i></div>
+            <div class="sidebar-user-info">
+                <div class="sidebar-name">Admin {{ session.get('firstname', 'User') }}</div>
+                <div class="sidebar-sub">Administrator</div>
             </div>
         </div>
         <nav class="sidebar-nav">
             <a href="/admin_dashboard" class="sidebar-item"><i class="fas fa-home"></i> Home</a>
+            <a href="#" class="sidebar-item" id="sb-search"><i class="fas fa-search"></i> Search Student</a>
             <div class="sidebar-divider"></div>
-            <div class="sidebar-section-label">Students</div>
+            <div class="sidebar-section-label">Students & Sit-ins</div>
             <a href="/student_list" class="sidebar-item"><i class="fas fa-user-graduate"></i> View Students</a>
             <a href="/active_sitins" class="sidebar-item"><i class="fas fa-desktop"></i> Active Sit-ins</a>
             <a href="/history" class="sidebar-item"><i class="fas fa-history"></i> History Records</a>
-            <a href="/admin_reservations" class="sidebar-item active"><i class="fas fa-calendar-check"></i> Reservations</a>
+            <a href="/admin_reservations" class="sidebar-item {% if request.path == '/admin_reservations' %}active{% endif %}"><i class="fas fa-calendar-check"></i> Reservations</a>
             <div class="sidebar-divider"></div>
             <div class="sidebar-section-label">Reports</div>
             <a href="/reports" class="sidebar-item"><i class="fas fa-file-alt"></i> Sit-in Reports</a>
             <a href="/admin_feedbacks" class="sidebar-item"><i class="fas fa-comments"></i> Feedback Reports</a>
             <div class="sidebar-divider"></div>
-            <a href="/leaderboard" class="sidebar-item"><i class="fas fa-trophy"></i> Leaderboard</a>
+            <a href="/leaderboard" class="sidebar-item"><i class="fas fa-trophy"></i> Rankings</a>
+            <a href="/admin_software" class="sidebar-item"><i class="fas fa-boxes"></i> Software List</a>
+            <a href="#" class="sidebar-item" id="sb-pc-mgmt"><i class="fas fa-laptop-medical"></i> PC Maintenance</a>
+            <a href="#" class="sidebar-item" id="sb-ai"><i class="fas fa-robot"></i> AI Assistant</a>
         </nav>
         <div class="sidebar-footer">
             <a href="/logout" class="sidebar-logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
@@ -231,78 +103,92 @@
     </aside>
 
     <div class="admin-container">
-
         <div class="page-header">
             <div class="page-header-icon"><i class="fas fa-calendar-check"></i></div>
             <div>
-                <h1 style="color: white;" >Lab Reservations</h1>
-                <p style="color: white;">Manage and process student reservation requests</p>
+                <h1>Manage Reservations</h1>
+                <p>Approve or decline student seat reservations</p>
+            </div>
+        </div>
+
+        <div class="settings-panel">
+            <div class="settings-card">
+                <h3>Reservation Access</h3>
+                <form action="/admin_update_system_settings" method="POST" style="display:grid; gap:12px;">
+                    <input type="hidden" name="next_page" value="{{ request.path }}">
+                    <input type="hidden" name="feedback_enabled" value="{{ feedback_enabled }}">
+                    <div class="setting-control">
+                        <div class="toggle-options">
+                            <label class="toggle-option {% if reservations_enabled == 'Enabled' %}active{% endif %}">
+                                <input type="radio" name="reservations_enabled" value="Enabled" {% if reservations_enabled == 'Enabled' %}checked{% endif %}>
+                                <span class="option-dot"></span>
+                                <span>Enabled</span>
+                            </label>
+                            <label class="toggle-option {% if reservations_enabled == 'Disabled' %}active{% endif %}">
+                                <input type="radio" name="reservations_enabled" value="Disabled" {% if reservations_enabled == 'Disabled' %}checked{% endif %}>
+                                <span class="option-dot"></span>
+                                <span>Disabled</span>
+                            </label>
+                        </div>
+                        <p>Toggle whether students can submit lab reservation requests from their dashboard.</p>
+                    </div>
+                    <button type="submit" class="settings-save">Save Reservation Setting</button>
+                </form>
             </div>
         </div>
 
         <div class="card">
             <div class="table-toolbar">
-                <div style="font-size: 13px; color: #7a8ea8;">
-                    <i class="fas fa-calendar-alt" style="margin-right: 5px;"></i>Pending & processed reservations
-                </div>
-                <div class="search-box">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="searchReservation" onkeyup="filterReservations()" placeholder="Search Name or Lab…">
-                </div>
+                <div style="font-size:13px; color:#7a8ea8;">Showing all pending requests</div>
             </div>
 
             <div style="overflow-x: auto;">
                 <table class="modern-table">
                     <thead>
                         <tr>
-                            <th>Date</th>
+                            <th>Student ID</th>
                             <th>Student Name</th>
                             <th>Laboratory</th>
                             <th>Purpose</th>
+                            <th>PC</th>
+                            <th>Date</th>
+                            <th>Time</th>
                             <th>Status</th>
-                            <th style="text-align:center;">Action</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for row in records %}
                         <tr>
-                            <td style="font-weight: 600;">{{ row['res_date'] }}</td>
-                            <td><span class="student-name">{{ row['firstname'] }} {{ row['lastname'] }}</span></td>
-                            <td><span class="lab-badge"><i class="fas fa-flask" style="font-size:10px;margin-right:4px;"></i>{{ row['res_lab'] }}</span></td>
+                            <td style="font-weight:700; color:#1a3f72;">{{ row['id_number'] }}</td>
+                            <td>{{ row['firstname'] }} {{ row['lastname'] }}</td>
+                            <td>{{ row['res_lab'] }}</td>
                             <td>{{ row['res_purpose'] }}</td>
+                            <td>{{ row['selected_pc'] if row['selected_pc'] else '—' }}</td>
+                            <td>{{ row['res_date'] }}</td>
+                            <td>{{ row['res_time'] if row['res_time'] else '—' }}</td>
                             <td>
                                 {% if row['status'] == 'Pending' %}
-                                    <span class="status-badge status-pending"><i class="fas fa-clock" style="font-size:9px;margin-right:4px;"></i>Pending</span>
+                                    <span class="status-pending">Pending</span>
                                 {% elif row['status'] == 'Approved' %}
-                                    <span class="status-badge status-approved"><i class="fas fa-check" style="font-size:9px;margin-right:4px;"></i>Approved</span>
+                                    <span class="status-approved">Approved</span>
+                                {% elif row['status'] == 'Declined' %}
+                                    <span class="status-declined">Declined</span>
                                 {% else %}
-                                    <span class="status-badge status-declined"><i class="fas fa-times" style="font-size:9px;margin-right:4px;"></i>Declined</span>
+                                    <span class="status-pending">{{ row['status'] }}</span>
                                 {% endif %}
                             </td>
                             <td>
                                 {% if row['status'] == 'Pending' %}
-                                    <div class="actions-cell">
-                                        <form action="/process_reservation/{{ row['id'] }}/approve" method="POST" style="display:inline;">
-                                            <button type="submit" class="action-btn action-approve" title="Approve">
-                                                <i class="fas fa-check"></i> Approve
-                                            </button>
-                                        </form>
-                                        <form action="/process_reservation/{{ row['id'] }}/decline" method="POST" style="display:inline;" onsubmit="return confirm('Decline this reservation?');">
-                                            <button type="submit" class="action-btn action-decline" title="Decline">
-                                                <i class="fas fa-times"></i> Decline
-                                            </button>
-                                        </form>
-                                    </div>
+                                <form action="/process_reservation/{{ row['id'] }}/approve" method="POST" style="display:inline;">
+                                    <button type="submit" class="btn-action btn-approve" title="Approve"><i class="fas fa-check"></i></button>
+                                </form>
+                                <form action="/process_reservation/{{ row['id'] }}/decline" method="POST" style="display:inline;">
+                                    <button type="submit" class="btn-action btn-decline" title="Decline"><i class="fas fa-times"></i></button>
+                                </form>
                                 {% else %}
-                                    <span style="font-size: 12px; color: #b0bec5; font-style: italic;">Processed</span>
+                                <span style="color:#aaa; font-size:12px;">—</span>
                                 {% endif %}
-                            </td>
-                        </tr>
-                        {% else %}
-                        <tr class="empty-row">
-                            <td colspan="6">
-                                <i class="fas fa-calendar-times" style="display:block; font-size: 28px; margin-bottom: 10px; color: #d1d5db;"></i>
-                                No reservations found.
                             </td>
                         </tr>
                         {% endfor %}
@@ -310,69 +196,82 @@
                 </table>
             </div>
         </div>
-
     </div>
 
-    <div id="toastBox"></div>
+    <!-- MODALS -->
+    <!-- SEARCH MODAL -->
+    <div id="searchModal" class="modal">
+        <div class="modal-content glass-effect" style="max-width: 550px;">
+            <div class="modal-header">
+                <h2><i class="fas fa-search"></i> Search Student</h2>
+                <button class="close-btn" id="closeSearchBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <input type="text" id="searchInputID" placeholder="Enter ID Number..." style="flex: 1; padding: 12px; border-radius: 8px; border: 1.5px solid #e2e8f0; outline: none; font-size: 14px;">
+                    <button id="executeSearchBtn" class="btn-post" style="padding: 0 25px;"><i class="fas fa-search"></i> Search</button>
+                </div>
+                <div id="searchResults" style="display: none; background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0;"></div>
+            </div>
+        </div>
+    </div>
 
-    <script>
-        function toggleSidebar() {
-            var s = document.getElementById('sidebar'), o = document.getElementById('sidebarOverlay'), h = document.getElementById('hamburgerBtn');
-            var open = s.classList.contains('open');
-            s.classList.toggle('open', !open); o.classList.toggle('visible', !open); h.classList.toggle('open', !open);
-        }
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                document.getElementById('sidebar').classList.remove('open');
-                document.getElementById('sidebarOverlay').classList.remove('visible');
-                document.getElementById('hamburgerBtn').classList.remove('open');
-            }
-        });
+    <!-- PC MANAGEMENT MODAL -->
+    <div id="pcMgmtModal" class="modal">
+        <div class="modal-content glass-effect" style="max-width: 900px; max-height: 90vh; display: flex; flex-direction: column;">
+            <div class="modal-header">
+                <h2><i class="fas fa-laptop-medical"></i> PC Laboratory Maintenance</h2>
+                <button class="close-btn" id="closePcMgmtBtn">&times;</button>
+            </div>
+            <div class="modal-body" style="overflow-y: auto; max-height: calc(90vh - 130px);">
+                <div id="pcGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; padding: 15px; background: #f8fafc; border-radius: 16px; border: 1px solid #e2e8f0; min-height: 300px;"></div>
+            </div>
+        </div>
+    </div>
 
-        function filterReservations() {
-            var q = document.getElementById('searchReservation').value.toLowerCase();
-            document.querySelectorAll('.modern-table tbody tr:not(.empty-row)').forEach(function(row) {
-                row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
-            });
-        }
-
-        // NOTIFICATIONS
-        (function() {
-            var POLL_INTERVAL = 30000, prevCount = 0, dropdownOpen = false;
-            var ICONS = { reservation: 'fa-calendar-check', approved: 'fa-check-circle', declined: 'fa-times-circle', announcement: 'fa-bullhorn' };
-            window.toggleNotifDropdown = function(e) {
-                e.stopPropagation(); var dd = document.getElementById('notifDropdown'); if (!dd) return;
-                dropdownOpen = !dropdownOpen; dd.style.display = dropdownOpen ? 'block' : 'none'; if (dropdownOpen) loadNotifications();
-            };
-            document.addEventListener('click', function(e) {
-                var wrapper = document.getElementById('notifWrapper');
-                if (wrapper && !wrapper.contains(e.target)) { var dd = document.getElementById('notifDropdown'); if (dd) dd.style.display='none'; dropdownOpen=false; }
-            });
-            function loadNotifications() {
-                fetch('/notifications/list').then(function(r){return r.json();}).then(function(items){
-                    var list=document.getElementById('notifList'); if(!list) return;
-                    if(!items||items.length===0){list.innerHTML='<div class="notif-empty"><i class="fas fa-bell-slash"></i><p>No notifications yet</p></div>';return;}
-                    list.innerHTML='';
-                    items.forEach(function(item){
-                        var icon=ICONS[item.type]||'fa-bell', unread=item.is_read===0;
-                        var div=document.createElement('div'); div.className='notif-item'+(unread?' unread':'');
-                        div.innerHTML='<div class="notif-icon '+item.type+'"><i class="fas '+icon+'"></i></div><div class="notif-body"><p class="notif-msg">'+escHtml(item.message)+'</p><span class="notif-time">'+formatTime(item.created_at)+'</span></div>'+(unread?'<div class="notif-unread-dot"></div>':'');
-                        div.addEventListener('click',function(){ fetch('/notifications/read/'+item.id,{method:'POST'}); div.classList.remove('unread'); var dot=div.querySelector('.notif-unread-dot'); if(dot) dot.remove(); if(item.link) window.location.href=item.link; fetchCount(); });
-                        list.appendChild(div);
-                    });
-                }).catch(function(){});
-            }
-            window.markAllRead=function(){ fetch('/notifications/read_all',{method:'POST'}).then(function(){ document.querySelectorAll('.notif-item.unread').forEach(function(el){el.classList.remove('unread');var dot=el.querySelector('.notif-unread-dot');if(dot)dot.remove();}); updateBadge(0); }); };
-            function fetchCount(){ fetch('/notifications/count').then(function(r){return r.json();}).then(function(data){ var count=data.count||0; updateBadge(count); if(count>prevCount&&prevCount!==null){var btn=document.getElementById('notifBellBtn');if(btn){btn.classList.remove('shake');void btn.offsetWidth;btn.classList.add('shake');setTimeout(function(){btn.classList.remove('shake');},700);}} prevCount=count; }).catch(function(){}); }
-            function updateBadge(count){ var badge=document.getElementById('notifBadge'); if(!badge) return; if(count>0){badge.style.display='flex';badge.textContent=count>99?'99+':count;}else{badge.style.display='none';} }
-            function formatTime(s){if(!s)return'';var d=new Date(s.replace(' ','T'));var diff=Math.floor((new Date()-d)/1000);if(diff<60)return'Just now';if(diff<3600)return Math.floor(diff/60)+'m ago';if(diff<86400)return Math.floor(diff/3600)+'h ago';return Math.floor(diff/86400)+'d ago';}
-            function escHtml(str){return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-            fetchCount(); setInterval(fetchCount, POLL_INTERVAL);
-        })();
-    </script>
+    <!-- AI ASSISTANT MODAL -->
+    <div id="aiModal" class="modal">
+        <div class="modal-content glass-effect" style="max-width: 650px; max-height: 90vh; display: flex; flex-direction: column;">
+            <div class="modal-header">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 1px solid rgba(255,255,255,0.3);">
+                        <i class="fas fa-robot" style="font-size: 18px;"></i>
+                    </div>
+                    <div>
+                        <h2 style="font-size: 18px !important;">CCS AI Assistant</h2>
+                        <p style="margin: 0; font-size: 11px; color: rgba(255,255,255,0.7); font-weight: 500;">Online Assistant</p>
+                    </div>
+                </div>
+                <button class="close-btn" id="closeAIBtn">&times;</button>
+            </div>
+            <div class="chat-container" style="flex: 1; border-radius: 0; border: none; height: auto; min-height: 400px;">
+                <div class="chat-messages" id="chatMessages" style="height: 400px; overflow-y: auto;"></div>
+                <form id="chatForm" class="chat-input-area">
+                    <input type="text" id="chatInput" placeholder="Ask about lab status..." autocomplete="off">
+                    <button type="submit" class="chat-send-btn"><i class="fas fa-paper-plane"></i></button>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
     <script src="{{ url_for('static', filename='admin.js') }}"></script>
     <script src="{{ url_for('static', filename='bible_verse.js') }}"></script>
+    <script>
+        document.querySelectorAll('.toggle-option').forEach(function(option) {
+            option.addEventListener('click', function() {
+                var input = option.querySelector('input[type="radio"]');
+                if (!input) return;
+                input.checked = true;
+                var group = option.closest('.toggle-options');
+                if (!group) return;
+                group.querySelectorAll('.toggle-option').forEach(function(opt) {
+                    opt.classList.remove('active');
+                });
+                option.classList.add('active');
+            });
+        });
+    </script>
+    <div id="toastBox"></div>
 </body>
 </html>

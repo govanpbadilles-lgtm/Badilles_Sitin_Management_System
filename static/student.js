@@ -29,6 +29,16 @@ document.addEventListener('DOMContentLoaded', function() {
         window.history.replaceState({}, document.title, window.location.pathname);
     }
 
+    // Check para sa Feedback Success Toast
+    if (urlParams.get('feedback') === 'success') {
+        setTimeout(() => {
+            if (typeof showToast === 'function') {
+                showToast('success', 'Feedback successfully submitted!');
+            }
+        }, 100);
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
     // =======================================================
     // EDIT PROFILE MODAL LOGIC (GIKAN SA NAVBAR)
     // =======================================================

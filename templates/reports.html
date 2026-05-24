@@ -8,235 +8,25 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        *, *::before, *::after { box-sizing: border-box; }
-
-        body.admin-page {
-            padding-top: 0 !important;
-            background: #f0f4f9 !important;
-            background-image: none !important;
-            font-family: 'Segoe UI', system-ui, sans-serif;
-        }
-
-        /* ── NAVBAR ── */
-        .navbar {
-            height: 54px; background: #1b4f8a;
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0 20px; position: sticky; top: 0; z-index: 1000;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.18);
-            width: 100%;
-        }
-        .nav-left { display: flex; align-items: center; gap: 10px; }
-        .nav-left img { height: 32px; width: auto; }
-        .nav-brand { color: white; font-size: 15px; font-weight: 600; }
-        .nav-right { display: flex; align-items: center; gap: 8px; }
-        .nav-links { display: none !important; }
-        .logo      { display: none !important; }
-
-        /* ── NOTIFICATION BELL ── */
-        .notif-wrapper { position: relative; display: inline-flex; align-items: center; }
-        .notif-bell-btn { background: rgba(255,255,255,0.12); border: none; color: white; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; position: relative; transition: background 0.2s, transform 0.2s; }
-        .notif-bell-btn:hover { background: rgba(255,255,255,0.25); transform: scale(1.08); }
-        .notif-bell-btn.shake { animation: bellShake 0.6s ease; }
-        @keyframes bellShake { 0%,100%{transform:rotate(0)} 20%{transform:rotate(-18deg)} 40%{transform:rotate(18deg)} 60%{transform:rotate(-10deg)} 80%{transform:rotate(10deg)} }
-        .notif-badge { position: absolute; top: -4px; right: -4px; background: #ff4c4c; color: white; font-size: 10px; font-weight: bold; min-width: 18px; height: 18px; border-radius: 9px; display: flex !important; align-items: center; justify-content: center; padding: 0 4px; border: 2px solid #1b4f8a; }
-        .notif-dropdown { position: absolute; top: calc(100% + 12px); right: 0; width: 340px; background: white; border-radius: 14px; box-shadow: 0 12px 40px rgba(0,0,0,0.18); z-index: 99999; overflow: hidden; border: 1px solid rgba(0,0,0,0.08); }
-        .notif-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 10px; border-bottom: 1px solid #f0f0f0; font-size: 14px; font-weight: 700; color: #1b4f8a; }
-        .notif-read-all-btn { background: none; border: none; font-size: 12px; color: #888; cursor: pointer; font-family: inherit; }
-        .notif-list { max-height: 360px; overflow-y: auto; }
-        .notif-item { display: flex; align-items: flex-start; gap: 12px; padding: 13px 16px; border-bottom: 1px solid #f7f7f7; cursor: pointer; transition: background 0.15s; }
-        .notif-item:hover { background: #f8faff; }
-        .notif-item.unread { background: #eef5ff; }
-        .notif-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; margin-top: 2px; }
-        .notif-icon.reservation { background: #fff3e0; color: #ff9800; }
-        .notif-icon.approved { background: #e8fff2; color: #15c35a; }
-        .notif-icon.declined { background: #fff0f0; color: #ff4c4c; }
-        .notif-icon.announcement { background: #e8f4fd; color: #1b4f8a; }
-        .notif-body { flex: 1; }
-        .notif-msg { font-size: 13px; color: #333; line-height: 1.4; margin: 0 0 4px; }
-        .notif-time { font-size: 11px; color: #aaa; }
-        .notif-unread-dot { width: 8px; height: 8px; background: #1b4f8a; border-radius: 50%; flex-shrink: 0; margin-top: 6px; }
-        .notif-empty { padding: 40px 20px; text-align: center; color: #bbb; }
-        .notif-empty i { font-size: 36px; display: block; margin-bottom: 10px; }
-        .notif-empty p { margin: 0; font-size: 14px; }
-
-        /* ── HAMBURGER & SIDEBAR ── */
-        .hamburger-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: rgba(255,255,255,0.12); cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; transition: background 0.2s; }
-        .hamburger-btn:hover { background: rgba(255,255,255,0.22); }
-        .hamburger-btn span { display: block; width: 16px; height: 2px; background: white; border-radius: 2px; transition: all 0.28s cubic-bezier(0.4,0,0.2,1); }
-        .hamburger-btn.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-        .hamburger-btn.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
-        .hamburger-btn.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.42); z-index: 1001; backdrop-filter: blur(2px); }
-        .sidebar-overlay.visible { display: block; }
-        .sidebar { position: fixed; top: 0; right: 0; width: 245px; height: 100vh; background: #1b4f8a; z-index: 1002; display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); box-shadow: -4px 0 24px rgba(0,0,0,0.25); }
-        .sidebar.open { transform: translateX(0); }
-        .sidebar-user { display: flex; align-items: center; gap: 12px; padding: 22px 16px 18px; border-bottom: 1px solid rgba(255,255,255,0.12); }
-        .sidebar-admin-icon { width: 48px; height: 48px; border-radius: 50%; background: rgba(255,255,255,0.18); color: white; font-size: 20px; display: flex; align-items: center; justify-content: center; border: 2px solid rgba(255,255,255,0.35); flex-shrink: 0; }
-        .sidebar-name { color: white; font-size: 13px; font-weight: 600; margin-bottom: 3px; }
-        .sidebar-sub { color: rgba(255,255,255,0.52); font-size: 11px; }
-        .sidebar-nav { flex: 1; padding: 10px 0; overflow-y: auto; display: flex; flex-direction: column; }
-        .sidebar-item { display: flex; align-items: center; gap: 12px; padding: 11px 20px; color: rgba(255,255,255,0.68); font-size: 13px; text-decoration: none; border-left: 3px solid transparent; transition: all 0.15s; }
-        .sidebar-item:hover { background: rgba(255,255,255,0.1); color: white; text-decoration: none; }
-        .sidebar-item.active { background: rgba(255,255,255,0.15); color: white; border-left-color: rgba(255,255,255,0.85); font-weight: 600; }
-        .sidebar-item i { width: 17px; text-align: center; font-size: 14px; flex-shrink: 0; }
-        .sidebar-divider { height: 1px; background: rgba(255,255,255,0.1); margin: 6px 16px; }
-        .sidebar-section-label { padding: 10px 20px 4px; font-size: 10px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: rgba(255,255,255,0.35); }
-        .sidebar-footer { padding: 14px 16px; border-top: 1px solid rgba(255,255,255,0.12); }
-        .sidebar-logout-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 10px; border-radius: 8px; background: rgba(255,75,75,0.18); color: rgba(255,175,175,1); font-size: 13px; font-weight: 600; text-decoration: none; transition: background 0.2s; }
-        .sidebar-logout-btn:hover { background: rgba(255,75,75,0.32); color: rgba(255,200,200,1); text-decoration: none; }
-
-        /* ── PAGE LAYOUT — FULL WIDTH ── */
-        .page-wrapper {
-            width: 100%;
-            padding: 24px 28px 60px;
-            box-sizing: border-box;
-        }
-
-        /* ── PAGE HEADER ── */
+        * { box-sizing: border-box; }
+        body.admin-page { padding-top: 0 !important; background: #f0f4f9 !important; font-family: 'Segoe UI', system-ui, sans-serif; }
+        .page-wrapper { width: 100%; max-width: 1600px; margin: 54px auto 0; padding: 24px 28px 60px; box-sizing: border-box; }
         .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
-        .page-title {
-            font-size: 22px; font-weight: 700; color: #1b4f8a;
-            display: flex; align-items: center; gap: 10px; margin: 0;
-        }
-        .page-title i { color: #1b4f8a; }
-
-        /* ── BUTTONS ── */
-        .btn { display: inline-flex; align-items: center; gap: 7px; padding: 9px 18px; border-radius: 8px; border: none; font-size: 13px; font-weight: 600; cursor: pointer; transition: opacity 0.15s, transform 0.1s; text-decoration: none; white-space: nowrap; font-family: inherit; }
-        .btn:active { transform: scale(0.97); }
-        .btn-primary { background: #1b4f8a; color: white; }
-        .btn-primary:hover { background: #15407a; }
-        .btn-success { background: #15b058; color: white; }
-        .btn-success:hover { opacity: 0.88; }
-        .btn-action-group { display: flex; gap: 8px; align-items: center; }
-
-        /* ── EXPORT DROPDOWN ── */
-        .export-dropdown { position: relative; display: inline-block; }
-        .export-menu { display: none; position: absolute; right: 0; top: calc(100% + 6px); background: white; border: 1px solid #e2e8f0; border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); min-width: 190px; z-index: 200; overflow: hidden; }
-        .export-menu.open { display: block; animation: fadeDown 0.15s ease; }
-        @keyframes fadeDown { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
-        .export-item { display: flex; align-items: center; gap: 10px; padding: 11px 16px; font-size: 13px; font-weight: 500; color: #334155; cursor: pointer; transition: background 0.1s; border-bottom: 1px solid #f1f5f9; }
-        .export-item:last-child { border-bottom: none; }
-        .export-item:hover { background: #f8faff; }
-        .export-item .icon-csv { color: #1a7a43; font-size: 15px; }
-        .export-item .icon-print { color: #6366f1; font-size: 15px; }
-
-        /* ── STATS ROW ── */
-        .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; }
-        .stat-card {
-            background: white;
-            border: 1px solid rgba(0,0,0,0.07);
-            border-radius: 12px;
-            padding: 16px 20px;
-            box-shadow: 0 1px 6px rgba(0,0,0,0.06);
-        }
-        .stat-label { font-size: 12px; color: #5a6a85; font-weight: 600; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
-        .stat-label i { font-size: 13px; }
-        .stat-value { font-size: 28px; font-weight: 800; line-height: 1; }
-        .stat-value.blue  { color: #1b4f8a; }
-        .stat-value.green { color: #0d7a3e; }
-        .stat-value.amber { color: #a05c00; }
-        .stat-value.slate { color: #2d3f5a; }
-
-        /* ── FILTER CARD ── */
-        .filter-card {
-            background: white;
-            border: 1px solid rgba(0,0,0,0.07);
-            border-radius: 12px;
-            padding: 18px 22px;
-            margin-bottom: 20px;
-            box-shadow: 0 1px 6px rgba(0,0,0,0.06);
-        }
-        .filter-card-title { font-size: 12px; font-weight: 700; color: #1b4f8a; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; }
-        .filter-row { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end; }
-        .filter-group { display: flex; flex-direction: column; gap: 4px; }
-        .filter-label { font-size: 11px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: 0.4px; }
-        .filter-input { height: 38px; padding: 0 12px; border-radius: 8px; border: 1.5px solid #c8dff5; background: white; color: #222; font-size: 13px; font-family: inherit; outline: none; transition: border-color 0.15s, box-shadow 0.15s; }
-        .filter-input:focus { border-color: #1b4f8a; box-shadow: 0 0 0 3px rgba(27,79,138,0.1); }
-        .filter-actions { display: flex; align-items: flex-end; gap: 10px; margin-left: auto; }
-        .clear-link { color: #c0170f; font-size: 13px; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 5px; padding: 9px 4px; cursor: pointer; transition: opacity 0.15s; }
-        .clear-link:hover { opacity: 0.7; text-decoration: none; }
-
-        /* ── TABLE CARD ── */
-        .table-card {
-            background: white;
-            border: 1px solid rgba(0,0,0,0.07);
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 1px 6px rgba(0,0,0,0.06);
-        }
-        .table-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 13px 20px; border-bottom: 1px solid #f0f0f0; }
-        .table-info { font-size: 13px; color: #1a2d45; font-weight: 600; }
-        .table-info strong { color: #1b4f8a; font-weight: 800; }
-        .table-scroll { overflow-x: auto; max-height: 500px; overflow-y: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        thead th {
-            background: #1b4f8a; color: white; padding: 11px 16px;
-            font-weight: 700; text-align: left; font-size: 12px;
-            position: sticky; top: 0; z-index: 2; white-space: nowrap;
-            letter-spacing: 0.3px;
-        }
-        thead th:first-child { padding-left: 20px; }
-        tbody tr { border-bottom: 1px solid #f0f4f9; transition: background 0.1s; }
-        tbody tr:last-child { border-bottom: none; }
-        tbody tr:hover { background: #f4f8ff; }
-        tbody td { padding: 11px 16px; color: #222; vertical-align: middle; font-weight: 500; }
-        tbody td:first-child { padding-left: 20px; color: #8a9ab5; font-size: 12px; font-weight: 400; }
-        .td-id { font-weight: 700; color: #1b4f8a !important; }
-        .td-name { font-weight: 700; color: #0f2440 !important; }
-        .td-timeout { color: #aaa !important; font-style: italic; }
-
-        /* ── BADGES ── */
-        .badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; }
-        .badge-blue   { background: #dbeafe; color: #1e40af; }
-        .badge-green  { background: #dcfce7; color: #15803d; }
-        .badge-amber  { background: #fef9c3; color: #92400e; }
-        .badge-purple { background: #ede9fe; color: #6d28d9; }
-        .badge-slate  { background: #e2e8f0; color: #334155; }
-        .status-active    { background: #dcfce7; color: #15803d; }
-        .status-completed { background: #e2e8f0; color: #334155; }
-
-        /* ── EMPTY STATE ── */
-        .empty-state { text-align: center; padding: 60px 20px; }
-        .empty-state i { font-size: 40px; color: #cbd5e1; display: block; margin-bottom: 12px; }
-        .empty-state p { color: #94a3b8; font-size: 14px; margin: 0; }
-
-        /* ── PRINT ── */
-        @media print {
-            body { background: white !important; }
-            .navbar, .sidebar, .sidebar-overlay, .filter-card, .btn, .export-dropdown, .stats-row, .table-toolbar { display: none !important; }
-            .page-wrapper { padding: 0; }
-            .table-card { border: none; border-radius: 0; }
-            .print-header { display: block !important; text-align: center; margin-bottom: 20px; }
-            .table-scroll { max-height: none; overflow: visible; }
-            thead th { background: #1b4f8a !important; -webkit-print-color-adjust: exact; }
-        }
-        .print-header { display: none; }
-
-        @media (max-width: 900px) { .stats-row { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 768px) {
-            .page-wrapper { padding: 16px 10px 40px; }
-            .page-header { flex-direction: column; align-items: flex-start; }
-            .filter-row { flex-direction: column; }
-            .filter-actions { margin-left: 0; width: 100%; }
-            .filter-input { width: 100% !important; }
-            .table-scroll { max-height: none; }
-            table { min-width: 600px; }
-            .notif-dropdown { right: -60px !important; width: 300px !important; }
-            .stat-card { padding: 12px 14px; }
-            .stat-value { font-size: 22px; }
-        }
-        @media (max-width: 480px) {
-            .stats-row { grid-template-columns: 1fr 1fr; gap: 8px; }
-            .page-wrapper { padding: 10px 6px 30px; }
-            .page-title { font-size: 18px; }
-            table { min-width: 500px; font-size: 11px; }
-            .notif-dropdown { right: -80px !important; width: 270px !important; }
-        }
+        .page-title { font-size: 22px; font-weight: 700; color: white; display: flex; align-items: center; gap: 10px; margin: 0; }
+        .report-card { background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); overflow: hidden; }
+        .report-toolbar { padding: 18px 20px; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; justify-content: space-between; gap: 15px; }
+        .modern-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .modern-table thead th { padding: 13px 16px; background: #1b4f8a; color: white; font-weight: 600; text-align: left; }
+        .modern-table tbody tr { border-bottom: 1px solid #f5f5f5; }
+        .modern-table tbody td { padding: 13px 16px; color: #444; }
+        .filter-group { display: flex; gap: 10px; align-items: center; }
+        .filter-group select, .filter-group input { padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; outline: none; }
+        .btn-print { padding: 8px 16px; background: #1b4f8a; color: white; border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 600; }
     </style>
 </head>
+
 <body class="admin-page">
 
-    <!-- NAVBAR -->
     <nav class="navbar">
         <div class="nav-left">
             <img src="{{ url_for('static', filename='images/uclogonav.png') }}" alt="UC Logo">
@@ -244,40 +34,29 @@
         </div>
         <div class="nav-right">
             <div class="notif-wrapper" id="notifWrapper">
-                <button class="notif-bell-btn" id="notifBellBtn" onclick="toggleNotifDropdown(event)" title="Notifications">
-                    <i class="fas fa-bell"></i>
-                    <span class="notif-badge" id="notifBadge" style="display:none;">0</span>
-                </button>
+                <button class="notif-bell-btn" id="notifBellBtn" onclick="toggleNotifDropdown(event)"><i class="fas fa-bell"></i><span class="notif-badge" id="notifBadge" style="display:none;">0</span></button>
                 <div class="notif-dropdown" id="notifDropdown" style="display:none;">
-                    <div class="notif-header">
-                        <span><i class="fas fa-bell"></i> Notifications</span>
-                        <button class="notif-read-all-btn" onclick="markAllRead()">Mark all read</button>
-                    </div>
-                    <div class="notif-list" id="notifList">
-                        <div class="notif-empty"><i class="fas fa-bell-slash"></i><p>No notifications yet</p></div>
-                    </div>
+                    <div class="notif-header"><span>Notifications</span><button onclick="markAllRead()">Mark all read</button></div>
+                    <div class="notif-list" id="notifList"></div>
                 </div>
             </div>
-            <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleSidebar()">
-                <span></span><span></span><span></span>
-            </button>
+            <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleSidebar()"><span></span><span></span><span></span></button>
         </div>
     </nav>
 
-    <!-- SIDEBAR OVERLAY -->
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
-    <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-user">
-            <div class="sidebar-admin-icon"><i class="fas fa-user-shield"></i></div>
-            <div>
-                <div class="sidebar-name">Administrator</div>
-                <div class="sidebar-sub">College of Computer Studies</div>
+            <div class="sidebar-avatar"><i class="fas fa-user-shield"></i></div>
+            <div class="sidebar-user-info">
+                <div class="sidebar-name">Admin {{ session.get('firstname', 'User') }}</div>
+                <div class="sidebar-sub">Administrator</div>
             </div>
         </div>
         <nav class="sidebar-nav">
             <a href="/admin_dashboard" class="sidebar-item"><i class="fas fa-home"></i> Home</a>
+            <a href="#" class="sidebar-item" id="sb-search"><i class="fas fa-search"></i> Search Student</a>
             <div class="sidebar-divider"></div>
             <div class="sidebar-section-label">Students & Sit-ins</div>
             <a href="/student_list" class="sidebar-item"><i class="fas fa-user-graduate"></i> View Students</a>
@@ -286,348 +65,154 @@
             <a href="/admin_reservations" class="sidebar-item"><i class="fas fa-calendar-check"></i> Reservations</a>
             <div class="sidebar-divider"></div>
             <div class="sidebar-section-label">Reports</div>
-            <a href="/reports" class="sidebar-item active"><i class="fas fa-file-alt"></i> Sit-in Reports</a>
+            <a href="/reports" class="sidebar-item {% if request.path == '/reports' %}active{% endif %}"><i class="fas fa-file-alt"></i> Sit-in Reports</a>
             <a href="/admin_feedbacks" class="sidebar-item"><i class="fas fa-comments"></i> Feedback Reports</a>
             <div class="sidebar-divider"></div>
-            <a href="/leaderboard" class="sidebar-item"><i class="fas fa-trophy"></i> Leaderboard</a>
-            <a href="/analytics" class="sidebar-item"><i class="fas fa-chart-bar"></i> Analytics</a>
+            <a href="/leaderboard" class="sidebar-item"><i class="fas fa-trophy"></i> Rankings</a>
             <a href="/admin_software" class="sidebar-item"><i class="fas fa-boxes"></i> Software List</a>
+            <a href="#" class="sidebar-item" id="sb-pc-mgmt"><i class="fas fa-laptop-medical"></i> PC Maintenance</a>
+            <a href="#" class="sidebar-item" id="sb-ai"><i class="fas fa-robot"></i> AI Assistant</a>
         </nav>
         <div class="sidebar-footer">
             <a href="/logout" class="sidebar-logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </div>
     </aside>
 
-    <!-- PRINT HEADER -->
-    <div class="print-header">
-        <h2 style="margin:0 0 4px;">College of Computer Studies</h2>
-        <h3 style="margin:0 0 4px; font-weight:400;">Laboratory Sit-in Report</h3>
-        <p style="margin:0; color:#555; font-size:13px;">Generated: <script>document.write(new Date().toLocaleDateString('en-PH', {year:'numeric',month:'long',day:'numeric'}));</script></p>
-    </div>
-
-    <!-- MAIN CONTENT -->
     <div class="page-wrapper">
-
-        <!-- Header -->
         <div class="page-header">
-            <h2 class="page-title"><i class="fas fa-file-invoice"></i> Sit-in Reports</h2>
-            <div class="btn-action-group">
-                <div class="export-dropdown" id="exportDropdown">
-                    <button class="btn btn-success" onclick="toggleExport(event)">
-                        <i class="fas fa-download"></i> Export <i class="fas fa-chevron-down" style="font-size:11px;"></i>
-                    </button>
-                    <div class="export-menu" id="exportMenu">
-                        <div class="export-item" onclick="downloadCSV()">
-                            <i class="fas fa-file-csv icon-csv"></i> Download as CSV
-                        </div>
-                        <div class="export-item" onclick="window.print(); document.getElementById('exportMenu').classList.remove('open');">
-                            <i class="fas fa-print icon-print"></i> Print / Save as PDF
-                        </div>
-                    </div>
+            <h1 class="page-title"><i class="fas fa-file-invoice"></i> Sit-in Reports</h1>
+            <button class="btn-print" onclick="window.print()"><i class="fas fa-print"></i> Generate PDF / Print</button>
+        </div>
+
+        <div class="report-card">
+            <div class="report-toolbar">
+                <div class="filter-group">
+                    <label style="font-size:12px; font-weight:700; color:#666;">FILTER BY:</label>
+                    <select id="filterLab" onchange="filterReports()">
+                        <option value="">All Laboratories</option>
+                        <option value="Lab 524">Lab 524</option>
+                        <option value="Lab 526">Lab 526</option>
+                        <option value="Lab 528">Lab 528</option>
+                        <option value="Lab 542">Lab 542</option>
+                    </select>
+                    <select id="filterPurpose" onchange="filterReports()">
+                        <option value="">All Purposes</option>
+                        <option value="Java">Java</option>
+                        <option value="Python">Python</option>
+                        <option value="C++">C++</option>
+                        <option value="Research">Research</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <i class="fas fa-search" style="color:#aaa;"></i>
+                    <input type="text" id="searchReport" onkeyup="filterReports()" placeholder="Search records...">
                 </div>
             </div>
-        </div>
 
-        <!-- Stats -->
-        <div class="stats-row">
-            <div class="stat-card">
-                <div class="stat-label"><i class="fas fa-list-alt" style="color:#1b4f8a;"></i> Total Records</div>
-                <div class="stat-value blue">{{ records|length }}</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label"><i class="fas fa-check-circle" style="color:#15b058;"></i> Completed</div>
-                <div class="stat-value green">{{ records|selectattr('status','equalto','Completed')|list|length }}</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label"><i class="fas fa-spinner" style="color:#d97706;"></i> Active / Ongoing</div>
-                <div class="stat-value amber">{{ records|selectattr('status','equalto','Active')|list|length }}</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label"><i class="fas fa-flask" style="color:#6366f1;"></i> Labs Covered</div>
-                <div class="stat-value slate" id="labsCovered">—</div>
-            </div>
-        </div>
-
-        <!-- Filters -->
-        <div class="filter-card">
-            <div class="filter-card-title"><i class="fas fa-filter"></i> Filter Records</div>
-            <form action="/reports" method="GET">
-                <div class="filter-row">
-                    <div class="filter-group">
-                        <label class="filter-label">Start Date</label>
-                        <input type="date" name="start_date" value="{{ start_date }}" class="filter-input">
-                    </div>
-                    <div class="filter-group">
-                        <label class="filter-label">End Date</label>
-                        <input type="date" name="end_date" value="{{ end_date }}" class="filter-input">
-                    </div>
-                    <div class="filter-group">
-                        <label class="filter-label">Laboratory</label>
-                        <select name="lab" class="filter-input" style="width:150px;">
-                            <option value="">All Labs</option>
-                            {% for lab in labs %}
-                                <option value="{{ lab['lab'] }}" {% if lab_filter == lab['lab'] %}selected{% endif %}>{{ lab['lab'] }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label class="filter-label">Purpose</label>
-                        <select name="purpose" class="filter-input" style="width:185px;">
-                            <option value="">All Purposes</option>
-                            {% for purp in purposes %}
-                                <option value="{{ purp['purpose'] }}" {% if purpose_filter == purp['purpose'] %}selected{% endif %}>{{ purp['purpose'] }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="filter-actions">
-                        <a href="/reports" class="clear-link"><i class="fas fa-times"></i> Clear</a>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-search"></i> Generate
-                        </button>
-                    </div>
-                </div>
-            </form>
-        </div>
-
-        <!-- Table -->
-        <div class="table-card">
-            <div class="table-toolbar">
-                <span class="table-info">Showing <strong>{{ records|length }}</strong> record{{ 's' if records|length != 1 else '' }}</span>
-                <span style="font-size:12px; color:#94a3b8;"><i class="fas fa-info-circle"></i> Scroll to see all columns</span>
-            </div>
-            <div class="table-scroll">
-                <table id="reportTable">
+            <div style="overflow-x: auto;">
+                <table class="modern-table">
                     <thead>
                         <tr>
-                            <th>#</th>
-                            <th>Date / Time In</th>
-                            <th>Time Out</th>
-                            <th>Status</th>
-                            <th>ID Number</th>
-                            <th>Student Name</th>
-                            <th>Course</th>
-                            <th>Laboratory</th>
+                            <th>Student ID</th>
+                            <th>Name</th>
+                            <th>Lab</th>
                             <th>Purpose</th>
+                            <th>Date</th>
+                            <th>Time In</th>
+                            <th>Time Out</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for row in records %}
-                        <tr>
-                            <td>{{ loop.index }}</td>
-                            <td>{{ row['time_in'] }}</td>
-                            <td>{% if row['time_out'] %}{{ row['time_out'] }}{% else %}<span class="td-timeout">—</span>{% endif %}</td>
-                            <td>
-                                {% if row['status'] == 'Active' %}
-                                    <span class="badge status-active"><i class="fas fa-circle" style="font-size:7px;margin-right:4px;"></i>Active</span>
-                                {% else %}
-                                    <span class="badge status-completed">Done</span>
-                                {% endif %}
-                            </td>
-                            <td class="td-id">{{ row['id_number'] }}</td>
-                            <td class="td-name">{{ row['firstname'] }} {{ row['lastname'] }}</td>
-                            <td>
-                                {% set c = row['course'] %}
-                                {% if c in ['BSCS', 'BSCS-AI'] %}
-                                    <span class="badge badge-blue">{{ c }}</span>
-                                {% elif c == 'BSIT' %}
-                                    <span class="badge badge-green">{{ c }}</span>
-                                {% else %}
-                                    <span class="badge badge-slate">{{ c }}</span>
-                                {% endif %}
-                            </td>
-                            <td><span class="badge badge-purple">{{ row['lab'] }}</span></td>
+                        <tr class="report-row" data-lab="{{ row['lab'] }}" data-purpose="{{ row['purpose'] }}">
+                            <td style="font-weight:700;">{{ row['id_number'] }}</td>
+                            <td>{{ row['firstname'] }} {{ row['lastname'] }}</td>
+                            <td>{{ row['lab'] }}</td>
                             <td>{{ row['purpose'] }}</td>
-                        </tr>
-                        {% else %}
-                        <tr>
-                            <td colspan="9">
-                                <div class="empty-state">
-                                    <i class="fas fa-folder-open"></i>
-                                    <p>No records found for the selected filters.</p>
-                                </div>
-                            </td>
+                            <td>{{ row['time_in'].split(' ')[0] }}</td>
+                            <td style="color:#059669;">{{ row['time_in'].split(' ')[1] }}</td>
+                            <td style="color:#666;">{{ row['time_out'].split(' ')[1] if row['time_out'] else '—' }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
         </div>
+    </div>
 
-    </div><!-- end page-wrapper -->
+    <!-- MODALS -->
+    <!-- SEARCH MODAL -->
+    <div id="searchModal" class="modal">
+        <div class="modal-content glass-effect" style="max-width: 550px;">
+            <div class="modal-header">
+                <h2><i class="fas fa-search"></i> Search Student</h2>
+                <button class="close-btn" id="closeSearchBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <input type="text" id="searchInputID" placeholder="Enter ID Number..." style="flex: 1; padding: 12px; border-radius: 8px; border: 1.5px solid #e2e8f0; outline: none; font-size: 14px;">
+                    <button id="executeSearchBtn" class="btn-post" style="padding: 0 25px;"><i class="fas fa-search"></i> Search</button>
+                </div>
+                <div id="searchResults" style="display: none; background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0;"></div>
+            </div>
+        </div>
+    </div>
 
-    <!-- RAW DATA for JS (CSV export) -->
-    <script id="rawData" type="application/json">
-    [
-        {% for row in records %}
-        {
-            "time_in":   {{ row['time_in']   | tojson }},
-            "time_out":  {{ (row['time_out'] or '') | tojson }},
-            "status":    {{ row['status']    | tojson }},
-            "id_number": {{ row['id_number'] | tojson }},
-            "firstname": {{ row['firstname'] | tojson }},
-            "lastname":  {{ row['lastname']  | tojson }},
-            "course":    {{ row['course']    | tojson }},
-            "lab":       {{ row['lab']       | tojson }},
-            "purpose":   {{ row['purpose']   | tojson }}
-        }{% if not loop.last %},{% endif %}
-        {% endfor %}
-    ]
-    </script>
+    <!-- PC MANAGEMENT MODAL -->
+    <div id="pcMgmtModal" class="modal">
+    <div class="modal-content glass-effect" style="max-width: 900px; max-height: 90vh; display: flex; flex-direction: column;">
+        <div class="modal-header">
+            <h2><i class="fas fa-laptop-medical"></i> PC Laboratory Maintenance</h2>
+            <button class="close-btn" id="closePcMgmtBtn">&times;</button>
+        </div>
+        <div class="modal-body" style="overflow-y: auto; max-height: calc(90vh - 130px);">
+            </div>
+        </div>
+    </div>
 
-    <script>
-        /* ── SIDEBAR ── */
-        function toggleSidebar() {
-            var sidebar   = document.getElementById('sidebar');
-            var overlay   = document.getElementById('sidebarOverlay');
-            var hamburger = document.getElementById('hamburgerBtn');
-            var isOpen    = sidebar.classList.contains('open');
-            if (isOpen) {
-                sidebar.classList.remove('open'); overlay.classList.remove('visible'); hamburger.classList.remove('open');
-            } else {
-                sidebar.classList.add('open'); overlay.classList.add('visible'); hamburger.classList.add('open');
-            }
-        }
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                document.getElementById('sidebar').classList.remove('open');
-                document.getElementById('sidebarOverlay').classList.remove('visible');
-                document.getElementById('hamburgerBtn').classList.remove('open');
-            }
-        });
-
-        /* ── EXPORT DROPDOWN ── */
-        function toggleExport(e) {
-            e.stopPropagation();
-            document.getElementById('exportMenu').classList.toggle('open');
-        }
-        document.addEventListener('click', function() {
-            document.getElementById('exportMenu').classList.remove('open');
-        });
-
-        /* ── CSV DOWNLOAD ── */
-        function downloadCSV() {
-            var raw = document.getElementById('rawData');
-            var data;
-            try { data = JSON.parse(raw.textContent || raw.innerHTML); } catch(e) { alert('No data to export.'); return; }
-            var headers = ['#','Date/Time In','Time Out','Status','ID Number','Student Name','Course','Laboratory','Purpose'];
-            var rows = data.map(function(r, i) {
-                return [i+1, r.time_in, r.time_out||'---', r.status, r.id_number, r.firstname+' '+r.lastname, r.course, r.lab, r.purpose];
-            });
-            var csv = [headers].concat(rows).map(function(row) {
-                return row.map(function(v){ return '"' + String(v).replace(/"/g,'""') + '"'; }).join(',');
-            }).join('\r\n');
-            var blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-            var url  = URL.createObjectURL(blob);
-            var a    = document.createElement('a');
-            a.href = url; a.download = 'sitin_report_' + new Date().toISOString().slice(0,10) + '.csv';
-            document.body.appendChild(a); a.click(); document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            document.getElementById('exportMenu').classList.remove('open');
-        }
-
-        /* ── LABS COVERED STAT ── */
-        (function() {
-            try {
-                var data = JSON.parse(document.getElementById('rawData').textContent || '[]');
-                var labs = new Set(data.map(function(r){ return r.lab; }).filter(Boolean));
-                document.getElementById('labsCovered').textContent = labs.size;
-            } catch(e) {}
-        })();
-
-        /* ── NOTIFICATIONS ── */
-        (function() {
-            var POLL_INTERVAL = 30000, prevCount = 0, dropdownOpen = false;
-            var ICONS = { reservation:'fa-calendar-check', approved:'fa-check-circle', declined:'fa-times-circle', announcement:'fa-bullhorn' };
-
-            window.toggleNotifDropdown = function(e) {
-                e.stopPropagation();
-                var dd = document.getElementById('notifDropdown');
-                if (!dd) return;
-                dropdownOpen = !dropdownOpen;
-                dd.style.display = dropdownOpen ? 'block' : 'none';
-                if (dropdownOpen) loadNotifications();
-            };
-            document.addEventListener('click', function(e) {
-                var wrapper = document.getElementById('notifWrapper');
-                if (wrapper && !wrapper.contains(e.target)) {
-                    var dd = document.getElementById('notifDropdown');
-                    if (dd) dd.style.display = 'none';
-                    dropdownOpen = false;
-                }
-            });
-            function loadNotifications() {
-                fetch('/notifications/list').then(function(r){ return r.json(); }).then(function(items) {
-                    var list = document.getElementById('notifList');
-                    if (!list) return;
-                    if (!items || items.length === 0) {
-                        list.innerHTML = '<div class="notif-empty"><i class="fas fa-bell-slash"></i><p>No notifications yet</p></div>';
-                        return;
-                    }
-                    list.innerHTML = '';
-                    items.forEach(function(item) {
-                        var icon = ICONS[item.type] || 'fa-bell';
-                        var unread = item.is_read === 0;
-                        var div = document.createElement('div');
-                        div.className = 'notif-item' + (unread ? ' unread' : '');
-                        div.innerHTML =
-                            '<div class="notif-icon ' + item.type + '"><i class="fas ' + icon + '"></i></div>' +
-                            '<div class="notif-body"><p class="notif-msg">' + escHtml(item.message) + '</p>' +
-                            '<span class="notif-time">' + formatTime(item.created_at) + '</span></div>' +
-                            (unread ? '<div class="notif-unread-dot"></div>' : '');
-                        div.addEventListener('click', function() {
-                            fetch('/notifications/read/' + item.id, { method: 'POST' });
-                            div.classList.remove('unread');
-                            var dot = div.querySelector('.notif-unread-dot');
-                            if (dot) dot.remove();
-                            if (item.link) window.location.href = item.link;
-                            fetchCount();
-                        });
-                        list.appendChild(div);
-                    });
-                }).catch(function(){});
-            }
-            window.markAllRead = function() {
-                fetch('/notifications/read_all', { method: 'POST' }).then(function() {
-                    document.querySelectorAll('.notif-item.unread').forEach(function(el) {
-                        el.classList.remove('unread');
-                        var dot = el.querySelector('.notif-unread-dot');
-                        if (dot) dot.remove();
-                    });
-                    updateBadge(0);
-                });
-            };
-            function fetchCount() {
-                fetch('/notifications/count').then(function(r){ return r.json(); }).then(function(data) {
-                    var count = data.count || 0;
-                    updateBadge(count);
-                    if (count > prevCount) {
-                        var btn = document.getElementById('notifBellBtn');
-                        if (btn) { btn.classList.remove('shake'); void btn.offsetWidth; btn.classList.add('shake'); setTimeout(function(){ btn.classList.remove('shake'); }, 700); }
-                    }
-                    prevCount = count;
-                }).catch(function(){});
-            }
-            function updateBadge(count) {
-                var badge = document.getElementById('notifBadge');
-                if (!badge) return;
-                badge.style.display = count > 0 ? 'flex' : 'none';
-                badge.textContent   = count > 99 ? '99+' : count;
-            }
-            function formatTime(s) {
-                if (!s) return '';
-                var d = new Date(s.replace(' ','T')), diff = Math.floor((new Date()-d)/1000);
-                if (diff < 60) return 'Just now';
-                if (diff < 3600) return Math.floor(diff/60)+'m ago';
-                if (diff < 86400) return Math.floor(diff/3600)+'h ago';
-                return Math.floor(diff/86400)+'d ago';
-            }
-            function escHtml(str) { return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-            fetchCount();
-            setInterval(fetchCount, POLL_INTERVAL);
-        })();
-    </script>
+    <!-- AI ASSISTANT MODAL -->
+    <div id="aiModal" class="modal">
+        <div class="modal-content glass-effect" style="max-width: 650px; max-height: 90vh; display: flex; flex-direction: column;">
+            <div class="modal-header">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 1px solid rgba(255,255,255,0.3);">
+                        <i class="fas fa-robot" style="font-size: 18px;"></i>
+                    </div>
+                    <div>
+                        <h2 style="font-size: 18px !important;">CCS AI Assistant</h2>
+                        <p style="margin: 0; font-size: 11px; color: rgba(255,255,255,0.7); font-weight: 500;">Online Assistant</p>
+                    </div>
+                </div>
+                <button class="close-btn" id="closeAIBtn">&times;</button>
+            </div>
+            <div class="chat-container" style="flex: 1; border-radius: 0; border: none; height: auto; min-height: 400px;">
+                <div class="chat-messages" id="chatMessages" style="height: 400px; overflow-y: auto;"></div>
+                <form id="chatForm" class="chat-input-area">
+                    <input type="text" id="chatInput" placeholder="Ask about lab status..." autocomplete="off">
+                    <button type="submit" class="chat-send-btn"><i class="fas fa-paper-plane"></i></button>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="{{ url_for('static', filename='admin.js') }}"></script>
+    <script>
+        function filterReports() {
+            var lab = document.getElementById('filterLab').value;
+            var purpose = document.getElementById('filterPurpose').value;
+            var search = document.getElementById('searchReport').value.toLowerCase();
+            
+            document.querySelectorAll('.report-row').forEach(function(row) {
+                var show = true;
+                if (lab && row.dataset.lab !== lab) show = false;
+                if (purpose && row.dataset.purpose !== purpose) show = false;
+                if (search && !row.textContent.toLowerCase().includes(search)) show = false;
+                row.style.display = show ? '' : 'none';
+            });
+        }
+    </script>
+    <script src="{{ url_for('static', filename='bible_verse.js') }}"></script>
     <div id="toastBox"></div>
 </body>
 </html>
