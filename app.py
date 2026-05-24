@@ -1228,15 +1228,19 @@ def leaderboard():
     conn.close()
     leaderboard_data = []
     for s in students:
-        pts_sitins = min((s['total_sitins'] / 30) * 50, 50)
-        pts_hours  = min((s['total_hours']  / 100) * 30, 30)
-        pts_tasks  = min((s['tasks_completed'] / 30) * 20, 20)
+        total_sitins = int(s['total_sitins'] or 0)
+        total_hours = float(s['total_hours'] or 0)
+        tasks_completed = int(s['tasks_completed'] or 0)
+
+        pts_sitins = min((total_sitins / 30) * 50, 50)
+        pts_hours  = min((total_hours / 100) * 30, 30)
+        pts_tasks  = min((tasks_completed / 30) * 20, 20)
         total_pts  = round(pts_sitins + pts_hours + pts_tasks, 2)
         leaderboard_data.append({
             'id_number': s['id_number'], 'firstname': s['firstname'], 'lastname': s['lastname'],
             'course': s['course'], 'profile_pic': s['profile_pic'],
-            'total_sitins': s['total_sitins'], 'total_hours': round(s['total_hours'], 1),
-            'tasks_completed': s['tasks_completed'],
+            'total_sitins': total_sitins, 'total_hours': round(total_hours, 1),
+            'tasks_completed': tasks_completed,
             'points_sitins': round(pts_sitins, 1), 'points_hours': round(pts_hours, 1),
             'points_tasks': round(pts_tasks, 1), 'total_points': total_pts
         })
@@ -1279,10 +1283,11 @@ def public_leaderboard():
     conn.close()
     leaderboard_data = []
     for s in students:
-        pts_sitins = min((s['total_sitins'] / 30) * 50, 50)
-        pts_hours  = min((s['total_hours']  / 100) * 30, 30)
-        pts_tasks  = min((s['tasks_completed'] / 30) * 20, 20)
+        pts_sitins = min((float(s['total_sitins']) / 30) * 50, 50)
+        pts_hours  = min((float(s['total_hours'])  / 100) * 30, 30)
+        pts_tasks  = min((float(s['tasks_completed']) / 30) * 20, 20)
         total_pts  = round(pts_sitins + pts_hours + pts_tasks, 2)
+
         leaderboard_data.append({
             'id_number': s['id_number'], 'firstname': s['firstname'], 'lastname': s['lastname'],
             'course': s['course'], 'profile_pic': s['profile_pic'],
