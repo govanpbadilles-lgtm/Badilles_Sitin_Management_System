@@ -711,6 +711,55 @@ def dashboard():
         """, (student['id_number'],))
     sitin_history = [dict(row) for row in cur.fetchall()]
 
+    # ── Leaderboard Rankings ──────────────────────────────
+    if USE_PG:
+        cur.execute("""
+            SELECT u.id, u.id_number, u.firstname, u.lastname, u.course, u.profile_pic,
+                COUNT(s.id) AS total_sitins,
+                COALESCE(SUM(CASE WHEN s.time_out IS NOT NULL
+                    THEN EXTRACT(EPOCH FROM (s.time_out - s.time_in)) / 3600 ELSE 0 END), 0) AS total_hours,
+                COALESCE(SUM(CASE WHEN s.feedback IS NOT NULL AND s.feedback != '' THEN 1 ELSE 0 END), 0) AS tasks_completed
+            FROM users u
+            LEFT JOIN sitin_records s ON u.id_number = s.id_number AND s.status = 'Completed'
+            WHERE u.role = 'student'
+            GROUP BY u.id, u.id_number, u.firstname, u.lastname, u.course, u.profile_pic
+        """)
+    else:
+        cur.execute("""
+            SELECT u.id, u.id_number, u.firstname, u.lastname, u.course, u.profile_pic,
+                COUNT(s.id) AS total_sitins,
+                COALESCE(SUM(CASE WHEN s.time_out IS NOT NULL
+                    THEN (julianday(s.time_out)-julianday(s.time_in))*24 ELSE 0 END),0) AS total_hours,
+                COALESCE(SUM(CASE WHEN s.feedback IS NOT NULL AND s.feedback != '' THEN 1 ELSE 0 END),0) AS tasks_completed
+            FROM users u
+            LEFT JOIN sitin_records s ON u.id_number = s.id_number AND s.status = 'Completed'
+            WHERE u.role = 'student'
+            GROUP BY u.id, u.id_number, u.firstname, u.lastname, u.course, u.profile_pic
+        """)
+    students_lb = cur.fetchall()
+    
+    leaderboard_data = []
+    for s in students_lb:
+        total_sitins = int(s['total_sitins'] or 0)
+        total_hours = float(s['total_hours'] or 0)
+        tasks_completed = int(s['tasks_completed'] or 0)
+
+        pts_sitins = min((total_sitins / 30) * 50, 50)
+        pts_hours  = min((total_hours / 100) * 30, 30)
+        pts_tasks  = min((tasks_completed / 30) * 20, 20)
+        total_pts  = round(pts_sitins + pts_hours + pts_tasks, 2)
+        leaderboard_data.append({
+            'id_number': s['id_number'], 'firstname': s['firstname'], 'lastname': s['lastname'],
+            'course': s['course'], 'profile_pic': s['profile_pic'],
+            'total_sitins': total_sitins, 'total_hours': round(total_hours, 1),
+            'tasks_completed': tasks_completed,
+            'points_sitins': round(pts_sitins, 1), 'points_hours': round(pts_hours, 1),
+            'points_tasks': round(pts_tasks, 1), 'total_points': total_pts
+        })
+    leaderboard_data.sort(key=lambda x: x['total_points'], reverse=True)
+    for i, s in enumerate(leaderboard_data):
+        s['rank'] = i + 1
+
     reservations_enabled = get_setting(conn, 'reservations_enabled', 'Enabled')
     feedback_enabled     = get_setting(conn, 'feedback_enabled',     'Enabled')
     conn.close()
@@ -723,6 +772,7 @@ def dashboard():
         sitin_history        = sitin_history,
         reservations_enabled = reservations_enabled,
         feedback_enabled     = feedback_enabled,
+        leaderboard          = leaderboard_data,
     )
 
 
@@ -973,10 +1023,18 @@ def delete_student(id):
         return redirect(url_for('home'))
     conn = get_db_connection()
     cur  = conn.cursor()
-    cur.execute(f"DELETE FROM users WHERE id = {PH}", (id,))
-    conn.commit()
+    cur.execute(f"SELECT id_number FROM users WHERE id={PH}", (id,))
+    student = cur.fetchone()
+    if student:
+        id_number = student['id_number']
+        cur.execute(f"DELETE FROM sitin_records WHERE id_number={PH}", (id_number,))
+        cur.execute(f"DELETE FROM reservations WHERE id_number={PH}", (id_number,))
+        cur.execute(f"DELETE FROM admin_awards WHERE id_number={PH}", (id_number,))
+        cur.execute(f"DELETE FROM admin_tasks WHERE id_number={PH}", (id_number,))
+        cur.execute(f"DELETE FROM users WHERE id={PH}", (id,))
+        conn.commit()
     conn.close()
-    return redirect(url_for('student_list'))
+    return redirect(url_for('student_list', deleted='success'))
 
 
 @app.route('/admin_add_student', methods=['POST'])
@@ -1005,7 +1063,7 @@ def admin_add_student():
             conn.rollback()
     finally:
         conn.close()
-    return redirect(url_for('student_list'))
+    return redirect(url_for('student_list', added='success'))
 
 
 @app.route('/reset_sessions', methods=['POST'])
@@ -1136,7 +1194,7 @@ def edit_student(id):
     """, (firstname, middlename, lastname, course, course_level, id))
     conn.commit()
     conn.close()
-    return redirect(url_for('student_list'))
+    return redirect(url_for('student_list', edited='success'))
 
 
 @app.route('/add_feedback', methods=['POST'])
@@ -1266,8 +1324,34 @@ def leaderboard():
     leaderboard_data.sort(key=lambda x: x['total_points'], reverse=True)
     for i, s in enumerate(leaderboard_data):
         s['rank'] = i + 1
+
+    role = session.get('role')
+    if role == 'admin':
+        # Re-open connection to query admin details
+        conn = get_db_connection()
+        cur  = conn.cursor()
+        cur.execute("SELECT * FROM admin_awards ORDER BY date_awarded DESC")
+        awards = cur.fetchall()
+        cur.execute("SELECT * FROM admin_tasks ORDER BY date_assigned DESC")
+        tasks = cur.fetchall()
+        cur.execute("SELECT id_number, firstname, lastname, course FROM users WHERE role='student' ORDER BY lastname ASC, firstname ASC")
+        students_list = cur.fetchall()
+        conn.close()
+        tab = request.args.get('tab', 'rankings')
+        return render_template('admin_leaderboard.html', 
+                               leaderboard=leaderboard_data,
+                               students=students_list, 
+                               awards=awards, 
+                               tasks=tasks, 
+                               current_tab=tab,
+                               role=role,
+                               current_user_id=session.get('user_id'))
+
+    if role == 'student':
+        return redirect(url_for('dashboard', action='leaderboard'))
+
     return render_template('leaderboard.html', leaderboard=leaderboard_data,
-                           role=session.get('role'), current_user_id=session.get('user_id'))
+                           role=role, current_user_id=session.get('user_id'))
 
 
 @app.route('/api/public/leaderboard')
@@ -1359,14 +1443,14 @@ def admin_feedbacks():
 def admin_award_points():
     if 'user_id' not in session or session.get('role') != 'admin':
         return redirect(url_for('home'))
-    conn = get_db_connection()
-    cur  = conn.cursor()
     if request.method == 'POST':
         id_number = request.form.get('id_number', '').strip()
         points    = int(request.form.get('points', 0))
         reason    = request.form.get('reason', '').strip()
         category  = request.form.get('category', 'Other').strip()
         formatted_reason = f"[{category}] {reason}"
+        conn = get_db_connection()
+        cur  = conn.cursor()
         cur.execute(f"SELECT firstname, lastname FROM users WHERE id_number = {PH}", (id_number,))
         student = cur.fetchone()
         student_name = f"{student['firstname']} {student['lastname']}" if student else id_number
@@ -1375,20 +1459,14 @@ def admin_award_points():
             VALUES ({PH},{PH},{PH},{PH},{PH})
         """, (id_number, student_name, points, formatted_reason, session.get('firstname', 'Admin')))
         conn.commit()
-    cur.execute("SELECT * FROM admin_awards ORDER BY date_awarded DESC")
-    awards = cur.fetchall()
-    cur.execute("SELECT id_number, firstname, lastname, course FROM users WHERE role='student' ORDER BY lastname ASC, firstname ASC")
-    students = cur.fetchall()
-    conn.close()
-    return render_template('admin_award_points.html', awards=awards, students=students)
+        conn.close()
+    return redirect(url_for('leaderboard', tab='award'))
 
 
 @app.route('/admin_manage_tasks', methods=['GET', 'POST'])
 def admin_manage_tasks():
     if 'user_id' not in session or session.get('role') != 'admin':
         return redirect(url_for('home'))
-    conn = get_db_connection()
-    cur  = conn.cursor()
     if request.method == 'POST':
         id_number   = request.form.get('id_number', '').strip()
         task_title  = request.form.get('task_title', '').strip()
@@ -1396,6 +1474,8 @@ def admin_manage_tasks():
         points      = int(request.form.get('points', 0))
         priority    = request.form.get('priority', 'Medium').strip()
         due_date    = request.form.get('due_date', '').strip()
+        conn = get_db_connection()
+        cur  = conn.cursor()
         cur.execute(f"SELECT firstname, lastname FROM users WHERE id_number = {PH}", (id_number,))
         student = cur.fetchone()
         student_name = f"{student['firstname']} {student['lastname']}" if student else id_number
@@ -1404,12 +1484,8 @@ def admin_manage_tasks():
             VALUES ({PH},{PH},{PH},{PH},{PH},{PH},{PH},{PH},'To Do')
         """, (id_number, student_name, task_title, description, points, session.get('firstname', 'Admin'), priority, due_date))
         conn.commit()
-    cur.execute("SELECT * FROM admin_tasks ORDER BY date_assigned DESC")
-    tasks = cur.fetchall()
-    cur.execute("SELECT id_number, firstname, lastname, course FROM users WHERE role='student' ORDER BY lastname ASC, firstname ASC")
-    students = cur.fetchall()
-    conn.close()
-    return render_template('admin_manage_tasks.html', tasks=tasks, students=students)
+        conn.close()
+    return redirect(url_for('leaderboard', tab='tasks'))
 
 
 @app.route('/admin_manage_tasks/<int:task_id>/complete', methods=['POST'])
@@ -1419,7 +1495,7 @@ def admin_complete_task(task_id):
     conn = get_db_connection()
     conn.cursor().execute(f"UPDATE admin_tasks SET status='Completed' WHERE id={PH}", (task_id,))
     conn.commit(); conn.close()
-    return redirect(url_for('admin_manage_tasks'))
+    return redirect(url_for('leaderboard', tab='tasks'))
 
 
 @app.route('/admin_manage_tasks/<int:task_id>/update_status', methods=['POST'])
@@ -1450,7 +1526,7 @@ def admin_delete_task(task_id):
     conn = get_db_connection()
     conn.cursor().execute(f"DELETE FROM admin_tasks WHERE id={PH}", (task_id,))
     conn.commit(); conn.close()
-    return redirect(url_for('admin_manage_tasks'))
+    return redirect(url_for('leaderboard', tab='tasks'))
 
 
 @app.route('/admin_award_points/<int:award_id>/delete', methods=['POST'])
@@ -1460,7 +1536,7 @@ def admin_delete_award(award_id):
     conn = get_db_connection()
     conn.cursor().execute(f"DELETE FROM admin_awards WHERE id={PH}", (award_id,))
     conn.commit(); conn.close()
-    return redirect(url_for('admin_award_points'))
+    return redirect(url_for('leaderboard', tab='award'))
 
 
 @app.route('/admin_update_system_settings', methods=['POST'])

@@ -34,6 +34,8 @@
         .students-table tbody td { padding: 14px 16px; vertical-align: middle; color: #475569; }
         .action-edit { color: #1a3f72; cursor: pointer; font-size: 16px; transition: transform 0.2s; }
         .action-edit:hover { transform: scale(1.2); color: #2563eb; }
+        .action-delete { color: #dc2626; cursor: pointer; font-size: 15px; transition: transform 0.2s; background: none; border: none; padding: 0; display: inline-flex; align-items: center; }
+        .action-delete:hover { transform: scale(1.2); color: #ef4444; }
 
         /* Modal specific to this page */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 10000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
@@ -124,12 +126,6 @@
             <a href="/admin_reservations" class="sidebar-item {% if request.path == '/admin_reservations' %}active{% endif %}">
                 <i class="fas fa-calendar-check"></i> Reservations
             </a>
-            <a href="/admin_award_points" class="sidebar-item {% if request.path == '/admin_award_points' %}active{% endif %}">
-                <i class="fas fa-award"></i> Award Points
-            </a>
-            <a href="/admin_manage_tasks" class="sidebar-item {% if request.path == '/admin_manage_tasks' %}active{% endif %}">
-                <i class="fas fa-tasks"></i> Manage Tasks
-            </a>
 
             <div class="sidebar-divider"></div>
             <div class="sidebar-section-label">Reports</div>
@@ -149,9 +145,6 @@
             </a>
             <a href="/admin_software" class="sidebar-item {% if request.path == '/admin_software' %}active{% endif %}">
                 <i class="fas fa-boxes"></i> Software List
-            </a>
-            <a href="/community" class="sidebar-item {% if request.path == '/community' %}active{% endif %}">
-                <i class="fas fa-users"></i> Community Hub
             </a>
             <a href="#" class="sidebar-item" id="sb-pc-mgmt">
                 <i class="fas fa-laptop-medical"></i> PC Maintenance
@@ -211,14 +204,20 @@
                             <td>{{ student.lastname }}</td>
                             <td><span style="font-weight:600; color:#1a3f72;">{{ student.course }}</span></td>
                             <td>{{ student.course_level }}</td>
-                            <td>
+                            <td style="display: flex; gap: 12px; align-items: center;">
                                 <i class="fas fa-edit action-edit open-edit-btn" 
                                    data-id="{{ student.id }}"
                                    data-firstname="{{ student.firstname }}"
                                    data-middlename="{{ student.middlename or '' }}"
                                    data-lastname="{{ student.lastname }}"
                                    data-course="{{ student.course }}"
-                                   data-level="{{ student.course_level }}"></i>
+                                   data-level="{{ student.course_level }}"
+                                   title="Edit Student"></i>
+                                <form action="/delete_student/{{ student.id }}" method="POST" onsubmit="return confirm('Are you sure you want to delete {{ student.firstname }} {{ student.lastname }}? This will also remove all their sit-in, reservation, and tasks/awards history.')" style="display: inline; margin: 0;">
+                                    <button type="submit" class="action-delete" title="Delete Student">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                         {% endfor %}
@@ -454,6 +453,27 @@
     <script src="{{ url_for('static', filename='admin.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // Toast notifications
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('deleted') === 'success') {
+                setTimeout(() => {
+                    if (typeof showToast === 'function') showToast('success', 'Student deleted successfully.');
+                }, 100);
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+            if (urlParams.get('added') === 'success') {
+                setTimeout(() => {
+                    if (typeof showToast === 'function') showToast('success', 'Student registered successfully.');
+                }, 100);
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+            if (urlParams.get('edited') === 'success') {
+                setTimeout(() => {
+                    if (typeof showToast === 'function') showToast('success', 'Student updated successfully.');
+                }, 100);
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+
             var addModal = document.getElementById('addStudentModal');
             var editModal = document.getElementById('editStudentModal');
             document.getElementById('openAddBtn').onclick = () => addModal.classList.add('open');

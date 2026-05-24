@@ -453,7 +453,7 @@
         <a href="#" class="sidebar-item {% if reservations_enabled == 'Disabled' %}disabled{% endif %}" id="sb-reservation"><i class="fas fa-calendar-check"></i> Reservation</a>
         <a href="#" class="sidebar-item {% if feedback_enabled == 'Disabled' %}disabled{% endif %}" id="sb-feedback"><i class="fas fa-comment-dots"></i> Send Feedback</a>
         <div class="sidebar-divider"></div>
-        <a href="/leaderboard" class="sidebar-item"><i class="fas fa-trophy"></i> Leaderboard</a>
+        <a href="#" class="sidebar-item" id="sb-leaderboard"><i class="fas fa-trophy"></i> Leaderboard</a>
         <a href="#" class="sidebar-item" id="sb-ai"><i class="fas fa-robot"></i> AI Advisor</a>
     </nav>
     <div class="sidebar-footer">
@@ -922,6 +922,154 @@
     </div>
 </div>
 
+<!-- LEADERBOARD MODAL -->
+<div id="leaderboardModal" class="modal">
+    <div class="modal-content glass-effect" style="max-width: 950px; max-height: 90vh; display: flex; flex-direction: column;">
+        <div class="modal-header">
+            <h2><i class="fas fa-trophy" style="color: #f7c948;"></i> Student Leaderboard</h2>
+            <button class="close-btn" id="closeLeaderboardBtn">&times;</button>
+        </div>
+        <div class="modal-body" style="overflow-y: auto; max-height: calc(90vh - 130px); padding: 25px;">
+            
+            <div class="lb-header" style="text-align: center; margin-bottom: 25px;">
+                <p style="color: #666; font-size: 14px; margin: 0;">Rankings based on sit-in activity, hours logged, and feedbacks submitted.</p>
+            </div>
+
+            <div class="legend-bar" style="margin-bottom: 25px;">
+                <div class="legend-item">
+                    <div class="legend-dot" style="background:#1b4f8a;"></div>
+                    <span>Points Earned (50%) — based on total sit-ins</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot" style="background:#15c35a;"></div>
+                    <span>Hours Sit-in (30%) — total lab hours</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot" style="background:#ff9800;"></div>
+                    <span>Tasks Completed (20%) — feedbacks submitted</span>
+                </div>
+            </div>
+
+            {% if leaderboard %}
+            <div class="podium-section" style="margin-bottom: 35px;">
+                {% if leaderboard|length >= 2 %}
+                <div class="podium-card silver-card">
+                    <div class="podium-badge">
+                        <i class="fas fa-medal"></i> 2nd Place
+                    </div>
+                    <div class="podium-avatar-wrapper">
+                        <img src="{{ url_for('static', filename='uploads/' + leaderboard[1]['profile_pic']) if leaderboard[1]['profile_pic'] and leaderboard[1]['profile_pic'] != 'default_profile.png' else url_for('static', filename='images/default_profile.png') }}"
+                             class="podium-avatar" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'">
+                        <div class="medal-badge"><i class="fas fa-medal"></i></div>
+                    </div>
+                    <div class="podium-name">{{ leaderboard[1]['firstname'] }} {{ leaderboard[1]['lastname'] }}</div>
+                    <div class="podium-course">{{ leaderboard[1]['course'] }}</div>
+                    <div class="podium-score">{{ leaderboard[1]['total_points'] }}</div>
+                    <div class="podium-label">Total Points</div>
+                </div>
+                {% endif %}
+
+                {% if leaderboard|length >= 1 %}
+                <div class="podium-card gold-card">
+                    <div class="podium-badge">
+                        <i class="fas fa-crown"></i> 1st Place
+                    </div>
+                    <div class="podium-avatar-wrapper">
+                        <img src="{{ url_for('static', filename='uploads/' + leaderboard[0]['profile_pic']) if leaderboard[0]['profile_pic'] and leaderboard[0]['profile_pic'] != 'default_profile.png' else url_for('static', filename='images/default_profile.png') }}"
+                             class="podium-avatar" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'">
+                        <div class="medal-badge"><i class="fas fa-trophy"></i></div>
+                    </div>
+                    <div class="podium-name">{{ leaderboard[0]['firstname'] }} {{ leaderboard[0]['lastname'] }}</div>
+                    <div class="podium-course">{{ leaderboard[0]['course'] }}</div>
+                    <div class="podium-score">{{ leaderboard[0]['total_points'] }}</div>
+                    <div class="podium-label">Total Points</div>
+                </div>
+                {% endif %}
+
+                {% if leaderboard|length >= 3 %}
+                <div class="podium-card bronze-card">
+                    <div class="podium-badge">
+                        <i class="fas fa-award"></i> 3rd Place
+                    </div>
+                    <div class="podium-avatar-wrapper">
+                        <img src="{{ url_for('static', filename='uploads/' + leaderboard[2]['profile_pic']) if leaderboard[2]['profile_pic'] and leaderboard[2]['profile_pic'] != 'default_profile.png' else url_for('static', filename='images/default_profile.png') }}"
+                             class="podium-avatar" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'">
+                        <div class="medal-badge"><i class="fas fa-award"></i></div>
+                    </div>
+                    <div class="podium-name">{{ leaderboard[2]['firstname'] }} {{ leaderboard[2]['lastname'] }}</div>
+                    <div class="podium-course">{{ leaderboard[2]['course'] }}</div>
+                    <div class="podium-score">{{ leaderboard[2]['total_points'] }}</div>
+                    <div class="podium-label">Total Points</div>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="lb-controls" style="margin-bottom: 20px;">
+                <h3 style="margin:0; color:#1b4f8a;"><i class="fas fa-list-ol"></i> Full Rankings</h3>
+                <div class="lb-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="lbSearchModal" placeholder="Search student..." onkeyup="filterLeaderboardModal()">
+                </div>
+            </div>
+
+            <div style="overflow-x: auto; border-radius: 12px; border: 1px solid #ddd;">
+                <table class="lb-table" id="lbTableModal">
+                    <thead>
+                        <tr>
+                            <th style="width:60px; text-align:center;">Rank</th>
+                            <th>Student</th>
+                            <th>Course</th>
+                            <th style="text-align:center;">Sit-ins</th>
+                            <th style="text-align:center;">Hours</th>
+                            <th style="text-align:center;">Feedbacks</th>
+                            <th>Points Breakdown</th>
+                            <th style="text-align:center;">Total Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in leaderboard %}
+                        <tr class="{{ 'is-me' if s['id_number'] == student['id_number'] else '' }}">
+                            <td style="text-align:center;">
+                                <span class="rank-badge {% if s['rank'] == 1 %}rank-1{% elif s['rank'] == 2 %}rank-2{% elif s['rank'] == 3 %}rank-3{% else %}rank-other{% endif %}">
+                                    {{ s['rank'] }}
+                                </span>
+                            </td>
+                            <td>
+                                <img src="{{ url_for('static', filename='uploads/' + s['profile_pic']) if s['profile_pic'] and s['profile_pic'] != 'default_profile.png' else url_for('static', filename='images/default_profile.png') }}"
+                                     class="mini-avatar" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'">
+                                {{ s['firstname'] }} {{ s['lastname'] }}
+                            </td>
+                            <td>{{ s['course'] }}</td>
+                            <td style="text-align:center; font-weight:bold;">{{ s['total_sitins'] }}</td>
+                            <td style="text-align:center;">{{ s['total_hours'] }}h</td>
+                            <td style="text-align:center;">{{ s['tasks_completed'] }}</td>
+                            <td>
+                                <div class="points-breakdown">
+                                    <span class="pts-pill pts-sitin" title="Points from Sit-ins (50%)">{{ s['points_sitins'] }}</span>
+                                    <span class="pts-pill pts-hours" title="Points from Hours (30%)">{{ s['points_hours'] }}</span>
+                                    <span class="pts-pill pts-tasks" title="Points from Tasks (20%)">{{ s['points_tasks'] }}</span>
+                                </div>
+                            </td>
+                            <td style="text-align:center;">
+                                <span class="total-pts" style="font-weight:bold; color:#1b4f8a;">{{ s['total_points'] }}</span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-trophy" style="font-size:50px; color:#ddd; display:block; margin-bottom:15px;"></i>
+                <p style="font-size:18px; font-weight:bold;">No data yet!</p>
+                <p>Students need to complete sit-in sessions for rankings to appear.</p>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+
 <!-- RESERVATION SUCCESS MODAL -->
 <div id="resSuccessModal" class="modal">
     <div class="modal-content glass-effect" style="max-width: 420px; text-align: center;">
@@ -998,20 +1146,55 @@ document.getElementById('sb-feedback').addEventListener('click', (e) => {
     }
     document.getElementById('feedbackModal').style.display = 'flex';
 });
+document.getElementById('sb-leaderboard').addEventListener('click', (e) => { e.preventDefault(); toggleSidebar(); document.getElementById('leaderboardModal').style.display = 'flex'; });
 document.getElementById('sb-ai').addEventListener('click', (e) => { e.preventDefault(); toggleSidebar(); document.getElementById('aiModal').style.display = 'flex'; loadChatHistory(); });
 
 document.getElementById('closeEditProfileBtn').onclick = () => document.getElementById('editProfileModal').style.display = 'none';
 document.getElementById('closeReservationBtn').onclick = () => document.getElementById('reservationModal').style.display = 'none';
 document.getElementById('closeFeedbackBtn').onclick = () => document.getElementById('feedbackModal').style.display = 'none';
+document.getElementById('closeLeaderboardBtn').onclick = () => document.getElementById('leaderboardModal').style.display = 'none';
 document.getElementById('closeAIBtn').onclick = () => document.getElementById('aiModal').style.display = 'none';
 
 window.onclick = (e) => {
-    const modals = ['editProfileModal', 'reservationModal', 'feedbackModal', 'aiModal'];
+    const modals = ['editProfileModal', 'reservationModal', 'feedbackModal', 'aiModal', 'leaderboardModal'];
     modals.forEach(id => {
         const m = document.getElementById(id);
         if (e.target === m) m.style.display = 'none';
     });
 };
+
+// URL Query Parameter Action Handler
+window.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const action = urlParams.get('action');
+    if (action === 'editProfile') {
+        document.getElementById('editProfileModal').style.display = 'flex';
+    } else if (action === 'reservation') {
+        if (reservationsEnabled) {
+            document.getElementById('reservationModal').style.display = 'flex';
+            goToStep(1);
+            switchTab('book');
+        } else {
+            alert('Reservations are currently disabled by the administrator.');
+        }
+    } else if (action === 'feedback') {
+        if (feedbackEnabled) {
+            document.getElementById('feedbackModal').style.display = 'flex';
+        } else {
+            alert('Student feedback is currently disabled by the administrator.');
+        }
+    } else if (action === 'ai') {
+        document.getElementById('aiModal').style.display = 'flex';
+        loadChatHistory();
+    } else if (action === 'leaderboard') {
+        document.getElementById('leaderboardModal').style.display = 'flex';
+    }
+    // Clean up the URL query params without reloading the page
+    if (action) {
+        const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+        window.history.replaceState({ path: cleanUrl }, '', cleanUrl);
+    }
+});
 
 // Reservation Success Logic
 function closeSuccessModal() {
@@ -1170,6 +1353,16 @@ function loadNotifications() {
 
 function markAllRead() {
     fetch('/notifications/read_all', { method: 'POST' }).then(() => loadNotifications());
+}
+
+function filterLeaderboardModal() {
+    const input = document.getElementById('lbSearchModal').value.toLowerCase();
+    const rows = document.querySelectorAll('#lbTableModal tbody tr');
+    rows.forEach(row => {
+        const name = row.cells[1] ? row.cells[1].textContent.toLowerCase() : '';
+        const course = row.cells[2] ? row.cells[2].textContent.toLowerCase() : '';
+        row.style.display = (name.includes(input) || course.includes(input)) ? '' : 'none';
+    });
 }
 </script>
 

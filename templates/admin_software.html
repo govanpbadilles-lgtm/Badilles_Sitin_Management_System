@@ -364,12 +364,6 @@
         <a href="/admin_reservations" class="sidebar-item {% if request.path == '/admin_reservations' %}active{% endif %}">
             <i class="fas fa-calendar-check"></i> Reservations
         </a>
-        <a href="/admin_award_points" class="sidebar-item {% if request.path == '/admin_award_points' %}active{% endif %}">
-            <i class="fas fa-award"></i> Award Points
-        </a>
-        <a href="/admin_manage_tasks" class="sidebar-item {% if request.path == '/admin_manage_tasks' %}active{% endif %}">
-            <i class="fas fa-tasks"></i> Manage Tasks
-        </a>
 
         <div class="sidebar-divider"></div>
         <div class="sidebar-section-label">Reports</div>
@@ -389,9 +383,6 @@
         </a>
         <a href="/admin_software" class="sidebar-item {% if request.path == '/admin_software' %}active{% endif %}">
             <i class="fas fa-boxes"></i> Software List
-        </a>
-        <a href="/community" class="sidebar-item {% if request.path == '/community' %}active{% endif %}">
-            <i class="fas fa-users"></i> Community Hub
         </a>
         <a href="#" class="sidebar-item" id="sb-pc-mgmt">
             <i class="fas fa-laptop-medical"></i> PC Maintenance
@@ -496,8 +487,6 @@
 <!-- ══════════════════════════════════════════
      SCRIPTS
 ══════════════════════════════════════════ -->
-<script src="{{ url_for('static', filename='script.js') }}"></script>
-<script src="{{ url_for('static', filename='admin.js') }}"></script>
 
 <script>
 /* ── SIDEBAR ── */
@@ -624,6 +613,7 @@ if (params.get('deleted') === 'true') {
     fetchCount();
     setInterval(fetchCount, POLL_INTERVAL);
 })();
+</script>
     <!-- COMMON MODALS -->
     <!-- SEARCH MODAL -->
     <div id="searchModal" class="modal">

@@ -6,8 +6,12 @@
     <title>{% if role == 'admin' %}Rankings | CCS Sit-in System{% else %}Leaderboard | CCS Sit-in System{% endif %}</title>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    {% if role == 'admin' %}
     <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
+    {% endif %}
+    {% if role == 'student' %}
     <link rel="stylesheet" href="{{ url_for('static', filename='student.css') }}">
+    {% endif %}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
@@ -116,7 +120,7 @@
         </style>
     </head>
 
-    <body class="{% if role == 'admin' %}admin-page{% else %}leaderboard-page{% endif %}">
+    <body class="{% if role == 'admin' %}admin-page{% elif role == 'student' %}student-page{% else %}leaderboard-page{% endif %}">
 
     <nav class="navbar">
         <div class="logo">
@@ -190,7 +194,7 @@
                 {% if session.get('role') == 'admin' %}
                     <a href="/admin_dashboard" class="nav-item"><i class="fas fa-user-shield"></i> Dashboard</a>
                 {% else %}
-                    <a href="/student_dashboard" class="nav-item"><i class="fas fa-desktop"></i> Dashboard</a>
+                    <a href="/dashboard" class="nav-item"><i class="fas fa-desktop"></i> Dashboard</a>
                 {% endif %}
                 <a href="/logout" class="nav-item"><i class="fas fa-sign-out-alt"></i> Logout</a>
             {% else %}
@@ -243,12 +247,6 @@
             <a href="/admin_reservations" class="sidebar-item {% if request.path == '/admin_reservations' %}active{% endif %}">
                 <i class="fas fa-calendar-check"></i> Reservations
             </a>
-            <a href="/admin_award_points" class="sidebar-item {% if request.path == '/admin_award_points' %}active{% endif %}">
-                <i class="fas fa-award"></i> Award Points
-            </a>
-            <a href="/admin_manage_tasks" class="sidebar-item {% if request.path == '/admin_manage_tasks' %}active{% endif %}">
-                <i class="fas fa-tasks"></i> Manage Tasks
-            </a>
 
             <div class="sidebar-divider"></div>
             <div class="sidebar-section-label">Reports</div>
@@ -268,9 +266,6 @@
             </a>
             <a href="/admin_software" class="sidebar-item {% if request.path == '/admin_software' %}active{% endif %}">
                 <i class="fas fa-boxes"></i> Software List
-            </a>
-            <a href="/community" class="sidebar-item {% if request.path == '/community' %}active{% endif %}">
-                <i class="fas fa-users"></i> Community Hub
             </a>
             <a href="#" class="sidebar-item" id="sb-pc-mgmt">
                 <i class="fas fa-laptop-medical"></i> PC Maintenance
@@ -300,8 +295,8 @@
 
             {% if role == 'admin' %}
             <div class="rankings-tabs">
-                <a href="/admin_award_points" class="rankings-tab">Award Points</a>
-                <a href="/admin_manage_tasks" class="rankings-tab">Manage Tasks</a>
+                <a href="/leaderboard?tab=award" class="rankings-tab">Award Points</a>
+                <a href="/leaderboard?tab=tasks" class="rankings-tab">Manage Tasks</a>
                 <a href="/leaderboard" class="rankings-tab active">View Rankings</a>
             </div>
             {% endif %}

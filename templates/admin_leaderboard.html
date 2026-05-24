@@ -12,7 +12,7 @@
     
     <style>
         body.admin-page { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; padding-top: 0 !important; }
-        .admin-container { padding: 80px 40px 50px !important; }
+        .admin-container { display: block !important; padding: 0 40px 50px !important; width: 100% !important; max-width: 1600px !important; margin: 54px auto 0 !important; box-sizing: border-box !important; }
         
         /* Tab Navigation */
         .admin-tabs { display: flex; gap: 10px; margin-bottom: 25px; background: #fff; padding: 10px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
@@ -108,6 +108,35 @@
         .lb-search input { padding: 10px 15px 10px 40px; border-radius: 12px; border: 1.5px solid #e2e8f0; outline: none; font-size: 14px; width: 260px; font-family: inherit; transition: all 0.2s; }
         .lb-search input:focus { border-color: #1b4f8a; box-shadow: 0 0 0 4px rgba(27,79,138,0.05); }
         .lb-search i { position: absolute; left: 14px; top: 13px; color: #94a3b8; }
+
+        /* ══════════════════════════════════════════
+           MOBILE RESPONSIVE
+        ══════════════════════════════════════════ */
+        @media (max-width: 768px) {
+            .admin-container { padding: 0 16px 30px !important; }
+            .leaderboard-card { padding: 20px 14px; }
+            .lb-header h1 { font-size: 24px; }
+            .podium-section { gap: 12px; flex-wrap: wrap; justify-content: center; }
+            .podium-card { width: 220px; padding: 20px 14px; }
+            .podium-avatar { width: 70px; height: 70px; }
+            .gold-card .podium-avatar { width: 85px; height: 85px; }
+            .podium-name { font-size: 14px; }
+            .lb-table { font-size: 12px; }
+            .lb-table th, .lb-table td { padding: 8px 8px; }
+            .lb-controls { flex-direction: column; align-items: stretch; }
+            .lb-search input { width: 100%; }
+            .admin-tabs { flex-wrap: wrap; justify-content: center; }
+            .admin-tab { flex: 1 1 auto; text-align: center; justify-content: center; font-size: 13px; padding: 10px 15px; }
+        }
+        @media (max-width: 480px) {
+            .admin-container { padding: 0 8px 20px !important; }
+            .leaderboard-card { padding: 14px 10px; }
+            .lb-header h1 { font-size: 20px; }
+            .lb-header p { font-size: 12px; }
+            .legend-bar { gap: 10px; }
+            .legend-item { font-size: 11px; }
+            .admin-tab { width: 100%; }
+        }
     </style>
 </head>
 <body class="admin-page">
@@ -165,7 +194,7 @@
             <a href="/admin_feedbacks" class="sidebar-item"><i class="fas fa-comments"></i> Feedback Reports</a>
             <div class="sidebar-divider"></div>
             <div class="sidebar-section-label">General</div>
-            <a href="/admin_leaderboard" class="sidebar-item active"><i class="fas fa-trophy"></i> Leaderboard</a>
+            <a href="/leaderboard" class="sidebar-item active"><i class="fas fa-trophy"></i> Leaderboard</a>
             <a href="/admin_software" class="sidebar-item"><i class="fas fa-boxes"></i> Software List</a>
             <a href="#" class="sidebar-item" id="sb-pc-mgmt"><i class="fas fa-laptop-medical"></i> PC Maintenance</a>
             <a href="#" class="sidebar-item" id="sb-ai"><i class="fas fa-robot"></i> AI Assistant</a>
@@ -483,6 +512,107 @@
                     <button id="executeSearchBtn" class="btn-primary">Search</button>
                 </div>
                 <div id="searchResults" style="display: none; background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PC MANAGEMENT MODAL -->
+    <div id="pcMgmtModal" class="modal">
+        <div class="modal-content glass-effect" style="max-width: 900px; max-height: 90vh; display: flex; flex-direction: column;">
+            <div class="modal-header">
+                <h2><i class="fas fa-laptop-medical"></i> PC Laboratory Maintenance</h2>
+                <button class="close-btn" id="closePcMgmtBtn">&times;</button>
+            </div>
+            <div class="modal-body" style="overflow-y: auto; max-height: calc(90vh - 130px);">
+                <div style="margin-bottom: 25px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <label for="labSelect" style="font-weight: 700; color: #475569; font-size: 14px;">Select Laboratory:</label>
+                        <select id="labSelect" onchange="loadPcStatuses()" style="padding: 10px 15px; border-radius: 8px; border: 1.5px solid #e2e8f0; outline: none; background: white; font-family: inherit; font-weight: 500;">
+                            <option value="Lab 524">Lab 524</option>
+                            <option value="Lab 526">Lab 526</option>
+                            <option value="Lab 528">Lab 528</option>
+                            <option value="Lab 530">Lab 530</option>
+                            <option value="Lab 542">Lab 542</option>
+                            <option value="Lab 544">Lab 544</option>
+                        </select>
+                    </div>
+                    <div style="font-size: 13px; color: #64748b; background: #f1f5f9; padding: 6px 14px; border-radius: 20px; border: 1px solid #e2e8f0;">
+                        <i class="fas fa-info-circle"></i> Click on a PC to toggle status.
+                    </div>
+                </div>
+
+                <div id="pcGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 15px; padding: 15px; background: #f8fafc; border-radius: 16px; border: 1px solid #e2e8f0; min-height: 300px;">
+                    <!-- PCs loaded via JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PC EDIT MODAL -->
+    <div id="editPcModal" class="modal">
+        <div class="modal-content glass-effect" style="max-width: 480px;">
+            <div class="modal-header">
+                <h2 id="editPcTitle"><i class="fas fa-edit"></i> Manage PC</h2>
+                <button class="close-btn" id="closeEditPcBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="editPcForm">
+                    <input type="hidden" id="editPcLab">
+                    <input type="hidden" id="editPcNumber">
+                    <div style="margin-bottom: 20px;">
+                        <label style="font-weight: 700; display: block; margin-bottom: 8px; color: #475569; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Condition / Status:</label>
+                        <select id="editPcStatus" style="width: 100%; padding: 12px; border-radius: 8px; border: 1.5px solid #e2e8f0; background: #fff; font-family: inherit;">
+                            <option value="Working">Working</option>
+                            <option value="Not Working">Not Working</option>
+                            <option value="Under Maintenance">Under Maintenance</option>
+                            <option value="No Internet Connection">No Internet Connection</option>
+                            <option value="Hardware Issue">Hardware Issue</option>
+                            <option value="Software Issue">Software Issue</option>
+                        </select>
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <label style="font-weight: 700; display: block; margin-bottom: 8px; color: #475569; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Availability:</label>
+                        <div style="display: flex; gap: 25px; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1.5px solid #e2e8f0;">
+                            <label style="cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 600; color: #334155;"><input type="radio" name="availability" value="Enabled" id="availEnabled"> Enabled</label>
+                            <label style="cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 600; color: #334155;"><input type="radio" name="availability" value="Disabled" id="availDisabled"> Disabled</label>
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <label style="font-weight: 700; display: block; margin-bottom: 8px; color: #475569; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Remarks / Notes:</label>
+                        <textarea id="editPcRemarks" style="width: 100%; height: 100px; padding: 12px; border-radius: 8px; border: 1.5px solid #e2e8f0; resize: none; font-family: inherit; font-size: 14px;" placeholder="Add details about the issue..."></textarea>
+                    </div>
+                    <p style="font-size: 12px; color: #94a3b8; margin-bottom: 25px; background: #f1f5f9; padding: 8px 12px; border-radius: 6px;">
+                        <i class="fas fa-clock"></i> Last Updated: <span id="editPcLastUpdated" style="font-weight: 600; color: #475569;">—</span>
+                    </p>
+                    <button type="submit" class="btn-post" style="width: 100%; height: 48px; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                        <i class="fas fa-save"></i> Update PC Status
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI ASSISTANT MODAL -->
+    <div id="aiModal" class="modal">
+        <div class="modal-content glass-effect" style="max-width: 650px; max-height: 90vh; display: flex; flex-direction: column;">
+            <div class="modal-header">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 1px solid rgba(255,255,255,0.3);">
+                        <i class="fas fa-robot" style="font-size: 18px;"></i>
+                    </div>
+                    <div>
+                        <h2 style="font-size: 18px !important;">CCS AI Assistant</h2>
+                        <p style="margin: 0; font-size: 11px; color: rgba(255,255,255,0.7); font-weight: 500;">Online Assistant</p>
+                    </div>
+                </div>
+                <button class="close-btn" id="closeAIBtn">&times;</button>
+            </div>
+            <div class="chat-container" style="flex: 1; border-radius: 0; border: none; height: auto; min-height: 400px;">
+                <div class="chat-messages" id="chatMessages" style="height: 400px; overflow-y: auto;"></div>
+                <form id="chatForm" class="chat-input-area">
+                    <input type="text" id="chatInput" placeholder="Ask about lab status..." autocomplete="off">
+                    <button type="submit" class="chat-send-btn"><i class="fas fa-paper-plane"></i></button>
+                </form>
             </div>
         </div>
     </div>
