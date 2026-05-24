@@ -1315,6 +1315,49 @@ document.getElementById('chatForm').onsubmit = function(e) {
     }).then(r => r.json()).then(data => appendMessage('ai', data.response || 'Error.'));
 };
 
+// Handle Reservation Form Submission
+const resForm = document.getElementById('reservationForm');
+if (resForm) {
+    resForm.onsubmit = function(e) {
+        e.preventDefault();
+        const btn = this.querySelector('.res-btn-submit');
+        const originalBtnHtml = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+        const formData = new FormData(this);
+        fetch('/submit_reservation', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('reservationModal').style.display = 'none';
+                document.getElementById('successLab').textContent = data.details.lab || 'N/A';
+                document.getElementById('successPc').textContent = data.details.pc || 'Any Available';
+                document.getElementById('successDate').textContent = data.details.date;
+                document.getElementById('successTime').textContent = data.details.time;
+                document.getElementById('resSuccessModal').style.display = 'flex';
+                this.reset();
+            } else {
+                alert(data.message || 'Reservation failed.');
+            }
+        })
+        .catch(err => {
+            console.error('Error:', err);
+            alert('An error occurred. Please try again.');
+        })
+        .finally(() => {
+            btn.disabled = false;
+            btn.innerHTML = originalBtnHtml;
+        });
+    };
+}
+
 // Notification Logic
 (function() {
     const fetchCount = () => {
