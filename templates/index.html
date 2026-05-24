@@ -180,74 +180,6 @@
         }
         .register-link a:hover { text-decoration: underline; }
 
-        /* ── ANNOUNCEMENT CARDS ── */
-        .announcement-section {
-            max-width: 1140px;
-            margin: 0 auto 44px;
-            padding: 0 20px;
-        }
-        .announcement-header {
-            display: flex;
-            align-items: flex-end;
-            justify-content: space-between;
-            gap: 16px;
-            margin-bottom: 22px;
-            flex-wrap: wrap;
-        }
-        .announcement-header h2 {
-            font-size: 26px;
-            color: #0d2b55;
-            margin: 0;
-        }
-        .announcement-header p {
-            color: #5a7190;
-            margin: 0;
-            max-width: 680px;
-        }
-        .announcement-grid {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 18px;
-        }
-        .announcement-card {
-            background: rgba(255,255,255,0.95);
-            border: 1px solid rgba(27, 79, 138, 0.12);
-            border-radius: 24px;
-            padding: 24px;
-            box-shadow: 0 20px 40px rgba(26, 57, 100, 0.08);
-        }
-        .announcement-card p {
-            color: #2c3e65;
-            line-height: 1.7;
-            margin: 0 0 14px;
-        }
-        .announcement-meta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            font-size: 13px;
-            color: #4a6c99;
-            align-items: center;
-        }
-        .announcement-meta span {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .announcement-empty {
-            padding: 28px;
-            border-radius: 22px;
-            background: rgba(255,255,255,0.95);
-            border: 1px solid rgba(27, 79, 138, 0.12);
-            color: #4a6c99;
-            text-align: center;
-        }
-        .announcement-empty i {
-            display: block;
-            font-size: 34px;
-            margin-bottom: 14px;
-            color: #1b4f8a;
-        }
 
         /* ── DIVIDER ── */
         .modal-divider {
@@ -308,31 +240,6 @@
         </div>
     </div>
 
-    <section class="announcement-section">
-        <div class="announcement-header">
-            <div>
-                <h2><i class="fas fa-bullhorn"></i> Latest Announcements</h2>
-                <p>See what the admin has posted recently for students and the community.</p>
-            </div>
-        </div>
-        <div class="announcement-grid">
-            {% if announcements %}
-                {% for ann in announcements %}
-                <article class="announcement-card">
-                    <div class="announcement-meta">
-                        <span><i class="fas fa-calendar-alt"></i> {{ ann['posted_date'] }}</span>
-                        <span><i class="fas fa-user-shield"></i> {{ ann['admin_name'] }}</span>
-                    </div>
-                    <p>{{ ann['message'] }}</p>
-                </article>
-                {% endfor %}
-            {% else %}
-                <div class="announcement-empty">
-                    <i class="fas fa-bullhorn"></i>
-                    <p>No announcements are available yet. Check back soon for updates from the admin.</p>
-                </div>
-            {% endif %}
-        </div>
     </section>
 
     <!-- ── LOGIN MODAL ── -->

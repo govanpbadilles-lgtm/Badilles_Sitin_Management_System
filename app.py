@@ -15,8 +15,8 @@ USE_PG = bool(DATABASE_URL)
 PH     = '%s' if USE_PG else '?'   # SQL placeholder
 
 if USE_PG:
-    import psycopg2
-    import psycopg2.extras
+    import psycopg2 # pyright: ignore[reportMissingModuleSource]
+    import psycopg2.extras # pyright: ignore[reportMissingModuleSource]
 else:
     import sqlite3
 
@@ -362,15 +362,7 @@ def home():
         else:
             return redirect(url_for('dashboard'))
 
-    conn = get_db_connection()
-    cur  = conn.cursor()
-    cur.execute(
-        f"SELECT id, admin_name, message, {sql_date('date_posted')} AS posted_date "
-        f"FROM announcements ORDER BY date_posted DESC LIMIT 3"
-    )
-    announcements = cur.fetchall()
-    conn.close()
-    return render_template('index.html', announcements=announcements)
+    return render_template('index.html')
 
 
 @app.route('/about')
@@ -1214,7 +1206,7 @@ def leaderboard():
                 COUNT(s.id) AS total_sitins,
                 COALESCE(SUM(CASE WHEN s.time_out IS NOT NULL
                     THEN EXTRACT(EPOCH FROM (s.time_out - s.time_in)) / 3600 ELSE 0 END), 0) AS total_hours,
-                COUNT(CASE WHEN s.feedback != '' AND s.feedback IS NOT NULL THEN 1 END) AS tasks_completed
+                COALESCE(SUM(CASE WHEN s.feedback IS NOT NULL AND s.feedback != '' THEN 1 ELSE 0 END), 0) AS tasks_completed
             FROM users u
             LEFT JOIN sitin_records s ON u.id_number = s.id_number AND s.status = 'Completed'
             WHERE u.role = 'student'
@@ -1226,11 +1218,11 @@ def leaderboard():
                 COUNT(s.id) AS total_sitins,
                 COALESCE(SUM(CASE WHEN s.time_out IS NOT NULL
                     THEN (julianday(s.time_out)-julianday(s.time_in))*24 ELSE 0 END),0) AS total_hours,
-                COUNT(CASE WHEN s.feedback != '' AND s.feedback IS NOT NULL THEN 1 END) AS tasks_completed
+                COALESCE(SUM(CASE WHEN s.feedback IS NOT NULL AND s.feedback != '' THEN 1 ELSE 0 END),0) AS tasks_completed
             FROM users u
             LEFT JOIN sitin_records s ON u.id_number = s.id_number AND s.status = 'Completed'
             WHERE u.role = 'student'
-            GROUP BY u.id
+            GROUP BY u.id, u.id_number, u.firstname, u.lastname, u.course, u.profile_pic
         """)
     students = cur.fetchall()
     conn.close()
