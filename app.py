@@ -264,6 +264,12 @@ def init_db():
 def seed_pcs():
     conn = get_db_connection()
     cur  = conn.cursor()
+    # Check if we already have PCs
+    cur.execute("SELECT COUNT(*) as count FROM lab_pcs")
+    if cur.fetchone()['count'] > 0:
+        conn.close()
+        return
+
     labs = ['Lab 524', 'Lab 526', 'Lab 528', 'Lab 530', 'Lab 542', 'Lab 544']
     for lab in labs:
         for i in range(1, 51):
@@ -300,6 +306,12 @@ def create_default_admin():
 def seed_students():
     conn = get_db_connection()
     cur  = conn.cursor()
+    # Check if we already have students
+    cur.execute(f"SELECT COUNT(*) as count FROM users WHERE role = {PH}", ('student',))
+    if cur.fetchone()['count'] > 0:
+        conn.close()
+        return
+
     students = [
         ('23749626', 'Aranas',     'Maria Nina',        'A', '2nd Year', 'maria@gmail.com',    'BSIT',    'Cebu'),
         ('24963025', 'Taburnal',   'Emmanuel Brylle',   'B', '2nd Year', 'emman@gmail.com',    'BSCS',    'Cebu'),
@@ -327,7 +339,7 @@ def seed_students():
                 conn.rollback()
     conn.commit()
     conn.close()
-    print("10 students added!")
+    print("Seeded students if missing!")
 
 
 init_db()
@@ -803,7 +815,12 @@ def admin_dashboard():
     cur.execute("SELECT * FROM announcements ORDER BY date_posted DESC"); announcements = cur.fetchall()
     cur.execute("""
         SELECT s.*, u.firstname, u.lastname
-        FROM sitin_records s JOIN users u ON s.id_number = u.id_number
+        FROM sitin_records s 
+        LEFT JOIN (
+            SELECT id_number, MAX(firstname) as firstname, MAX(lastname) as lastname 
+            FROM users 
+            GROUP BY id_number
+        ) u ON s.id_number = u.id_number
         ORDER BY s.time_in DESC
     """); records = cur.fetchall()
 
@@ -874,7 +891,12 @@ def history():
     cur  = conn.cursor()
     cur.execute("""
         SELECT s.*, u.firstname, u.lastname
-        FROM sitin_records s JOIN users u ON s.id_number = u.id_number
+        FROM sitin_records s 
+        LEFT JOIN (
+            SELECT id_number, MAX(firstname) as firstname, MAX(lastname) as lastname 
+            FROM users 
+            GROUP BY id_number
+        ) u ON s.id_number = u.id_number
         ORDER BY s.time_in DESC
     """)
     records = cur.fetchall()
@@ -1246,6 +1268,8 @@ def submit_reservation():
             INSERT INTO reservations (id_number, res_date, res_lab, res_purpose, selected_pc, res_time)
             VALUES ({PH},{PH},{PH},{PH},{PH},{PH})
         """, (id_number, res_date, res_lab, res_purpose, selected_pc, res_time))
+        conn.commit() # Explicitly commit the reservation
+
         cur.execute(f"SELECT firstname, lastname FROM users WHERE id_number = {PH}", (id_number,))
         student = cur.fetchone()
         student_name = f"{student['firstname']} {student['lastname']}" if student else id_number
@@ -1425,9 +1449,15 @@ def admin_reservations():
         return redirect(url_for('home'))
     conn = get_db_connection()
     cur  = conn.cursor()
+    # Use a subquery to ensure we only get one user per id_number even if duplicates exist
     cur.execute("""
         SELECT r.*, u.firstname, u.lastname
-        FROM reservations r JOIN users u ON r.id_number = u.id_number
+        FROM reservations r 
+        LEFT JOIN (
+            SELECT id_number, MAX(firstname) as firstname, MAX(lastname) as lastname 
+            FROM users 
+            GROUP BY id_number
+        ) u ON r.id_number = u.id_number
         ORDER BY r.id DESC
     """)
     records = cur.fetchall()
